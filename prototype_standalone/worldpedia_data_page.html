@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorldPedia — World Data & Insights</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --ink:#0f1117; --ink-light:#2d3142; --cream:#f5f2ec; --cream-dark:#ede8df;
+  --red:#c8102e; --gold:#b8944a; --blue:#1a4aad; --green:#1a7a4a;
+  --muted:#6b7280; --border:#d4cfc5; --white:#fff;
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Source Serif 4',Georgia,serif;
+  --font-mono:'DM Mono','Courier New',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased;}
+a{color:var(--red);text-decoration:none;}
+h1,h2,h3,h4{font-family:var(--font-display);line-height:1.1;}
+
+/* Nav */
+.nav{position:fixed;top:0;left:0;right:0;height:60px;background:var(--white);border-bottom:2px solid var(--ink);z-index:100;display:flex;align-items:center;padding:0 2rem;gap:1.5rem;}
+.nav-brand{font-family:var(--font-display);font-size:1.4rem;font-weight:900;color:var(--ink);}
+.nav-brand span{color:var(--red);}
+.nav-link{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:.25rem 0;border-bottom:2px solid transparent;}
+.nav-link.active{color:var(--red);border-color:var(--red);}
+.nav-div{flex:1;}
+
+/* Hero */
+.hero{min-height:55vh;background:var(--ink);display:flex;align-items:flex-end;padding:4rem 0 0;margin-top:60px;position:relative;overflow:hidden;}
+.hero-grid-bg{position:absolute;inset:0;background-image:
+  repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(255,255,255,.02) 60px,rgba(255,255,255,.02) 61px),
+  repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(255,255,255,.02) 60px,rgba(255,255,255,.02) 61px);}
+.hero-content{position:relative;z-index:1;padding:0 3rem 3.5rem;}
+.hero-eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin-bottom:1rem;display:flex;align-items:center;gap:.75rem;}
+.hero-eyebrow::before{content:'';display:inline-block;width:28px;height:1px;background:var(--red);}
+.hero h1{font-size:clamp(3rem,8vw,7rem);font-weight:900;color:var(--white);letter-spacing:-0.03em;line-height:.9;margin-bottom:1rem;}
+.hero h1 em{color:var(--red);font-style:normal;}
+.hero-sub{font-size:1.05rem;color:rgba(255,255,255,.5);max-width:540px;font-style:italic;margin-bottom:2.5rem;}
+
+/* Updated banner */
+.updated-banner{background:var(--white);border-bottom:1px solid var(--border);padding:.6rem 2rem;display:flex;align-items:center;gap:2rem;font-family:var(--font-mono);font-size:.68rem;color:var(--muted);overflow-x:auto;white-space:nowrap;}
+.updated-banner strong{color:var(--ink);}
+.banner-dot{width:5px;height:5px;background:var(--border);border-radius:50%;flex-shrink:0;}
+
+/* Container */
+.container{max-width:1200px;margin:0 auto;padding:0 2rem;}
+.section{padding:5rem 0;border-bottom:1px solid var(--border);}
+.section:last-child{border:none;}
+.section-accent{display:block;width:36px;height:4px;background:var(--red);margin-bottom:.65rem;}
+.section-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;letter-spacing:-0.02em;margin-bottom:.5rem;}
+.section-sub{color:var(--muted);font-style:italic;font-size:.95rem;}
+
+/* Leaderboard */
+.leaderboard{display:flex;flex-direction:column;gap:0;}
+.lb-item{display:grid;grid-template-columns:3rem 3rem 2fr 1fr 1fr 1fr 1fr;gap:1.25rem;align-items:center;padding:1.1rem 1.25rem;border-bottom:1px solid var(--border);transition:background .15s;cursor:pointer;}
+.lb-item:hover{background:var(--white);}
+.lb-item-header{background:var(--ink);color:rgba(255,255,255,.4);font-family:var(--font-mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border-radius:3px 3px 0 0;}
+.lb-item-header:hover{background:var(--ink);}
+.lb-rank{font-family:var(--font-display);font-size:1.4rem;font-weight:900;color:var(--cream-dark);text-align:center;}
+.lb-rank.gold-rank{color:#d4a017;}
+.lb-rank.silver-rank{color:#9ea3a8;}
+.lb-rank.bronze-rank{color:#a0654b;}
+.lb-flag{font-size:1.6rem;text-align:center;}
+.lb-country-name{font-family:var(--font-display);font-size:1.05rem;font-weight:700;}
+.lb-country-native{font-size:.78rem;color:var(--muted);font-style:italic;}
+.lb-stat{font-family:var(--font-mono);font-size:.82rem;}
+.lb-trend{font-size:.75rem;}
+.lb-trend.up{color:#1a7a4a;}
+.lb-trend.down{color:var(--red);}
+.lb-trend.flat{color:var(--muted);}
+
+/* Bar chart visual */
+.bar-viz{position:relative;height:6px;background:var(--cream-dark);border-radius:3px;overflow:hidden;}
+.bar-viz-fill{position:absolute;top:0;left:0;height:100%;border-radius:3px;transition:width 1.2s ease;}
+
+/* Stat cards row */
+.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-bottom:3rem;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:3px;padding:1.5rem;position:relative;overflow:hidden;}
+.stat-card::after{content:attr(data-emoji);position:absolute;right:.5rem;bottom:-.25rem;font-size:3.5rem;opacity:.08;line-height:1;}
+.stat-card-label{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;}
+.stat-card-value{font-family:var(--font-display);font-size:2rem;font-weight:900;line-height:1;margin-bottom:.3rem;}
+.stat-card-context{font-size:.82rem;color:var(--muted);}
+
+/* Charts */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+.chart-box{background:var(--white);border:1px solid var(--border);border-radius:3px;padding:1.75rem;}
+.chart-box-title{font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:.35rem;}
+.chart-box-sub{font-size:.82rem;color:var(--muted);margin-bottom:1.5rem;font-style:italic;}
+
+/* Wishlist trends */
+.wl-leaderboard{display:flex;flex-direction:column;gap:0;}
+.wl-item{display:grid;grid-template-columns:2.5rem 2.5rem 2fr 120px 80px;gap:1rem;align-items:center;padding:.9rem 1rem;border-bottom:1px solid var(--border);transition:background .15s;}
+.wl-item:hover{background:var(--white);}
+.wl-rank{font-family:var(--font-mono);font-size:.75rem;color:var(--muted);text-align:center;}
+.wl-rank-medal{font-size:1.1rem;text-align:center;}
+
+/* Type tabs */
+.type-tabs{display:flex;gap:.5rem;margin-bottom:1.75rem;flex-wrap:wrap;}
+.type-tab{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.5rem 1.1rem;border:1px solid var(--border);border-radius:2px;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted);}
+.type-tab.active{background:var(--ink);color:var(--white);border-color:var(--ink);}
+.type-tab:hover:not(.active){border-color:var(--ink);color:var(--ink);}
+
+/* World heat bar */
+.heat-row{display:flex;gap:.25rem;margin-bottom:.5rem;height:28px;}
+.heat-cell{flex:1;border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:rgba(255,255,255,.7);font-family:var(--font-mono);cursor:pointer;transition:opacity .2s;position:relative;}
+.heat-cell:hover{opacity:.85;}
+.heat-cell:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--white);font-size:.65rem;padding:.3rem .6rem;border-radius:3px;white-space:nowrap;z-index:10;}
+
+/* Footer */
+.wp-footer{background:var(--ink);color:rgba(255,255,255,.4);padding:2.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+.wp-footer-brand{font-family:var(--font-display);font-size:1.3rem;font-weight:900;color:var(--white);}
+.wp-footer-brand span{color:var(--red);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.fade-up{animation:fadeUp .6s ease both;}
+
+@media(max-width:900px){
+  .stat-cards{grid-template-columns:1fr 1fr;}
+  .chart-grid{grid-template-columns:1fr;}
+  .lb-item{grid-template-columns:2.5rem 2.5rem 1fr 1fr;gap:.75rem;}
+  .lb-stat:nth-child(5),.lb-stat:nth-child(6),.lb-stat:nth-child(7){display:none;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#" class="nav-brand">World<span>Pedia</span></a>
+  <div class="nav-div"></div>
+  <a href="#" class="nav-link">🌍 Countries</a>
+  <a href="#" class="nav-link active">📊 World Data</a>
+  <a href="#" class="nav-link">About</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">WorldPedia · Data & Insights</div>
+    <h1>The World<br>in <em>Numbers</em></h1>
+    <p class="hero-sub">Aggregated insights from WorldPedia data — most explored countries, wishlist trends, and cultural curiosity mapped globally.</p>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:3px;padding:.75rem 1.25rem;font-family:var(--font-mono);font-size:.72rem;color:rgba(255,255,255,.5);">
+        <span style="color:var(--red);font-size:1.2rem;font-weight:700;display:block;font-family:var(--font-display);">1</span>
+        Countries in database
+      </div>
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:3px;padding:.75rem 1.25rem;font-family:var(--font-mono);font-size:.72rem;color:rgba(255,255,255,.5);">
+        <span style="color:var(--red);font-size:1.2rem;font-weight:700;display:block;font-family:var(--font-display);">5,028</span>
+        User wishlists created
+      </div>
+      <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:3px;padding:.75rem 1.25rem;font-family:var(--font-mono);font-size:.72rem;color:rgba(255,255,255,.5);">
+        <span style="color:var(--red);font-size:1.2rem;font-weight:700;display:block;font-family:var(--font-display);">50</span>
+        Countries — milestone target
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="updated-banner">
+  <span><strong>Last updated:</strong> 17 Feb 2026</span>
+  <div class="banner-dot"></div>
+  <span>Traffic data refreshes daily · Wishlist data is anonymised & aggregated · No personal data shared</span>
+  <div class="banner-dot"></div>
+  <span>Currently 1 country · <strong>Data page fully activates at 50+ countries</strong> — full leaderboards, heatmaps and comparisons unlock then</span>
+</div>
+
+<div class="container">
+
+  <!-- ══ MOST POPULAR COUNTRIES ══════════════════════════════════════════ -->
+  <section class="section" id="popular">
+    <span class="section-accent"></span>
+    <h2 class="section-title">Most Explored Countries</h2>
+    <p class="section-sub" style="margin-bottom:2rem;">Ranked by total page visits — updated daily. Placeholder data shows how this will look at 50+ countries.</p>
+
+    <div style="background:rgba(200,16,46,.05);border:1px solid rgba(200,16,46,.15);border-radius:3px;padding:1rem 1.25rem;margin-bottom:2rem;display:flex;align-items:center;gap:.75rem;font-size:.85rem;color:var(--red);">
+      <i class="fa fa-circle-info fa-sm"></i>
+      <span>Sample data shown below — leaderboard fully populates once 50+ countries are live. Denmark is currently the only real entry.</span>
+    </div>
+
+    <div class="leaderboard">
+      <div class="lb-item lb-item-header">
+        <div>#</div><div>Flag</div><div>Country</div>
+        <div>Sessions (30d)</div><div>Avg. Time</div><div>Wishlist Adds</div><div>Trend</div>
+      </div>
+      <div id="lb-countries"></div>
+    </div>
+  </section>
+
+  <!-- ══ WISHLIST TRENDS ═════════════════════════════════════════════════ -->
+  <section class="section" id="wishlists">
+    <span class="section-accent"></span>
+    <h2 class="section-title">Global Wishlist Trends</h2>
+    <p class="section-sub" style="margin-bottom:2rem;">What the world wants to visit, read, and watch — aggregated from user wishlists.</p>
+
+    <div class="type-tabs" id="wl-tabs">
+      <div class="type-tab active" data-wl="visit">✈️ To Visit</div>
+      <div class="type-tab" data-wl="read">📚 To Read</div>
+      <div class="type-tab" data-wl="watch">🎬 To Watch</div>
+    </div>
+
+    <div class="wl-leaderboard" id="wl-list">
+      <div style="display:grid;grid-template-columns:2.5rem 2.5rem 2fr 120px 80px;gap:1rem;padding:.5rem 1rem;font-family:var(--font-mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);">
+        <div></div><div></div><div>Country / Item</div><div>Wishlist adds</div><div>This week</div>
+      </div>
+      <!-- Populated by JS -->
+    </div>
+  </section>
+
+  <!-- ══ CHARTS ══════════════════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-accent"></span>
+    <h2 class="section-title" style="margin-bottom:2rem;">Data Insights</h2>
+
+    <div class="stat-cards">
+      <div class="stat-card" data-emoji="🌍">
+        <div class="stat-card-label">Countries in Database</div>
+        <div class="stat-card-value">1 / 195</div>
+        <div class="stat-card-context">Target: 50 major countries</div>
+        <div style="margin-top:1rem;height:6px;background:var(--cream-dark);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:.5%;background:var(--red);border-radius:3px;"></div>
+        </div>
+      </div>
+      <div class="stat-card" data-emoji="✈️">
+        <div class="stat-card-label">Most Wishlisted (Visit)</div>
+        <div class="stat-card-value">🇩🇰 Denmark</div>
+        <div class="stat-card-context">834 users want to visit</div>
+      </div>
+      <div class="stat-card" data-emoji="📚">
+        <div class="stat-card-label">Most Read Books</div>
+        <div class="stat-card-value">The Little Mermaid</div>
+        <div class="stat-card-context">Hans Christian Andersen · 412 lists</div>
+      </div>
+      <div class="stat-card" data-emoji="🎬">
+        <div class="stat-card-label">Most Wishlisted Film</div>
+        <div class="stat-card-value">Another Round</div>
+        <div class="stat-card-context">Vinterberg · 2020 · 287 lists</div>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-box">
+        <div class="chart-box-title">Traffic Growth</div>
+        <div class="chart-box-sub">Monthly sessions — live since prototype launch</div>
+        <canvas id="growthChart" height="180"></canvas>
+      </div>
+      <div class="chart-box">
+        <div class="chart-box-title">Wishlist Distribution</div>
+        <div class="chart-box-sub">Breakdown of what users are saving</div>
+        <canvas id="wlChart" height="180"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ COMPLETION ROADMAP ═══════════════════════════════════════════════ -->
+  <section class="section">
+    <span class="section-accent"></span>
+    <h2 class="section-title">Countries Roadmap</h2>
+    <p class="section-sub" style="margin-bottom:2rem;">Tracking our progress toward the 50-country milestone. Data page fully unlocks at 50.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.75rem;" id="roadmap-grid"></div>
+  </section>
+
+</div>
+
+<footer class="wp-footer">
+  <div>
+    <div class="wp-footer-brand">World<span>Pedia</span></div>
+    <div style="font-size:.8rem;margin-top:.3rem;">All data aggregated &amp; anonymised. No personal data collected.</div>
+  </div>
+  <div style="font-family:var(--font-mono);font-size:.65rem;color:rgba(255,255,255,.25);max-width:300px;text-align:right;">
+    Data refreshes every 24 hours. Wishlist data is opt-in and anonymised before aggregation.
+  </div>
+</footer>
+
+<script>
+// ── Leaderboard data (sample for prototype) ─────────────────────────────
+const lbData = [
+  {flag:'🇩🇰',name:'Denmark',native:'Danmark',sessions:'31,204',time:'5:12',wishlist:834,trend:'up',real:true},
+  {flag:'🇯🇵',name:'Japan',native:'日本',sessions:'—',time:'—',wishlist:'—',trend:'flat'},
+  {flag:'🇫🇷',name:'France',native:'France',sessions:'—',time:'—',wishlist:'—',trend:'flat'},
+  {flag:'🇮🇹',name:'Italy',native:'Italia',sessions:'—',time:'—',wishlist:'—',trend:'flat'},
+  {flag:'🇬🇧',name:'United Kingdom',native:'United Kingdom',sessions:'—',time:'—',wishlist:'—',trend:'flat'},
+  {flag:'🇮🇳',name:'India',native:'भारत',sessions:'—',time:'—',wishlist:'—',trend:'flat'},
+  {flag:'🇧🇷',name:'Brazil',native:'Brasil',sessions:'—',time:'—',wishlist:'—',trend:'flat'},
+  {flag:'🇩🇪',name:'Germany',native:'Deutschland',sessions:'—',time:'—',wishlist:'—',trend:'flat'},
+  {flag:'🇲🇽',name:'Mexico',native:'México',sessions:'—',time:'—',wishlist:'—',trend:'flat'},
+  {flag:'🇰🇷',name:'South Korea',native:'대한민국',sessions:'—',time:'—',wishlist:'—',trend:'flat'},
+];
+const medals = ['🥇','🥈','🥉'];
+const rankClasses = ['gold-rank','silver-rank','bronze-rank'];
+const lbEl = document.getElementById('lb-countries');
+lbData.forEach((c,i)=>{
+  const trendHtml = c.trend==='up' ? '<span class="lb-trend up"><i class="fa fa-arrow-trend-up fa-xs"></i> Rising</span>' : '<span class="lb-trend flat">Coming soon</span>';
+  const row = document.createElement('div');
+  row.className = 'lb-item';
+  row.innerHTML = `
+    <div class="lb-rank ${rankClasses[i]||''}">${i<3?medals[i]:i+1}</div>
+    <div class="lb-flag">${c.flag}</div>
+    <div><div class="lb-country-name">${c.name} ${c.real?'<span style="font-family:var(--font-mono);font-size:.58rem;background:rgba(200,16,46,.1);color:var(--red);padding:.1rem .35rem;border-radius:2px;">Live</span>':''}</div><div class="lb-country-native">${c.native}</div></div>
+    <div class="lb-stat" style="color:${c.real?'var(--ink)':'var(--muted)'};">${c.sessions}</div>
+    <div class="lb-stat" style="color:${c.real?'var(--ink)':'var(--muted)'};">${c.time}</div>
+    <div class="lb-stat" style="color:${c.real?'var(--ink)':'var(--muted)'};">${c.wishlist}</div>
+    <div>${trendHtml}</div>
+  `;
+  lbEl.appendChild(row);
+});
+
+// ── Wishlist data ───────────────────────────────────────────────────────
+const wlData = {
+  visit: [
+    {flag:'🇩🇰',name:'Denmark',count:834,delta:'+42'},
+    {flag:'🇯🇵',name:'Japan',count:718,delta:'+61'},
+    {flag:'🇮🇹',name:'Italy',count:631,delta:'+38'},
+    {flag:'🇧🇷',name:'Brazil',count:448,delta:'+29'},
+    {flag:'🇮🇳',name:'India',count:397,delta:'+51'},
+    {flag:'🇬🇷',name:'Greece',count:362,delta:'+19'},
+    {flag:'🇵🇹',name:'Portugal',count:341,delta:'+33'},
+  ],
+  read: [
+    {flag:'🇩🇰',name:'The Complete Fairy Tales',sub:'Andersen · Denmark',count:412,delta:'+28'},
+    {flag:'🇩🇰',name:'Out of Africa',sub:'Blixen · Denmark',count:367,delta:'+21'},
+    {flag:'🇩🇰',name:'The Little Book of Hygge',sub:'Wiking · Denmark',count:289,delta:'+44'},
+    {flag:'🇩🇰',name:"Miss Smilla's Feeling for Snow",sub:'Høeg · Denmark',count:198,delta:'+15'},
+    {flag:'🇩🇰',name:'Either/Or',sub:'Kierkegaard · Denmark',count:142,delta:'+9'},
+  ],
+  watch: [
+    {flag:'🇩🇰',name:'Another Round (Druk)',sub:'Vinterberg · 2020',count:287,delta:'+39'},
+    {flag:'🇩🇰',name:'The Hunt (Jagten)',sub:'Vinterberg · 2012',count:254,delta:'+22'},
+    {flag:'🇩🇰',name:"Babette's Feast",sub:'Axel · 1987',count:198,delta:'+17'},
+    {flag:'🇩🇰',name:'Melancholia',sub:'von Trier · 2011',count:175,delta:'+14'},
+    {flag:'🇩🇰',name:'Borgen',sub:'Series · 2010',count:163,delta:'+31'},
+  ]
+};
+function renderWishlist(type){
+  const items = wlData[type];
+  const max = items[0].count;
+  const el = document.getElementById('wl-list');
+  const header = el.children[0];
+  el.innerHTML = '';
+  el.appendChild(header);
+  items.forEach((item,i)=>{
+    const pct = Math.round(item.count/max*100);
+    const row = document.createElement('div');
+    row.className = 'wl-item';
+    row.innerHTML = `
+      <div class="wl-rank">${i+1}</div>
+      <div class="wl-rank-medal">${['🥇','🥈','🥉'][i]||'  '}</div>
+      <div>
+        <div style="font-family:var(--font-display);font-size:.95rem;font-weight:700;">${item.name}</div>
+        ${item.sub?`<div style="font-size:.78rem;color:var(--muted);font-style:italic;">${item.sub}</div>`:''}
+        <div style="margin-top:.4rem;height:4px;background:var(--cream-dark);border-radius:2px;width:200px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:var(--red);border-radius:2px;transition:width 1s ease;"></div>
+        </div>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:.85rem;font-weight:500;">${item.count.toLocaleString()}</div>
+      <div style="font-family:var(--font-mono);font-size:.78rem;color:#1a7a4a;">${item.delta} this week</div>
+    `;
+    el.appendChild(row);
+  });
+}
+renderWishlist('visit');
+document.querySelectorAll('.type-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.type-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    renderWishlist(tab.dataset.wl);
+  });
+});
+
+// ── Charts ──────────────────────────────────────────────────────────────
+Chart.defaults.font.family = "'DM Mono', monospace";
+Chart.defaults.font.size = 10;
+Chart.defaults.color = '#6b7280';
+Chart.defaults.borderColor = '#d4cfc5';
+
+const months = ['Sep','Oct','Nov','Dec','Jan','Feb'];
+new Chart(document.getElementById('growthChart'),{
+  type:'line',
+  data:{
+    labels:months,
+    datasets:[{
+      label:'Sessions',
+      data:[1200,2800,5100,9400,22000,48300],
+      borderColor:'#c8102e',
+      backgroundColor:'rgba(200,16,46,.06)',
+      tension:.4,pointRadius:4,pointBackgroundColor:'#c8102e',fill:true,borderWidth:2
+    }]
+  },
+  options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(212,207,197,.5)'}},x:{grid:{display:false}}}}
+});
+
+new Chart(document.getElementById('wlChart'),{
+  type:'doughnut',
+  data:{
+    labels:['To Visit','To Read','To Watch'],
+    datasets:[{data:[2847,1203,978],backgroundColor:['#c8102e','#b8944a','#2d3142'],borderWidth:0,hoverOffset:6}]
+  },
+  options:{responsive:true,plugins:{legend:{position:'bottom',labels:{padding:16,usePointStyle:true}}},cutout:'62%'}
+});
+
+// ── Roadmap grid ─────────────────────────────────────────────────────────
+const roadmapCountries = [
+  {flag:'🇩🇰',name:'Denmark',status:'live'},
+  {flag:'🇬🇧',name:'UK',status:'next'},
+  {flag:'🇯🇵',name:'Japan',status:'next'},
+  {flag:'🇫🇷',name:'France',status:'planned'},
+  {flag:'🇩🇪',name:'Germany',status:'planned'},
+  {flag:'🇮🇳',name:'India',status:'planned'},
+  {flag:'🇮🇹',name:'Italy',status:'planned'},
+  {flag:'🇧🇷',name:'Brazil',status:'planned'},
+  {flag:'🇺🇸',name:'USA',status:'planned'},
+  {flag:'🇨🇳',name:'China',status:'planned'},
+  {flag:'🇪🇸',name:'Spain',status:'planned'},
+  {flag:'🇲🇽',name:'Mexico',status:'planned'},
+  {flag:'🇰🇷',name:'South Korea',status:'planned'},
+  {flag:'🇦🇺',name:'Australia',status:'planned'},
+  {flag:'🇨🇦',name:'Canada',status:'planned'},
+  {flag:'🇷🇺',name:'Russia',status:'planned'},
+  {flag:'🇹🇷',name:'Turkey',status:'planned'},
+  {flag:'🇦🇷',name:'Argentina',status:'planned'},
+  {flag:'🇳🇬',name:'Nigeria',status:'planned'},
+  {flag:'🇿🇦',name:'South Africa',status:'planned'},
+  {flag:'🇵🇹',name:'Portugal',status:'planned'},
+  {flag:'🇬🇷',name:'Greece',status:'planned'},
+  {flag:'🇵🇱',name:'Poland',status:'planned'},
+  {flag:'🇳🇱',name:'Netherlands',status:'planned'},
+  {flag:'🇸🇪',name:'Sweden',status:'planned'},
+];
+const colors = {live:'rgba(200,16,46,.08)',next:'rgba(184,148,74,.08)',planned:'transparent'};
+const borders = {live:'#c8102e',next:'#b8944a',planned:'#d4cfc5'};
+const labels = {live:'✓ Live',next:'→ Next',planned:'Planned'};
+const grid = document.getElementById('roadmap-grid');
+roadmapCountries.forEach(c=>{
+  const el = document.createElement('div');
+  el.style.cssText=`background:${colors[c.status]};border:1px solid ${borders[c.status]};border-radius:3px;padding:1rem;text-align:center;`;
+  el.innerHTML=`
+    <div style="font-size:1.8rem;margin-bottom:.4rem;">${c.flag}</div>
+    <div style="font-family:var(--font-display);font-size:.9rem;font-weight:700;margin-bottom:.35rem;">${c.name}</div>
+    <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:${borders[c.status]};">${labels[c.status]}</div>
+  `;
+  grid.appendChild(el);
+});
+// Fill remaining to 50
+for(let i=roadmapCountries.length;i<50;i++){
+  const el=document.createElement('div');
+  el.style.cssText=`background:transparent;border:1px dashed #d4cfc5;border-radius:3px;padding:1rem;text-align:center;opacity:.3;`;
+  el.innerHTML=`<div style="font-size:1.5rem;color:#d4cfc5;">+</div><div style="font-family:var(--font-mono);font-size:.6rem;color:#d4cfc5;margin-top:.3rem;">TBD</div>`;
+  grid.appendChild(el);
+}
+</script>
+</body>
+</html>

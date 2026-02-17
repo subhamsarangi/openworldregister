@@ -1,0 +1,475 @@
+{% extends "base.html" %}
+{% set c = country %}
+
+{% block title %}{{ c.name }} ({{ c.native_name }}){% endblock %}
+{% block meta_desc %}Everything about {{ c.name }} — culture, history, food, people, politics, travel and more.{% endblock %}
+
+{% block content %}
+
+<!-- ── Country Hero ──────────────────────────────────────────────────────── -->
+<section class="country-hero">
+  <div class="country-hero-pattern"></div>
+  <div class="country-hero-bg"></div>
+  <div class="country-hero-flag">{{ c.flag_emoji }}</div>
+  <div class="country-hero-content">
+    <div class="country-hero-eyebrow fade-up">
+      {{ c.continent }} &bull; {{ c.subregion }}
+    </div>
+    <h1 class="fade-up fade-up-d1">{{ c.name }}</h1>
+    <div class="country-hero-native fade-up fade-up-d2">{{ c.native_name }}</div>
+    <p class="country-hero-tagline fade-up fade-up-d3">{{ c.tagline }}</p>
+    <div class="country-hero-stats fade-up fade-up-d4">
+      <div class="hero-stat">
+        <span class="hero-stat-value">{{ "{:,.0f}".format(c.population|float) }}</span>
+        <span class="hero-stat-label">Population</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">{{ c.capital }}</span>
+        <span class="hero-stat-label">Capital</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">{{ "{:,.0f}".format(c.area_km2|float) }} km²</span>
+        <span class="hero-stat-label">Area</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">{{ c.currency }} ({{ c.currency_symbol }})</span>
+        <span class="hero-stat-label">Currency</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">{{ c.iso2 }} / {{ c.iso3 }}</span>
+        <span class="hero-stat-label">ISO Codes</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-value">${{ c.gdp_usd_billions }}B</span>
+        <span class="hero-stat-label">GDP (USD)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Section Navigation ────────────────────────────────────────────────── -->
+<nav class="section-nav">
+  <div class="section-nav-inner">
+    {% for item in [
+      ("overview","fa-flag","Overview"),
+      ("politics","fa-landmark","Politics"),
+      ("divisions","fa-map","Divisions"),
+      ("people","fa-user","People"),
+      ("festivals","fa-star","Festivals"),
+      ("food","fa-utensils","Food"),
+      ("attractions","fa-camera","Attractions"),
+      ("movies","fa-film","Films"),
+      ("books","fa-book","Books"),
+      ("products","fa-box","Shop")
+    ] %}
+    <div class="section-nav-item" data-target="{{ item[0] }}">
+      <i class="fa fa-{{ item[1] }} fa-xs"></i> {{ item[2] }}
+    </div>
+    {% endfor %}
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div class="container" style="max-width:1100px;">
+
+  <!-- ── § Overview: Flag, Map, Anthem, Languages ─────────────────────── -->
+  <section class="wp-section" data-section="overview">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Overview</h2>
+      </div>
+    </div>
+
+    <!-- Flag + Map -->
+    <div class="flag-map-grid" style="margin-bottom:2.5rem;">
+      <!-- Flag -->
+      <div class="flag-card">
+        <div class="flag-emoji-large">{{ c.flag_emoji }}</div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;text-align:center;margin-bottom:.35rem;">Flag of {{ c.name }}</div>
+          <div class="flag-description">
+            The Danish flag (Dannebrog) — a white Nordic cross on a red field — is the world's oldest national flag still in use, dating to 1370.
+          </div>
+        </div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+          <div style="text-align:center;">
+            <div style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Independence</div>
+            <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;">{{ c.independence_year }}</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Calling</div>
+            <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;">{{ c.calling_code }}</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">TZ</div>
+            <div style="font-family:var(--font-display);font-size:.9rem;font-weight:700;">{{ c.timezone }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div class="map-card" id="map-placeholder" data-lat="{{ c.lat }}" data-lng="{{ c.lng }}" data-name="{{ c.name }}" style="cursor:pointer;" title="Click to open in OpenStreetMap">
+        <div class="map-placeholder">
+          <i class="fa fa-map-location-dot" style="display:block;font-size:3rem;margin-bottom:.75rem;"></i>
+          <p style="font-family:var(--font-mono);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.35rem;">{{ c.name }}</p>
+          <p style="font-size:.8rem;opacity:.6;">{{ c.lat }}, {{ c.lng }}</p>
+          <p style="font-size:.75rem;margin-top:.75rem;opacity:.45;">Click to open in OpenStreetMap</p>
+          <p style="font-size:.72rem;margin-top:.35rem;color:var(--gold);font-family:var(--font-mono);">← Leaflet.js / Google Maps to be integrated</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- National Anthem -->
+    <div class="anthem-player" style="margin-bottom:2.5rem;">
+      <div class="anthem-icon" id="anthem-play-btn">
+        <i class="fa fa-play" style="margin-left:4px;"></i>
+      </div>
+      <div class="anthem-info">
+        <h3>Der er et yndigt land</h3>
+        <p style="color:rgba(255,255,255,.55);font-size:.9rem;">There is a lovely land &mdash; National Anthem of Denmark</p>
+        <div id="anthem-status" class="anthem-note">Click to play (prototype — YouTube/SoundCloud embed in production)</div>
+      </div>
+      <div style="margin-left:auto;text-align:right;">
+        <div style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);">Adopted</div>
+        <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:rgba(255,255,255,.6);">1835</div>
+      </div>
+    </div>
+
+    <!-- Languages -->
+    <div>
+      <h3 style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-bottom:1.25rem;">Languages</h3>
+      <div class="language-list">
+        {% for lang in languages %}
+        <div class="language-card">
+          <div class="language-name">{{ lang.language }}</div>
+          <div class="language-native">{{ lang.native_name }}</div>
+          <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);margin-bottom:.6rem;">
+            {{ lang.script }} script &bull; ~{{ lang.speakers_pct }}% speakers
+          </div>
+          <span class="language-badge {{ 'official' if lang.status == 'official' else '' }}">
+            {{ lang.status|replace('_',' ') }}
+          </span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── § Politics ─────────────────────────────────────────────────────── -->
+  <section class="wp-section" data-section="politics">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Politics</h2>
+      </div>
+      <a href="/country/{{ c.slug }}/history" class="wp-section-link">
+        Full History <i class="fa fa-arrow-right fa-xs"></i>
+      </a>
+    </div>
+    {% for pol in politics %}
+    <div class="politics-box">
+      <div class="politics-header">
+        <div class="politics-stat">
+          <span class="politics-stat-value">{{ pol.government_type if pol.government_type else pol.current_govt_type }}</span>
+          <span class="politics-stat-label">Government Type</span>
+        </div>
+        <div class="politics-stat">
+          <span class="politics-stat-value">{{ pol.head_of_govt }}</span>
+          <span class="politics-stat-label">{{ pol.head_of_govt_title }}</span>
+        </div>
+        <div class="politics-stat">
+          <span class="politics-stat-value">{{ pol.ruling_party }}</span>
+          <span class="politics-stat-label">Ruling Party</span>
+        </div>
+        <div class="politics-stat">
+          <span class="politics-stat-value">{{ pol.in_power_since }}</span>
+          <span class="politics-stat-label">In Power Since</span>
+        </div>
+        <div class="politics-stat">
+          <span class="politics-stat-value">{{ pol.parliament_name }}</span>
+          <span class="politics-stat-label">Parliament</span>
+        </div>
+        <div class="politics-stat">
+          <span class="politics-stat-value">{{ pol.parliament_seats }}</span>
+          <span class="politics-stat-label">Seats</span>
+        </div>
+        <div class="politics-stat">
+          <span class="politics-stat-value">{{ pol.next_election_year }}</span>
+          <span class="politics-stat-label">Next Election</span>
+        </div>
+      </div>
+      <div class="politics-body">
+        <div style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem;">Recent Political History</div>
+        <p class="politics-history-text">{{ pol.brief_history }}</p>
+        <span class="ideology-tag">{{ pol.ideology }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </section>
+
+  <!-- ── § Administrative Divisions ────────────────────────────────────── -->
+  <section class="wp-section" data-section="divisions">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Administrative Divisions</h2>
+      </div>
+      <a href="/country/{{ c.slug }}/divisions" class="wp-section-link">
+        Full List with Phonetics <i class="fa fa-arrow-right fa-xs"></i>
+      </a>
+    </div>
+
+    {% for dt in division_types %}
+    <div style="margin-bottom:2rem;">
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+        <h3 style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;">{{ dt.division_type }}s</h3>
+        <span style="font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;background:var(--cream-dark);padding:.25rem .6rem;border-radius:2px;">{{ dt.total_count }} total</span>
+        <p style="font-size:.88rem;color:var(--muted);flex:1;">{{ dt.description }}</p>
+      </div>
+      {% if dt.division_level == '1' %}
+      <div class="divisions-grid">
+        {% for div in divisions %}
+        <div class="division-card">
+          <div class="division-card-name">{{ div.name_official }}</div>
+          <div class="division-card-native">{{ div.name_native }}</div>
+          <div class="division-card-phonetic">🔊 {{ div.name_phonetic }}</div>
+          <div class="division-card-meta">
+            <div class="division-meta-item"><strong>{{ "{:,.0f}".format(div.population|float) }}</strong><br>population</div>
+            <div class="division-meta-item"><strong>{{ "{:,.0f}".format(div.area_km2|float) }} km²</strong><br>area</div>
+            <div class="division-meta-item"><strong>{{ div.capital }}</strong><br>capital</div>
+          </div>
+          <div class="division-card-desc">{{ div.description }}</div>
+          <a href="/country/{{ c.slug }}/division/{{ div.slug }}" class="btn-division">
+            Explore Region <i class="fa fa-arrow-right fa-xs"></i>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+
+  <!-- ── § Notable People ───────────────────────────────────────────────── -->
+  <section class="wp-section" data-section="people">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Notable People</h2>
+      </div>
+    </div>
+    <div class="persons-grid">
+      {% for person in persons %}
+      <div class="person-card">
+        <div class="person-avatar">
+          <i class="fa fa-user" style="color:var(--border);"></i>
+        </div>
+        <div class="person-name">{{ person.name }}</div>
+        <div class="person-years">
+          {{ person.birth_year }}{% if person.death_year %} – {{ person.death_year }}{% endif %}
+        </div>
+        <div class="person-subcategory">{{ person.subcategory }}</div>
+        <div class="person-desc">{{ person.description }}</div>
+        {% if person.notable_works %}
+        <div style="margin-top:.75rem;font-family:var(--font-mono);font-size:.68rem;color:var(--gold);">
+          Notable: {{ person.notable_works.split(';')[0] }}{% if person.notable_works.split(';')|length > 1 %} + {{ person.notable_works.split(';')|length - 1 }} more{% endif %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ── § Festivals ────────────────────────────────────────────────────── -->
+  <section class="wp-section" data-section="festivals">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Festivals & Celebrations</h2>
+      </div>
+    </div>
+    <div class="cards-grid">
+      {% set festival_icons = {"Cultural-Religious":"🕯️","Cultural":"🎉","Music":"🎵","Arts":"🎨"} %}
+      {% for fest in festivals %}
+      <div class="wp-card">
+        <div class="wp-card-img" style="font-size:3.5rem;">
+          {{ festival_icons.get(fest.type, "🎊") }}
+        </div>
+        <div class="wp-card-body">
+          <div class="wp-card-category">{{ fest.type }}</div>
+          <div class="wp-card-title">{{ fest.name }}</div>
+          <div class="wp-card-text">{{ fest.description }}</div>
+          <div class="wp-card-meta">
+            <span><i class="fa fa-calendar fa-xs"></i> Month {{ fest.month }}</span>
+            <span><i class="fa fa-clock fa-xs"></i> {{ fest.duration_days }} day{{ 's' if fest.duration_days|int > 1 else '' }}</span>
+            {% if fest.is_public_holiday == 'yes' %}<span style="color:var(--red);">🏛 Public holiday</span>{% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ── § Food ──────────────────────────────────────────────────────────── -->
+  <section class="wp-section" data-section="food">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Food & Cuisine</h2>
+      </div>
+    </div>
+    {% set food_emojis = {"smorrebrod":"🥪","flæskesteg":"🍖","æbleskiver":"🧇","rugbrod":"🍞","wienerbroed":"🥐","stegt-flæsk":"🥓","frikadeller":"🍳","risalamande":"🍚","new-nordic":"🌿","hotdog":"🌭"} %}
+    <div class="foods-grid">
+      {% for food in foods %}
+      <div class="food-card">
+        <div class="food-card-emoji">
+          {{ food_emojis.get(food.slug, "🍽️") }}
+        </div>
+        <div class="food-card-body">
+          <div class="food-card-name">{{ food.name }}</div>
+          <div class="food-card-native">{{ food.native_name }}</div>
+          <div class="food-card-desc">{{ food.description }}</div>
+          <div style="display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap;">
+            {% if food.is_iconic == 'yes' %}
+            <span class="iconic-badge">⭐ Iconic</span>
+            {% endif %}
+            <span style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;background:var(--cream-dark);padding:.2rem .55rem;border-radius:2px;color:var(--muted);">{{ food.meal_type }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ── § Tourist Attractions ─────────────────────────────────────────── -->
+  <section class="wp-section" data-section="attractions">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Tourist Attractions</h2>
+      </div>
+    </div>
+    <div class="attractions-list">
+  {% for attr in attractions %}
+  <div class="attraction-card">
+    <div class="attraction-number">
+      {{ "%02d"|format(loop.index) }}
+    </div>
+    <div class="attraction-body">
+      <div class="attraction-title">{{ attr.name }}</div>
+      <div class="attraction-location">
+        <i class="fa fa-location-dot fa-xs"></i>
+        {{ attr.city }}
+      </div>
+      <div class="attraction-desc">{{ attr.description }}</div>
+      <div class="attraction-badges">
+        {% if attr.is_free == 'yes' %}
+          <span class="badge-free">Free Entry</span>
+        {% endif %}
+        {% if attr.unesco_listed == 'yes' %}
+          <span class="badge-unesco">UNESCO World Heritage</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+  </section>
+
+  <!-- ── § Films ────────────────────────────────────────────────────────── -->
+  <section class="wp-section" data-section="movies">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Notable Films</h2>
+      </div>
+    </div>
+    <div class="movies-grid">
+      {% set movie_emojis = {"babettes-feast":"🕯️","melancholia":"🪐","the-square":"🖼️","a-war":"🪖","borgen-the-film":"🏛️","jagten":"🎭","another-round":"🥃","riders-of-justice":"🚂"} %}
+      {% for movie in movies %}
+      <div class="movie-card">
+        <div class="movie-card-header">
+          <span style="font-size:4rem;position:relative;z-index:1;">{{ movie_emojis.get(movie.slug, "🎬") }}</span>
+          <span class="movie-year">{{ movie.year }}</span>
+        </div>
+        <div class="movie-card-body">
+          <div class="movie-card-title">{{ movie.name }}</div>
+          <div class="movie-card-director">dir. {{ movie.director }}</div>
+          <div class="movie-card-desc">{{ movie.description }}</div>
+          <div class="movie-card-awards">🏆 {{ movie.awards }}</div>
+          {% if movie.imdb_rating %}
+          <div class="movie-rating" style="margin-top:.5rem;">
+            <i class="fa fa-star fa-xs"></i> {{ movie.imdb_rating }} IMDb
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- ── § Books ────────────────────────────────────────────────────────── -->
+  <section class="wp-section" data-section="books">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Essential Books</h2>
+      </div>
+    </div>
+    <div class="books-grid">
+      {% for book in books %}
+      <div class="book-card">
+        <div class="book-card-title">{{ book.name }}</div>
+        <div class="book-card-author">{{ book.author }}</div>
+        <div class="book-card-year">{{ book.year }}</div>
+        <div class="book-card-desc">{{ book.description }}</div>
+        <a href="{{ book.amazon_link_placeholder }}" target="_blank" rel="noopener" class="btn-amazon">
+          <i class="fab fa-amazon fa-sm"></i> Find on Amazon
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    <p style="margin-top:1.5rem;font-family:var(--font-mono);font-size:.7rem;color:var(--muted);">* Amazon affiliate links. A small commission helps us stay free.</p>
+  </section>
+
+  <!-- ── § Products (Affiliate) ─────────────────────────────────────────── -->
+  <section class="wp-section" data-section="products">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">{{ c.name }} Products</h2>
+        <p style="color:var(--muted);font-style:italic;margin-top:.4rem;font-size:.9rem;">Curated Danish finds — affiliate links support this site.</p>
+      </div>
+    </div>
+    <div class="products-grid">
+      {% set product_emojis = {"Toys":"🧱","Luxury Goods":"💎","Home Decor":"🏺","Books":"📚","Food":"🍪","Furniture":"🪑"} %}
+      {% for prod in products %}
+      <div class="product-card">
+        <div style="font-size:2rem;margin-bottom:.25rem;">{{ product_emojis.get(prod.category,"🛍️") }}</div>
+        <div class="product-category">{{ prod.category }}</div>
+        <div class="product-name">{{ prod.name }}</div>
+        <div class="product-desc">{{ prod.description }}</div>
+        <div class="product-price">{{ prod.price_range }}</div>
+        <a href="{{ prod.amazon_link_placeholder }}" target="_blank" rel="noopener" class="btn-amazon">
+          <i class="fab fa-amazon fa-sm"></i> View on Amazon
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    <p style="margin-top:1.5rem;font-family:var(--font-mono);font-size:.7rem;color:var(--muted);">* Amazon affiliate links. As an Amazon Associate we earn from qualifying purchases.</p>
+  </section>
+
+</div><!-- /container -->
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Jinja2 filters not available — add enumerate polyfill
+(function(){
+  // Already handled server-side, this is a fallback comment
+})();
+</script>
+{% endblock %}

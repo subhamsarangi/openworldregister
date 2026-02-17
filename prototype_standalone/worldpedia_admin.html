@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorldPedia Admin — Analytics</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:       #080c12;
+  --surface:  #0d1320;
+  --surface2: #131c2e;
+  --border:   #1e2d45;
+  --accent:   #00d4ff;
+  --accent2:  #ff6b35;
+  --green:    #00e5a0;
+  --red:      #ff3d5a;
+  --gold:     #ffbe3d;
+  --text:     #e2e8f0;
+  --muted:    #4a6080;
+  --mono:     'JetBrains Mono', monospace;
+  --display:  'Syne', sans-serif;
+  --serif:    'Instrument Serif', Georgia, serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--mono);background:var(--bg);color:var(--text);min-height:100vh;display:flex;overflow-x:hidden;}
+
+/* Sidebar */
+.sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+.sidebar-brand{padding:1.5rem 1.25rem;border-bottom:1px solid var(--border);}
+.sidebar-brand-name{font-family:var(--display);font-size:1.1rem;font-weight:800;color:var(--text);}
+.sidebar-brand-name span{color:var(--accent);}
+.sidebar-brand-sub{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:.2rem;}
+.sidebar-section{padding:.75rem 1.25rem .35rem;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+.sidebar-item{display:flex;align-items:center;gap:.75rem;padding:.65rem 1.25rem;font-size:.75rem;color:var(--muted);cursor:pointer;transition:all .2s;border-left:3px solid transparent;text-decoration:none;}
+.sidebar-item:hover{color:var(--text);background:rgba(255,255,255,.03);}
+.sidebar-item.active{color:var(--accent);background:rgba(0,212,255,.06);border-color:var(--accent);}
+.sidebar-item i{width:16px;text-align:center;}
+.sidebar-bottom{margin-top:auto;padding:1rem 1.25rem;border-top:1px solid var(--border);}
+.online-badge{display:flex;align-items:center;gap:.5rem;font-size:.7rem;color:var(--green);}
+.online-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse-g 2s infinite;}
+@keyframes pulse-g{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* Main */
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:.9rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;position:sticky;top:0;z-index:50;}
+.topbar-title{font-family:var(--display);font-size:1.1rem;font-weight:700;}
+.topbar-right{display:flex;align-items:center;gap:1.25rem;}
+.topbar-date{font-size:.7rem;color:var(--muted);}
+.btn-export{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--accent);font-family:var(--mono);font-size:.7rem;padding:.4rem .9rem;border-radius:4px;cursor:pointer;letter-spacing:.05em;transition:all .2s;}
+.btn-export:hover{background:rgba(0,212,255,.2);}
+.range-tabs{display:flex;gap:.25rem;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:.2rem;}
+.range-tab{font-size:.68rem;padding:.3rem .6rem;border-radius:3px;cursor:pointer;color:var(--muted);transition:all .2s;}
+.range-tab.active{background:var(--accent);color:var(--bg);font-weight:600;}
+
+.content{padding:1.75rem 2rem;display:flex;flex-direction:column;gap:1.75rem;}
+
+/* KPI row */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.35rem;position:relative;overflow:hidden;transition:border-color .2s;}
+.kpi:hover{border-color:var(--accent);}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.kpi.blue::before{background:var(--accent);}
+.kpi.orange::before{background:var(--accent2);}
+.kpi.green::before{background:var(--green);}
+.kpi.gold::before{background:var(--gold);}
+.kpi-label{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;}
+.kpi-value{font-family:var(--display);font-size:2rem;font-weight:800;line-height:1;color:var(--text);}
+.kpi-delta{font-size:.7rem;margin-top:.5rem;display:flex;align-items:center;gap:.3rem;}
+.kpi-delta.up{color:var(--green);}
+.kpi-delta.down{color:var(--red);}
+.kpi-spark{position:absolute;bottom:0;right:0;opacity:.15;font-size:4rem;line-height:1;padding:.25rem .5rem;}
+
+/* Chart cards */
+.charts-row{display:grid;grid-template-columns:2fr 1fr;gap:1rem;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.35rem;}
+.chart-card-header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.25rem;}
+.chart-card-title{font-family:var(--display);font-size:.95rem;font-weight:700;}
+.chart-card-sub{font-size:.65rem;color:var(--muted);margin-top:.1rem;}
+.chart-wrap{position:relative;}
+
+/* Top countries table */
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.35rem;}
+.table-hdr{display:grid;grid-template-columns:1.5rem 2fr 1fr 1fr 1fr 1fr;gap:1rem;padding:.5rem .75rem;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);margin-bottom:.25rem;}
+.table-row{display:grid;grid-template-columns:1.5rem 2fr 1fr 1fr 1fr 1fr;gap:1rem;padding:.65rem .75rem;font-size:.75rem;border-radius:4px;transition:background .15s;align-items:center;}
+.table-row:hover{background:rgba(255,255,255,.03);}
+.table-rank{color:var(--muted);font-size:.7rem;}
+.table-rank.top{color:var(--gold);}
+.country-cell{display:flex;align-items:center;gap:.65rem;}
+.country-flag{font-size:1.25rem;}
+.country-name-cell{font-size:.8rem;font-weight:500;}
+.country-native{font-size:.65rem;color:var(--muted);}
+.bar-cell{display:flex;align-items:center;gap:.6rem;}
+.mini-bar{height:4px;border-radius:2px;background:var(--accent);opacity:.7;}
+.trend-up{color:var(--green);}
+.trend-down{color:var(--red);}
+.trend-flat{color:var(--muted);}
+
+/* SEO panel */
+.seo-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.seo-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.35rem;}
+.seo-score-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;}
+.seo-score-num{font-family:var(--display);font-size:2rem;font-weight:800;color:var(--green);}
+.seo-item{display:flex;align-items:center;justify-content:space-between;padding:.55rem 0;border-bottom:1px solid var(--border);font-size:.75rem;}
+.seo-item:last-child{border:none;}
+.seo-item-label{color:var(--muted);}
+.seo-item-val{font-weight:500;}
+.seo-item-status{font-size:.65rem;padding:.18rem .5rem;border-radius:2px;}
+.status-good{background:rgba(0,229,160,.12);color:var(--green);}
+.status-warn{background:rgba(255,190,61,.12);color:var(--gold);}
+.status-bad{background:rgba(255,61,90,.12);color:var(--red);}
+
+/* Keyword table */
+.kw-row{display:grid;grid-template-columns:2fr 80px 80px 80px 100px;gap:1rem;padding:.6rem .75rem;font-size:.73rem;border-radius:4px;align-items:center;}
+.kw-row:hover{background:rgba(255,255,255,.03);}
+.kw-hdr{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:.5rem .75rem;border-bottom:1px solid var(--border);display:grid;grid-template-columns:2fr 80px 80px 80px 100px;gap:1rem;margin-bottom:.25rem;}
+.diff-pill{font-size:.6rem;padding:.15rem .5rem;border-radius:10px;}
+.diff-easy{background:rgba(0,229,160,.12);color:var(--green);}
+.diff-med{background:rgba(255,190,61,.12);color:var(--gold);}
+.diff-hard{background:rgba(255,61,90,.12);color:var(--red);}
+
+/* Realtime */
+.realtime-row{display:flex;gap:1rem;align-items:stretch;}
+.realtime-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:1.35rem;flex:1;}
+.active-users-num{font-family:var(--display);font-size:3.5rem;font-weight:800;color:var(--accent);line-height:1;}
+.active-pulse{display:inline-flex;align-items:center;gap:.5rem;font-size:.7rem;color:var(--green);margin-top:.5rem;}
+.pulse-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse-g 1.5s infinite;}
+.page-list-item{display:flex;align-items:center;justify-content:space-between;padding:.55rem 0;border-bottom:1px solid var(--border);font-size:.73rem;}
+.page-list-item:last-child{border:none;}
+.page-url{color:var(--accent);font-size:.68rem;}
+.page-users{font-size:.8rem;font-weight:600;}
+
+/* Wishlist analytics */
+.wishlist-bars{display:flex;flex-direction:column;gap:.75rem;}
+.wl-bar-row{display:flex;align-items:center;gap:1rem;font-size:.75rem;}
+.wl-bar-label{width:120px;color:var(--muted);}
+.wl-bar-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.wl-bar-fill{height:100%;border-radius:4px;transition:width 1s ease;}
+.wl-bar-val{width:50px;text-align:right;font-size:.72rem;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-name">World<span>Pedia</span></div>
+    <div class="sidebar-brand-sub">Admin Dashboard</div>
+  </div>
+
+  <div class="sidebar-section">Analytics</div>
+  <a class="sidebar-item active"><i class="fa fa-chart-line"></i> Overview</a>
+  <a class="sidebar-item"><i class="fa fa-globe"></i> Countries</a>
+  <a class="sidebar-item"><i class="fa fa-magnifying-glass"></i> SEO</a>
+  <a class="sidebar-item"><i class="fa fa-users"></i> Users</a>
+  <a class="sidebar-item"><i class="fa fa-heart"></i> Wishlists</a>
+
+  <div class="sidebar-section">Content</div>
+  <a class="sidebar-item"><i class="fa fa-flag"></i> Manage Countries</a>
+  <a class="sidebar-item"><i class="fa fa-pen"></i> Articles</a>
+  <a class="sidebar-item"><i class="fa fa-link"></i> Affiliates</a>
+
+  <div class="sidebar-section">System</div>
+  <a class="sidebar-item"><i class="fa fa-gear"></i> Settings</a>
+  <a class="sidebar-item"><i class="fa fa-shield"></i> Robots & Sitemap</a>
+
+  <div class="sidebar-bottom">
+    <div class="online-badge"><span class="online-dot"></span> Live data · auto-refresh</div>
+    <div style="margin-top:.5rem;font-size:.65rem;color:var(--muted);">v0.1 prototype</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Analytics Overview</div>
+    <div class="topbar-right">
+      <div class="range-tabs">
+        <div class="range-tab">24h</div>
+        <div class="range-tab">7d</div>
+        <div class="range-tab active">30d</div>
+        <div class="range-tab">90d</div>
+        <div class="range-tab">1y</div>
+      </div>
+      <div class="topbar-date" id="live-date"></div>
+      <button class="btn-export"><i class="fa fa-download fa-xs"></i> Export CSV</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi blue">
+        <div class="kpi-label">Total Sessions</div>
+        <div class="kpi-value" id="kpi-sessions">48,291</div>
+        <div class="kpi-delta up"><i class="fa fa-arrow-trend-up fa-xs"></i> +18.4% vs prev period</div>
+        <div class="kpi-spark">📈</div>
+      </div>
+      <div class="kpi orange">
+        <div class="kpi-label">Unique Visitors</div>
+        <div class="kpi-value" id="kpi-users">31,047</div>
+        <div class="kpi-delta up"><i class="fa fa-arrow-trend-up fa-xs"></i> +12.1% vs prev period</div>
+        <div class="kpi-spark">👥</div>
+      </div>
+      <div class="kpi green">
+        <div class="kpi-label">Affiliate Revenue</div>
+        <div class="kpi-value" id="kpi-revenue">$842</div>
+        <div class="kpi-delta up"><i class="fa fa-arrow-trend-up fa-xs"></i> +31.6% vs prev period</div>
+        <div class="kpi-spark">💰</div>
+      </div>
+      <div class="kpi gold">
+        <div class="kpi-label">Avg. Session Duration</div>
+        <div class="kpi-value">4:38</div>
+        <div class="kpi-delta up"><i class="fa fa-arrow-trend-up fa-xs"></i> +0:42 vs prev period</div>
+        <div class="kpi-spark">⏱</div>
+      </div>
+    </div>
+
+    <!-- Traffic + Bounce Rate charts -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-card-title">Traffic — Sessions & Visitors</div>
+            <div class="chart-card-sub">30 days · organic + direct + referral</div>
+          </div>
+          <div style="display:flex;gap:1rem;font-size:.68rem;color:var(--muted);">
+            <span style="display:flex;align-items:center;gap:.3rem;"><span style="display:inline-block;width:10px;height:3px;background:var(--accent);border-radius:2px;"></span>Sessions</span>
+            <span style="display:flex;align-items:center;gap:.3rem;"><span style="display:inline-block;width:10px;height:3px;background:var(--accent2);border-radius:2px;"></span>Visitors</span>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="trafficChart" height="90"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <div>
+            <div class="chart-card-title">Traffic Sources</div>
+            <div class="chart-card-sub">30 days breakdown</div>
+          </div>
+        </div>
+        <div class="chart-wrap" style="display:flex;align-items:center;justify-content:center;"><canvas id="sourceChart" height="160" width="160"></canvas></div>
+        <div style="display:flex;flex-direction:column;gap:.4rem;margin-top:1rem;">
+          <div style="display:flex;justify-content:space-between;font-size:.7rem;"><span style="color:var(--accent);">● Organic Search</span><span>58%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:.7rem;"><span style="color:var(--accent2);">● Direct</span><span>22%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:.7rem;"><span style="color:var(--green);">● Social</span><span>12%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:.7rem;"><span style="color:var(--gold);">● Referral</span><span>8%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Countries Table -->
+    <div class="table-card">
+      <div class="chart-card-header">
+        <div>
+          <div class="chart-card-title">Top Countries by Traffic</div>
+          <div class="chart-card-sub">Most visited country pages · 30 days</div>
+        </div>
+        <div style="font-size:.68rem;color:var(--muted);">Will populate as more countries are added</div>
+      </div>
+      <div class="table-hdr">
+        <div>#</div><div>Country</div><div>Sessions</div><div>Avg. Duration</div><div>Bounce Rate</div><div>Revenue</div>
+      </div>
+      <div id="countries-table"></div>
+    </div>
+
+    <!-- Realtime + Wishlist analytics -->
+    <div class="realtime-row">
+      <div class="realtime-card" style="flex:0 0 260px;">
+        <div style="font-family:var(--display);font-size:.9rem;font-weight:700;margin-bottom:1rem;">Realtime</div>
+        <div class="active-users-num" id="active-users">47</div>
+        <div style="font-size:.68rem;color:var(--muted);margin-top:.2rem;">users on site right now</div>
+        <div class="active-pulse" style="margin-top:.5rem;"><span class="pulse-dot"></span> Live</div>
+        <hr style="border-color:var(--border);margin:1rem 0;">
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem;">Active Pages</div>
+        <div class="page-list-item"><div><div class="page-url">/country/denmark</div><div style="font-size:.68rem;color:var(--muted);margin-top:.1rem;">Denmark</div></div><div class="page-users">18</div></div>
+        <div class="page-list-item"><div><div class="page-url">/country/denmark/history</div><div style="font-size:.68rem;color:var(--muted);margin-top:.1rem;">History</div></div><div class="page-users">11</div></div>
+        <div class="page-list-item"><div><div class="page-url">/country/denmark/division/capital-region</div></div><div class="page-users">9</div></div>
+        <div class="page-list-item"><div><div class="page-url">/</div><div style="font-size:.68rem;color:var(--muted);margin-top:.1rem;">Homepage</div></div><div class="page-users">9</div></div>
+      </div>
+
+      <div class="realtime-card">
+        <div style="font-family:var(--display);font-size:.9rem;font-weight:700;margin-bottom:1rem;">Wishlist Analytics</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;">
+          <div style="text-align:center;padding:1rem;background:var(--bg);border-radius:4px;">
+            <div style="font-size:1.5rem;margin-bottom:.3rem;">✈️</div>
+            <div style="font-family:var(--display);font-size:1.5rem;font-weight:800;color:var(--accent);">2,847</div>
+            <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">To Visit</div>
+          </div>
+          <div style="text-align:center;padding:1rem;background:var(--bg);border-radius:4px;">
+            <div style="font-size:1.5rem;margin-bottom:.3rem;">📚</div>
+            <div style="font-family:var(--display);font-size:1.5rem;font-weight:800;color:var(--gold);">1,203</div>
+            <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">To Read</div>
+          </div>
+          <div style="text-align:center;padding:1rem;background:var(--bg);border-radius:4px;">
+            <div style="font-size:1.5rem;margin-bottom:.3rem;">🎬</div>
+            <div style="font-family:var(--display);font-size:1.5rem;font-weight:800;color:var(--accent2);">978</div>
+            <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">To Watch</div>
+          </div>
+        </div>
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.85rem;">Most Wishlisted Countries (To Visit)</div>
+        <div class="wishlist-bars">
+          <div class="wl-bar-row"><div class="wl-bar-label">🇩🇰 Denmark</div><div class="wl-bar-track"><div class="wl-bar-fill" style="width:82%;background:var(--accent);"></div></div><div class="wl-bar-val">834</div></div>
+          <div class="wl-bar-row"><div class="wl-bar-label">🇯🇵 Japan</div><div class="wl-bar-track"><div class="wl-bar-fill" style="width:71%;background:var(--accent);"></div></div><div class="wl-bar-val">718</div></div>
+          <div class="wl-bar-row"><div class="wl-bar-label">🇮🇹 Italy</div><div class="wl-bar-track"><div class="wl-bar-fill" style="width:62%;background:var(--accent);"></div></div><div class="wl-bar-val">631</div></div>
+          <div class="wl-bar-row"><div class="wl-bar-label">🇧🇷 Brazil</div><div class="wl-bar-track"><div class="wl-bar-fill" style="width:44%;background:var(--accent);"></div></div><div class="wl-bar-val">448</div></div>
+          <div class="wl-bar-row"><div class="wl-bar-label">🇮🇳 India</div><div class="wl-bar-track"><div class="wl-bar-fill" style="width:39%;background:var(--accent);"></div></div><div class="wl-bar-val">397</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO Panel -->
+    <div class="chart-card-header" style="margin-bottom:0;">
+      <div><div class="chart-card-title" style="font-size:1.1rem;">SEO Health</div></div>
+    </div>
+    <div class="seo-grid">
+      <div class="seo-card">
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;">Technical SEO</div>
+        <div class="seo-item"><span class="seo-item-label">Sitemap.xml</span><span class="seo-item-status status-good">Generated</span></div>
+        <div class="seo-item"><span class="seo-item-label">Robots.txt</span><span class="seo-item-status status-good">Configured</span></div>
+        <div class="seo-item"><span class="seo-item-label">Core Web Vitals (LCP)</span><span class="seo-item-status status-good">1.8s ✓</span></div>
+        <div class="seo-item"><span class="seo-item-label">Core Web Vitals (CLS)</span><span class="seo-item-status status-good">0.04 ✓</span></div>
+        <div class="seo-item"><span class="seo-item-label">Meta descriptions</span><span class="seo-item-status status-warn">48 / 51 pages</span></div>
+        <div class="seo-item"><span class="seo-item-label">Canonical tags</span><span class="seo-item-status status-good">All set</span></div>
+        <div class="seo-item"><span class="seo-item-label">Structured data (JSON-LD)</span><span class="seo-item-status status-warn">Partial</span></div>
+        <div class="seo-item"><span class="seo-item-label">hreflang (i18n)</span><span class="seo-item-status status-bad">Not set</span></div>
+        <div class="seo-item"><span class="seo-item-label">Open Graph tags</span><span class="seo-item-status status-good">All set</span></div>
+        <div class="seo-item"><span class="seo-item-label">Mobile-friendly</span><span class="seo-item-status status-good">Pass ✓</span></div>
+      </div>
+      <div class="seo-card">
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;">Top Ranking Keywords</div>
+        <div class="kw-hdr"><div>Keyword</div><div>Position</div><div>Volume</div><div>CTR</div><div>Difficulty</div></div>
+        <div class="kw-row"><div>traditional foods of denmark</div><div style="color:var(--green);">#4</div><div>2,400</div><div>8.2%</div><div><span class="diff-pill diff-easy">Easy</span></div></div>
+        <div class="kw-row"><div>danish administrative regions</div><div style="color:var(--green);">#2</div><div>880</div><div>14.1%</div><div><span class="diff-pill diff-easy">Easy</span></div></div>
+        <div class="kw-row"><div>denmark festivals and holidays</div><div style="color:var(--gold);">#11</div><div>1,900</div><div>3.4%</div><div><span class="diff-pill diff-med">Medium</span></div></div>
+        <div class="kw-row"><div>notable people from denmark</div><div style="color:var(--green);">#6</div><div>1,200</div><div>6.8%</div><div><span class="diff-pill diff-easy">Easy</span></div></div>
+        <div class="kw-row"><div>best danish films</div><div style="color:var(--gold);">#15</div><div>3,600</div><div>2.1%</div><div><span class="diff-pill diff-med">Medium</span></div></div>
+        <div class="kw-row"><div>denmark travel guide</div><div style="color:var(--red);">#34</div><div>8,100</div><div>0.4%</div><div><span class="diff-pill diff-hard">Hard</span></div></div>
+        <div class="kw-row"><div>kronborg castle history</div><div style="color:var(--green);">#3</div><div>720</div><div>11.2%</div><div><span class="diff-pill diff-easy">Easy</span></div></div>
+        <div class="kw-row"><div>hygge meaning danish</div><div style="color:var(--gold);">#18</div><div>12,000</div><div>1.8%</div><div><span class="diff-pill diff-hard">Hard</span></div></div>
+      </div>
+    </div>
+
+    <!-- Affiliate Revenue Breakdown -->
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <div><div class="chart-card-title">Affiliate Revenue Breakdown</div><div class="chart-card-sub">30 days · by source</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;">
+        <div style="background:var(--bg);border-radius:4px;padding:1rem;">
+          <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem;">Amazon Books</div>
+          <div style="font-family:var(--display);font-size:1.4rem;font-weight:800;color:var(--text);">$312</div>
+          <div style="font-size:.68rem;color:var(--green);margin-top:.2rem;">↑ +22%</div>
+        </div>
+        <div style="background:var(--bg);border-radius:4px;padding:1rem;">
+          <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem;">Amazon Products</div>
+          <div style="font-family:var(--display);font-size:1.4rem;font-weight:800;color:var(--text);">$287</div>
+          <div style="font-size:.68rem;color:var(--green);margin-top:.2rem;">↑ +41%</div>
+        </div>
+        <div style="background:var(--bg);border-radius:4px;padding:1rem;">
+          <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem;">Flight Affiliate</div>
+          <div style="font-family:var(--display);font-size:1.4rem;font-weight:800;color:var(--text);">$178</div>
+          <div style="font-size:.68rem;color:var(--gold);margin-top:.2rem;">↑ +8%</div>
+        </div>
+        <div style="background:var(--bg);border-radius:4px;padding:1rem;">
+          <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.4rem;">Display Ads</div>
+          <div style="font-family:var(--display);font-size:1.4rem;font-weight:800;color:var(--text);">$65</div>
+          <div style="font-size:.68rem;color:var(--muted);margin-top:.2rem;">→ early stage</div>
+        </div>
+      </div>
+      <canvas id="revenueChart" height="60"></canvas>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// Live clock
+function updateClock(){
+  document.getElementById('live-date').textContent = new Date().toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(updateClock,1000); updateClock();
+
+// Simulate live active users
+let baseUsers = 47;
+setInterval(()=>{
+  baseUsers += Math.floor(Math.random()*5)-2;
+  baseUsers = Math.max(30, Math.min(80, baseUsers));
+  document.getElementById('active-users').textContent = baseUsers;
+},3000);
+
+// Range tabs
+document.querySelectorAll('.range-tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.range-tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+  });
+});
+
+// Sidebar items
+document.querySelectorAll('.sidebar-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    document.querySelectorAll('.sidebar-item').forEach(x=>x.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+// Countries table data
+const countries = [
+  {flag:'🇩🇰',name:'Denmark',native:'Danmark',sessions:'31,204',duration:'5:12',bounce:'28%',revenue:'$612',trend:'up'},
+  {flag:'🇬🇧',name:'United Kingdom',native:'United Kingdom',sessions:'—',duration:'—',bounce:'—',revenue:'—',trend:'flat',coming:true},
+  {flag:'🇯🇵',name:'Japan',native:'日本',sessions:'—',duration:'—',bounce:'—',revenue:'—',trend:'flat',coming:true},
+  {flag:'🇮🇳',name:'India',native:'भारत',sessions:'—',duration:'—',bounce:'—',revenue:'—',trend:'flat',coming:true},
+  {flag:'🇩🇪',name:'Germany',native:'Deutschland',sessions:'—',duration:'—',bounce:'—',revenue:'—',trend:'flat',coming:true},
+];
+
+const tableEl = document.getElementById('countries-table');
+countries.forEach((c,i)=>{
+  const row = document.createElement('div');
+  row.className = 'table-row';
+  const trendIcon = c.trend === 'up' ? '<i class="fa fa-arrow-trend-up fa-xs trend-up"></i>' : '<span class="trend-flat">—</span>';
+  const comingBadge = c.coming ? '<span style="font-size:.58rem;background:rgba(255,190,61,.1);color:#ffbe3d;padding:.12rem .4rem;border-radius:2px;margin-left:.4rem;">coming soon</span>' : '';
+  row.innerHTML = `
+    <div class="table-rank ${i<3?'top':''}">${i+1}</div>
+    <div class="country-cell">
+      <span class="country-flag">${c.flag}</span>
+      <div><div class="country-name-cell">${c.name}${comingBadge}</div><div class="country-native">${c.native}</div></div>
+    </div>
+    <div class="bar-cell">
+      ${!c.coming ? `<div class="mini-bar" style="width:${80}px;"></div>` : ''}
+      <span>${c.sessions}</span>
+    </div>
+    <div>${c.duration}</div>
+    <div>${c.bounce}</div>
+    <div style="color:${c.revenue!=='—'?'#00e5a0':'#4a6080'}">${c.revenue} ${!c.coming?trendIcon:''}</div>
+  `;
+  tableEl.appendChild(row);
+});
+
+// Chart.js config
+Chart.defaults.color = '#4a6080';
+Chart.defaults.borderColor = '#1e2d45';
+Chart.defaults.font.family = "'JetBrains Mono', monospace";
+Chart.defaults.font.size = 10;
+
+// Traffic chart
+const days = Array.from({length:30},(_,i)=>{const d=new Date(2026,1,i+1);return `${d.getDate()}/${d.getMonth()+1}`;});
+const sessions = Array.from({length:30},(_,i)=>800+Math.floor(Math.random()*600)+i*30);
+const visitors = sessions.map(s=>Math.floor(s*0.65));
+new Chart(document.getElementById('trafficChart'),{
+  type:'line',
+  data:{
+    labels:days,
+    datasets:[
+      {label:'Sessions',data:sessions,borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.08)',tension:.4,pointRadius:0,borderWidth:2,fill:true},
+      {label:'Visitors',data:visitors,borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,.05)',tension:.4,pointRadius:0,borderWidth:2,fill:true}
+    ]
+  },
+  options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(30,45,69,.8)'},ticks:{maxTicksLimit:8}},y:{grid:{color:'rgba(30,45,69,.8)'}}}}
+});
+
+// Source donut
+new Chart(document.getElementById('sourceChart'),{
+  type:'doughnut',
+  data:{
+    labels:['Organic','Direct','Social','Referral'],
+    datasets:[{data:[58,22,12,8],backgroundColor:['#00d4ff','#ff6b35','#00e5a0','#ffbe3d'],borderWidth:0,hoverOffset:4}]
+  },
+  options:{responsive:false,plugins:{legend:{display:false}},cutout:'68%'}
+});
+
+// Revenue trend
+const revData = Array.from({length:30},(_,i)=>15+Math.floor(Math.random()*40)+i*1.2);
+new Chart(document.getElementById('revenueChart'),{
+  type:'bar',
+  data:{
+    labels:days,
+    datasets:[{label:'Revenue ($)',data:revData,backgroundColor:'rgba(0,212,255,.3)',borderColor:'#00d4ff',borderWidth:1,borderRadius:2}]
+  },
+  options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:8}},y:{grid:{color:'rgba(30,45,69,.8)'}}}}
+});
+</script>
+</body>
+</html>

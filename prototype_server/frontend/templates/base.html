@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}WorldPedia{% endblock %} — The World's Countries</title>
+  <meta name="description" content="{% block meta_desc %}Free access to comprehensive information on every country in the world.{% endblock %}">
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <!-- WorldPedia CSS -->
+  <link rel="stylesheet" href="/static/css/worldpedia.css">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- ── Navbar ──────────────────────────────────────────────────────────── -->
+  <nav class="wp-nav">
+    <a href="/" class="wp-nav-brand">World<span>Pedia</span></a>
+    <div class="wp-nav-divider"></div>
+    <a href="/" class="wp-nav-link {% if active_nav == 'home' %}active{% endif %}">
+      <i class="fa fa-globe"></i> Countries
+    </a>
+    <a href="#" class="wp-nav-link">About</a>
+    <div class="wp-nav-search">
+      <i class="fa fa-magnifying-glass fa-xs"></i>
+      <span>Search</span>
+    </div>
+  </nav>
+
+  <!-- ── Main Content ──────────────────────────────────────────────────────── -->
+  <main class="wp-page-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Footer ──────────────────────────────────────────────────────────── -->
+  <footer class="wp-footer">
+    <div>
+      <div class="wp-footer-brand">World<span>Pedia</span></div>
+      <div class="wp-footer-text" style="margin-top:.35rem;">Free knowledge about every country on Earth.</div>
+    </div>
+    <div class="wp-footer-affiliate">
+      * Some links are Amazon affiliate links. We earn a small commission at no extra cost to you. This helps us keep content free.
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/worldpedia.js"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

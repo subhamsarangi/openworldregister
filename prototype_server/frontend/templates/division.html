@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}{{ division.name_official }} — {{ country.name }}{% endblock %}
+
+{% block content %}
+<div style="background:var(--ink);padding:5rem 0 3rem;min-height:50vh;display:flex;align-items:flex-end;">
+  <div class="container">
+    <div style="font-family:var(--font-mono);font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin-bottom:.75rem;">
+      <a href="/" style="color:rgba(255,255,255,.35);">WorldPedia</a>
+      <span style="color:rgba(255,255,255,.2);margin:0 .5rem;">→</span>
+      <a href="/country/{{ country.slug }}" style="color:rgba(255,255,255,.35);">{{ country.name }}</a>
+      <span style="color:rgba(255,255,255,.2);margin:0 .5rem;">→</span>
+      <span style="color:var(--red);">{{ division.name_official }}</span>
+    </div>
+    <h1 style="font-family:var(--font-display);font-size:clamp(2.5rem,7vw,5.5rem);font-weight:900;color:var(--white);letter-spacing:-0.03em;line-height:.95;margin-bottom:.6rem;">
+      {{ division.name_official }}
+    </h1>
+    <div style="font-family:var(--font-display);font-style:italic;font-size:1.5rem;color:rgba(255,255,255,.35);margin-bottom:.5rem;">{{ division.name_native }}</div>
+    <div style="font-family:var(--font-mono);font-size:.85rem;color:var(--gold);">🔊 {{ division.name_phonetic }}</div>
+    <div style="display:flex;gap:2.5rem;margin-top:2rem;flex-wrap:wrap;">
+      {% for label, value in [("Capital", division.capital),("Population", "{:,.0f}".format(division.population|float)),("Area", "{:,.0f} km²".format(division.area_km2|float))] %}
+      <div>
+        <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--white);">{{ value }}</div>
+        <div style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);">{{ label }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-top:4rem;padding-bottom:5rem;max-width:1100px;">
+
+  <!-- Description -->
+  <div style="max-width:700px;margin-bottom:4rem;">
+    <p style="font-size:1.1rem;line-height:1.8;color:var(--ink-light);">{{ division.description }}</p>
+  </div>
+
+  <!-- Persons from this region -->
+  {% if persons %}
+  <section class="wp-section" style="border-top:1px solid var(--border);padding-top:3rem;">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Notable People</h2>
+      </div>
+    </div>
+    <div class="persons-grid">
+      {% for person in persons %}
+      <div class="person-card">
+        <div class="person-avatar"><i class="fa fa-user" style="color:var(--border);"></i></div>
+        <div class="person-name">{{ person.name }}</div>
+        <div class="person-years">{{ person.birth_year }}{% if person.death_year %} – {{ person.death_year }}{% endif %}</div>
+        <div class="person-subcategory">{{ person.subcategory }}</div>
+        <div class="person-desc">{{ person.description }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Festivals from this region -->
+  {% if festivals %}
+  <section class="wp-section">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Festivals</h2>
+      </div>
+    </div>
+    <div class="cards-grid">
+      {% for fest in festivals %}
+      <div class="wp-card">
+        <div class="wp-card-img">🎉</div>
+        <div class="wp-card-body">
+          <div class="wp-card-category">{{ fest.type }}</div>
+          <div class="wp-card-title">{{ fest.name }}</div>
+          <div class="wp-card-text">{{ fest.description }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Attractions from this region -->
+  {% if attractions %}
+  <section class="wp-section">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Attractions</h2>
+      </div>
+    </div>
+    <div class="attractions-list">
+      {% for i, attr in attractions|enumerate %}
+      <div class="attraction-card">
+        <div class="attraction-number">{{ "%02d"|format(i+1) }}</div>
+        <div class="attraction-body">
+          <div class="attraction-title">{{ attr.name }}</div>
+          <div class="attraction-location"><i class="fa fa-location-dot fa-xs"></i> {{ attr.city }}</div>
+          <div class="attraction-desc">{{ attr.description }}</div>
+          <div class="attraction-badges">
+            {% if attr.is_free == 'yes' %}<span class="badge-free">Free Entry</span>{% endif %}
+            {% if attr.unesco_listed == 'yes' %}<span class="badge-unesco">UNESCO</span>{% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Foods from this region -->
+  {% if foods %}
+  <section class="wp-section">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Food</h2>
+      </div>
+    </div>
+    <div class="foods-grid">
+      {% for food in foods %}
+      <div class="food-card">
+        <div class="food-card-emoji">🍽️</div>
+        <div class="food-card-body">
+          <div class="food-card-name">{{ food.name }}</div>
+          <div class="food-card-native">{{ food.native_name }}</div>
+          <div class="food-card-desc">{{ food.description }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Movies from this region -->
+  {% if movies %}
+  <section class="wp-section">
+    <div class="wp-section-header">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Films</h2>
+      </div>
+    </div>
+    <div class="movies-grid">
+      {% for movie in movies %}
+      <div class="movie-card">
+        <div class="movie-card-header" style="height:140px;">
+          <span style="font-size:3rem;">🎬</span>
+          <span class="movie-year">{{ movie.year }}</span>
+        </div>
+        <div class="movie-card-body">
+          <div class="movie-card-title">{{ movie.name }}</div>
+          <div class="movie-card-director">dir. {{ movie.director }}</div>
+          <div class="movie-card-desc">{{ movie.description }}</div>
+          <div class="movie-card-awards">🏆 {{ movie.awards }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Coming soon sections -->
+  <section style="padding:3rem 0;">
+    <div style="background:var(--white);border:1px dashed var(--border);border-radius:var(--radius);padding:2rem;text-align:center;opacity:.6;">
+      <div style="font-family:var(--font-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.5rem;">Coming Soon for {{ division.name_official }}</div>
+      <p style="color:var(--muted);font-size:.9rem;">Art · Sculptures · Events · Awards · Transportation · Articles · Products</p>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

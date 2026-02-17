@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% set c = country %}
+
+{% block title %}History of {{ c.name }}{% endblock %}
+
+{% block content %}
+<div style="background:var(--ink);padding:5rem 0 3rem;margin-top:0;">
+  <div class="container">
+    <div style="font-family:var(--font-mono);font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin-bottom:.75rem;">
+      <a href="/country/{{ c.slug }}" style="color:var(--red);">← {{ c.name }}</a>
+    </div>
+    <h1 style="font-family:var(--font-display);font-size:clamp(2.5rem,6vw,5rem);font-weight:900;color:var(--white);letter-spacing:-0.03em;margin-bottom:.5rem;">
+      History of {{ c.name }}
+    </h1>
+    <p style="color:rgba(255,255,255,.45);font-size:1rem;font-style:italic;">A chronological journey through {{ c.name }}'s defining moments</p>
+  </div>
+</div>
+
+<div class="container" style="padding-top:4rem;padding-bottom:5rem;max-width:900px;">
+
+  <!-- Coming: Gallery, Book Recs, YouTube Recs -->
+  <div style="display:flex;gap:1rem;margin-bottom:3rem;flex-wrap:wrap;">
+    <div style="flex:1;min-width:200px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;opacity:.5;">
+      <div style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;">Coming Soon</div>
+      <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;">📸 Historical Gallery</div>
+    </div>
+    <div style="flex:1;min-width:200px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;opacity:.5;">
+      <div style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;">Coming Soon</div>
+      <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;">📺 YouTube Documentaries</div>
+    </div>
+    <div style="flex:1;min-width:200px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;opacity:.5;">
+      <div style="font-family:var(--font-mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;">Coming Soon</div>
+      <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;">📚 History Book Recs</div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div style="margin-bottom:2rem;">
+    <div class="wp-section-title-accent"></div>
+    <h2 class="wp-section-title" style="margin-bottom:3rem;">Chronological Timeline</h2>
+  </div>
+
+  <ul class="timeline">
+    {% for event in history|sort(attribute='year') %}
+    <li class="timeline-item">
+      <div class="timeline-year">{{ event.year }}</div>
+      <div class="timeline-dot {{ 'critical' if event.significance == 'Critical' else '' }}"></div>
+      <div class="timeline-content">
+        <div class="timeline-era">{{ event.era }}</div>
+        <div class="timeline-title">{{ event.event_title }}</div>
+        <div class="timeline-desc">{{ event.description }}</div>
+        <div style="margin-top:.5rem;">
+          <span style="font-family:var(--font-mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .5rem;border-radius:2px;
+            background:{{ '#fce8e8' if event.significance == 'Critical' else '#fef3cd' if event.significance == 'High' else 'var(--cream-dark)' }};
+            color:{{ 'var(--red)' if event.significance == 'Critical' else 'var(--gold)' if event.significance == 'High' else 'var(--muted)' }};">
+            {{ event.significance }} significance
+          </span>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+
+</div>
+{% endblock %}

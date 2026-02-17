@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WorldPedia — Denmark 🇩🇰</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+<style>
+/* ─────────────────────────────────────────────────
+   WorldPedia — Nordic Editorial Design System
+   ───────────────────────────────────────────────── */
+:root {
+  --ink:       #0f1117;
+  --ink-light: #2d3142;
+  --cream:     #f5f2ec;
+  --cream-dark:#ede8df;
+  --red:       #c8102e;
+  --red-dark:  #9a0c22;
+  --gold:      #b8944a;
+  --muted:     #6b7280;
+  --border:    #d4cfc5;
+  --white:     #ffffff;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'Source Serif 4', Georgia, serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+  --nav-h: 64px;
+  --radius: 3px;
+  --shadow: 0 4px 24px rgba(15,17,23,.10);
+  --shadow-lg: 0 12px 48px rgba(15,17,23,.18);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--cream); color: var(--ink); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+h1,h2,h3,h4,h5,h6 { font-family: var(--font-display); line-height: 1.15; color: var(--ink); }
+a { color: var(--red); text-decoration: none; transition: color .2s; }
+a:hover { color: var(--red-dark); }
+
+/* Navbar */
+.wp-nav { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); background: var(--white); border-bottom: 2px solid var(--ink); z-index: 1000; display: flex; align-items: center; padding: 0 2rem; gap: 1.5rem; }
+.wp-nav-brand { font-family: var(--font-display); font-size: 1.5rem; font-weight: 900; color: var(--ink); letter-spacing: -0.02em; }
+.wp-nav-brand span { color: var(--red); }
+.wp-nav-divider { flex: 1; }
+.wp-nav-link { font-family: var(--font-mono); font-size: .72rem; font-weight: 400; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: .3rem 0; border-bottom: 2px solid transparent; transition: all .2s; }
+.wp-nav-link:hover { color: var(--ink); border-color: var(--red); text-decoration: none; }
+
+/* Hero */
+.country-hero { position: relative; min-height: 92vh; background: var(--ink); overflow: hidden; display: flex; align-items: flex-end; padding-top: var(--nav-h); }
+.country-hero-bg { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(200,16,46,.15) 0%, transparent 50%), linear-gradient(to top, rgba(15,17,23,.95) 0%, rgba(15,17,23,.3) 60%, transparent 100%); z-index: 1; }
+.country-hero-pattern { position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(255,255,255,.025) 80px, rgba(255,255,255,.025) 81px), repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(255,255,255,.025) 80px, rgba(255,255,255,.025) 81px); z-index: 0; }
+.country-hero-flag { position: absolute; right: -60px; top: 50%; transform: translateY(-50%); font-size: clamp(200px, 30vw, 380px); opacity: .1; z-index: 0; filter: blur(2px); user-select: none; }
+.country-hero-content { position: relative; z-index: 2; padding: 4rem 3rem; max-width: 900px; }
+.hero-eyebrow { font-family: var(--font-mono); font-size: .75rem; letter-spacing: .15em; text-transform: uppercase; color: var(--red); margin-bottom: 1rem; display: flex; align-items: center; gap: .75rem; }
+.hero-eyebrow::before { content: ''; display: inline-block; width: 32px; height: 1px; background: var(--red); }
+.country-hero h1 { font-size: clamp(3.5rem, 9vw, 7.5rem); font-weight: 900; color: var(--white); letter-spacing: -0.03em; line-height: .93; margin-bottom: .6rem; }
+.hero-native { font-family: var(--font-display); font-style: italic; font-size: clamp(1.2rem, 3vw, 2rem); color: rgba(255,255,255,.4); margin-bottom: .75rem; }
+.hero-tagline { font-size: 1.05rem; color: rgba(255,255,255,.65); max-width: 460px; margin-bottom: 2.5rem; font-style: italic; }
+.hero-stats { display: flex; flex-wrap: wrap; gap: 2rem; }
+.hero-stat { display: flex; flex-direction: column; }
+.hero-stat-value { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--white); line-height: 1; }
+.hero-stat-label { font-family: var(--font-mono); font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); margin-top: .2rem; }
+
+/* Section Nav */
+.section-nav { position: sticky; top: var(--nav-h); background: var(--white); border-bottom: 1px solid var(--border); z-index: 100; overflow-x: auto; scrollbar-width: none; }
+.section-nav::-webkit-scrollbar { display: none; }
+.section-nav-inner { display: flex; padding: 0 2rem; min-width: max-content; }
+.snav-item { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 1rem 1.1rem; border-bottom: 2px solid transparent; cursor: pointer; transition: all .2s; white-space: nowrap; display: flex; align-items: center; gap: .4rem; }
+.snav-item:hover { color: var(--ink); border-color: var(--border); }
+.snav-item.active { color: var(--red); border-color: var(--red); }
+
+/* Sections */
+.wp-section { padding: 4.5rem 0; border-bottom: 1px solid var(--border); }
+.wp-section:last-child { border-bottom: none; }
+.section-hdr { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem; }
+.section-accent { display: block; width: 36px; height: 4px; background: var(--red); margin-bottom: .6rem; }
+.section-title { font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 900; letter-spacing: -0.02em; }
+.section-more { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: .4rem; }
+.section-more:hover { color: var(--red); }
+
+/* Flag + Map */
+.flag-map-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
+.flag-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem; text-align: center; }
+.map-card { background: var(--ink-light); border-radius: var(--radius); overflow: hidden; min-height: 280px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity .2s; background: #1a1f2e; }
+.map-card:hover { opacity: .9; }
+
+/* Anthem */
+.anthem-player { background: var(--ink); border-radius: var(--radius); padding: 2.5rem; color: var(--white); display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+.anthem-btn { width: 72px; height: 72px; border: 2px solid rgba(255,255,255,.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; cursor: pointer; transition: all .3s; }
+.anthem-btn:hover { background: var(--red); border-color: var(--red); }
+
+/* Languages */
+.lang-grid { display: flex; flex-wrap: wrap; gap: 1rem; }
+.lang-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; min-width: 180px; flex: 1; }
+.lang-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; }
+.lang-badge { display: inline-block; font-family: var(--font-mono); font-size: .6rem; letter-spacing: .08em; text-transform: uppercase; padding: .2rem .55rem; border-radius: 2px; background: var(--cream-dark); color: var(--muted); margin-top: .4rem; }
+.lang-badge.official { background: var(--red); color: var(--white); }
+
+/* Politics */
+.pol-box { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.pol-header { background: var(--ink); padding: 1.5rem 2rem; display: flex; gap: 2rem; flex-wrap: wrap; }
+.pol-stat-value { font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--white); }
+.pol-stat-label { font-family: var(--font-mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); }
+
+/* Divisions */
+.div-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+.div-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; transition: all .25s; position: relative; overflow: hidden; }
+.div-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--red); transform: scaleY(0); transform-origin: bottom; transition: transform .25s; }
+.div-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.div-card:hover::before { transform: scaleY(1); }
+.div-name { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; }
+.div-native { font-style: italic; font-size: .88rem; color: var(--muted); }
+.div-phonetic { font-family: var(--font-mono); font-size: .75rem; color: var(--gold); margin: .25rem 0 .8rem; }
+
+/* Cards */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.5rem; }
+.wp-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all .25s; }
+.wp-card:hover { box-shadow: var(--shadow); transform: translateY(-3px); }
+.card-img-area { height: 160px; display: flex; align-items: center; justify-content: center; font-size: 4rem; background: linear-gradient(135deg, var(--cream-dark), var(--cream)); }
+.card-body { padding: 1.1rem; }
+.card-cat { font-family: var(--font-mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--red); margin-bottom: .4rem; }
+.card-title { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; margin-bottom: .4rem; line-height: 1.2; }
+.card-text { font-size: .82rem; color: var(--muted); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Persons */
+.persons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1.5rem; }
+.person-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; text-align: center; transition: all .25s; }
+.person-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.person-avatar { width: 72px; height: 72px; background: var(--cream-dark); border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; border: 2px solid var(--border); }
+.person-name { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; }
+.person-years { font-family: var(--font-mono); font-size: .68rem; color: var(--muted); margin: .2rem 0 .4rem; }
+.person-cat { font-family: var(--font-mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: var(--red); margin-bottom: .6rem; }
+.person-desc { font-size: .82rem; color: var(--muted); line-height: 1.6; }
+
+/* Foods */
+.foods-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+.food-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all .25s; }
+.food-card:hover { box-shadow: var(--shadow); }
+.food-emoji { height: 110px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; background: linear-gradient(135deg, var(--cream-dark), var(--cream)); }
+.food-body { padding: 1.1rem; }
+.food-name { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; }
+.food-native { font-style: italic; font-size: .82rem; color: var(--gold); margin-bottom: .5rem; }
+.food-desc { font-size: .82rem; color: var(--muted); line-height: 1.6; }
+.iconic-badge { display: inline-block; margin-top: .5rem; font-family: var(--font-mono); font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; background: var(--red); color: var(--white); padding: .18rem .5rem; border-radius: 2px; }
+
+/* Attractions */
+.attr-list { display: flex; flex-direction: column; gap: 1.25rem; }
+.attr-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; display: flex; gap: 1.75rem; align-items: flex-start; transition: all .25s; }
+.attr-card:hover { box-shadow: var(--shadow); }
+.attr-num { font-family: var(--font-display); font-size: 2.5rem; font-weight: 900; color: var(--cream-dark); line-height: 1; flex-shrink: 0; width: 52px; text-align: right; }
+.attr-title { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; margin-bottom: .2rem; }
+.attr-location { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--red); margin-bottom: .6rem; }
+.attr-desc { font-size: .88rem; color: var(--muted); line-height: 1.7; }
+.badge-free { background: #d1fae5; color: #065f46; font-family: var(--font-mono); font-size: .6rem; letter-spacing: .08em; text-transform: uppercase; padding: .18rem .5rem; border-radius: 2px; }
+.badge-unesco { background: #dbeafe; color: #1e40af; font-family: var(--font-mono); font-size: .6rem; letter-spacing: .08em; text-transform: uppercase; padding: .18rem .5rem; border-radius: 2px; }
+
+/* Movies */
+.movies-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1.5rem; }
+.movie-card { background: var(--ink); border-radius: var(--radius); overflow: hidden; transition: transform .25s; }
+.movie-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.movie-header { height: 180px; background: linear-gradient(135deg, #1a1f2e, #2d3142); display: flex; align-items: center; justify-content: center; font-size: 4.5rem; position: relative; overflow: hidden; }
+.movie-header::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,17,23,.8) 0%, transparent 60%); }
+.movie-year-tag { position: absolute; top: 1rem; right: 1rem; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .1em; background: rgba(0,0,0,.6); color: var(--gold); padding: .2rem .55rem; border-radius: 2px; z-index: 1; }
+.movie-body { padding: 1.25rem; }
+.movie-title { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: .2rem; line-height: 1.2; }
+.movie-director { font-size: .78rem; color: rgba(255,255,255,.4); margin-bottom: .6rem; }
+.movie-desc { font-size: .8rem; color: rgba(255,255,255,.6); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: .6rem; }
+.movie-award { font-family: var(--font-mono); font-size: .63rem; color: var(--gold); }
+.movie-rating { font-family: var(--font-mono); font-size: .72rem; color: var(--gold); margin-top: .4rem; }
+
+/* Books */
+.books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.25rem; }
+.book-card { background: var(--white); border: 1px solid var(--border); border-left: 5px solid var(--gold); border-radius: var(--radius); padding: 1.4rem; transition: all .25s; display: flex; flex-direction: column; }
+.book-card:hover { box-shadow: var(--shadow); transform: translateX(2px); }
+.book-title { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; }
+.book-author { font-style: italic; color: var(--muted); font-size: .88rem; }
+.book-year { font-family: var(--font-mono); font-size: .68rem; color: var(--muted); margin-bottom: .6rem; }
+.book-desc { font-size: .82rem; color: var(--muted); line-height: 1.65; flex: 1; }
+
+/* Products */
+.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1.25rem; }
+.product-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem; display: flex; flex-direction: column; gap: .6rem; transition: all .25s; }
+.product-card:hover { box-shadow: var(--shadow); }
+.product-cat { font-family: var(--font-mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.product-name { font-family: var(--font-display); font-size: 1rem; font-weight: 700; }
+.product-desc { font-size: .8rem; color: var(--muted); line-height: 1.6; flex: 1; }
+.product-price { font-family: var(--font-mono); font-size: .78rem; color: var(--gold); }
+
+/* Buttons */
+.btn-primary { display: inline-flex; align-items: center; gap: .5rem; background: var(--red); color: var(--white) !important; font-family: var(--font-mono); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; padding: .65rem 1.5rem; border-radius: var(--radius); transition: background .2s; }
+.btn-primary:hover { background: var(--red-dark); text-decoration: none; }
+.btn-amazon { display: inline-flex; align-items: center; gap: .5rem; background: #ff9900; color: var(--ink) !important; font-family: var(--font-mono); font-size: .68rem; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; padding: .45rem .9rem; border-radius: var(--radius); transition: background .2s; margin-top: auto; text-decoration: none; }
+.btn-amazon:hover { background: #e68900; }
+.btn-div { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--red); display: inline-flex; align-items: center; gap: .4rem; }
+
+/* Timeline */
+.timeline { position: relative; padding: 0; list-style: none; }
+.timeline::before { content: ''; position: absolute; left: 90px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+.tl-item { position: relative; display: flex; margin-bottom: 2.25rem; padding-left: 118px; }
+.tl-year { position: absolute; left: 0; top: 0; width: 80px; text-align: right; font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--red); }
+.tl-dot { position: absolute; left: 84px; top: .35rem; width: 12px; height: 12px; background: var(--red); border: 3px solid var(--cream); border-radius: 50%; box-shadow: 0 0 0 1px var(--red); }
+.tl-dot.crit { background: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.tl-content { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.4rem; flex: 1; }
+.tl-era { font-family: var(--font-mono); font-size: .62rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin-bottom: .3rem; }
+.tl-title { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; margin-bottom: .4rem; }
+.tl-desc { font-size: .86rem; color: var(--muted); line-height: 1.65; }
+
+/* Utilities */
+.container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+.wp-footer { background: var(--ink); color: rgba(255,255,255,.45); padding: 2.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; }
+.wp-footer-brand { font-family: var(--font-display); font-size: 1.3rem; font-weight: 900; color: var(--white); }
+.wp-footer-brand span { color: var(--red); }
+.ideology-tag { display: inline-block; margin-top: 1rem; font-family: var(--font-mono); font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; padding: .3rem .75rem; border: 1px solid var(--red); border-radius: 2px; color: var(--red); }
+
+/* Animations */
+@keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+.fade-up { animation: fadeUp .65s ease both; }
+.d1 { animation-delay: .1s; } .d2 { animation-delay: .2s; } .d3 { animation-delay: .3s; } .d4 { animation-delay: .4s; }
+@keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(200,16,46,.4); } 50% { box-shadow: 0 0 0 8px rgba(200,16,46,0); } }
+
+@media(max-width:768px){
+  .flag-map-grid { grid-template-columns: 1fr; }
+  .country-hero-content { padding: 2rem 1.25rem; }
+  .attr-card { flex-direction: column; }
+  .timeline::before { left: 46px; }
+  .tl-item { padding-left: 68px; }
+  .tl-year { width: 38px; font-size: .8rem; }
+  .tl-dot { left: 40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="wp-nav">
+  <a href="#" class="wp-nav-brand">World<span>Pedia</span></a>
+  <div class="wp-nav-divider"></div>
+  <a href="#" class="wp-nav-link">🌍 Countries</a>
+  <a href="#" class="wp-nav-link">About</a>
+  <div style="display:flex;align-items:center;gap:.5rem;border:1px solid var(--border);border-radius:var(--radius);padding:.3rem .7rem;font-family:var(--font-mono);font-size:.8rem;color:var(--muted);cursor:pointer;">
+    <i class="fa fa-magnifying-glass fa-xs"></i> Search
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="country-hero">
+  <div class="country-hero-pattern"></div>
+  <div class="country-hero-bg"></div>
+  <div class="country-hero-flag">🇩🇰</div>
+  <div class="country-hero-content">
+    <div class="hero-eyebrow fade-up">Europe &bull; Northern Europe</div>
+    <h1 class="fade-up d1">Denmark</h1>
+    <div class="hero-native fade-up d2">Danmark</div>
+    <p class="hero-tagline fade-up d3">The Land of Hygge &amp; Vikings</p>
+    <div class="hero-stats fade-up d4">
+      <div class="hero-stat"><span class="hero-stat-value">5,910,913</span><span class="hero-stat-label">Population</span></div>
+      <div class="hero-stat"><span class="hero-stat-value">Copenhagen</span><span class="hero-stat-label">Capital</span></div>
+      <div class="hero-stat"><span class="hero-stat-value">42,924 km²</span><span class="hero-stat-label">Area</span></div>
+      <div class="hero-stat"><span class="hero-stat-value">DKK (kr)</span><span class="hero-stat-label">Currency</span></div>
+      <div class="hero-stat"><span class="hero-stat-value">DK / DNK</span><span class="hero-stat-label">ISO Codes</span></div>
+      <div class="hero-stat"><span class="hero-stat-value">$404.2B</span><span class="hero-stat-label">GDP</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION NAV -->
+<nav class="section-nav">
+  <div class="section-nav-inner">
+    <div class="snav-item active" data-target="overview"><i class="fa fa-flag fa-xs"></i> Overview</div>
+    <div class="snav-item" data-target="politics"><i class="fa fa-landmark fa-xs"></i> Politics</div>
+    <div class="snav-item" data-target="divisions"><i class="fa fa-map fa-xs"></i> Divisions</div>
+    <div class="snav-item" data-target="people"><i class="fa fa-user fa-xs"></i> People</div>
+    <div class="snav-item" data-target="festivals"><i class="fa fa-star fa-xs"></i> Festivals</div>
+    <div class="snav-item" data-target="food"><i class="fa fa-utensils fa-xs"></i> Food</div>
+    <div class="snav-item" data-target="attractions"><i class="fa fa-camera fa-xs"></i> Attractions</div>
+    <div class="snav-item" data-target="history"><i class="fa fa-clock-rotate-left fa-xs"></i> History</div>
+    <div class="snav-item" data-target="movies"><i class="fa fa-film fa-xs"></i> Films</div>
+    <div class="snav-item" data-target="books"><i class="fa fa-book fa-xs"></i> Books</div>
+    <div class="snav-item" data-target="products"><i class="fa fa-box fa-xs"></i> Shop</div>
+  </div>
+</nav>
+
+<div class="container" style="padding-bottom:5rem;">
+
+<!-- ═══════════════ OVERVIEW ═══════════════════════════════════════════════ -->
+<section class="wp-section" id="sec-overview" data-section="overview">
+  <div class="section-hdr">
+    <div><span class="section-accent"></span><h2 class="section-title">Overview</h2></div>
+  </div>
+
+  <div class="flag-map-grid" style="margin-bottom:2.5rem;">
+    <div class="flag-card">
+      <div style="font-size:clamp(5rem,12vw,8rem);line-height:1;">🇩🇰</div>
+      <div>
+        <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:.35rem;">Dannebrog</div>
+        <div style="font-size:.88rem;color:var(--muted);font-style:italic;">The world's oldest national flag still in use — a white Nordic cross on red, dating to 1370. Legend says it fell from the sky during the Battle of Lyndanisse in 1219.</div>
+      </div>
+      <div style="display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;">
+        <div style="text-align:center;"><div style="font-family:var(--font-mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Independent</div><div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;">1849</div></div>
+        <div style="text-align:center;"><div style="font-family:var(--font-mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Calling</div><div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;">+45</div></div>
+        <div style="text-align:center;"><div style="font-family:var(--font-mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);">Timezone</div><div style="font-family:var(--font-display);font-size:.9rem;font-weight:700;">CET/CEST</div></div>
+      </div>
+    </div>
+    <div class="map-card" onclick="window.open('https://www.openstreetmap.org/?mlat=56.2639&mlon=9.5018#map=6/56.2639/9.5018','_blank')">
+      <div style="text-align:center;color:rgba(255,255,255,.4);">
+        <i class="fa fa-map-location-dot" style="display:block;font-size:3.5rem;margin-bottom:.75rem;"></i>
+        <p style="font-family:var(--font-mono);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem;">Denmark</p>
+        <p style="font-size:.8rem;opacity:.6;">56.26°N, 9.50°E</p>
+        <p style="font-size:.72rem;margin-top:.75rem;opacity:.4;">Click to open in OpenStreetMap</p>
+        <p style="font-size:.68rem;margin-top:.3rem;color:var(--gold);font-family:var(--font-mono);">← Leaflet.js / Google Maps to be integrated</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anthem -->
+  <div class="anthem-player" style="margin-bottom:2.5rem;">
+    <div class="anthem-btn" id="anthem-btn"><i class="fa fa-play" style="margin-left:3px;"></i></div>
+    <div>
+      <h3 style="color:var(--white);font-size:1.3rem;">Der er et yndigt land</h3>
+      <p style="color:rgba(255,255,255,.5);font-size:.9rem;">There is a lovely land — National Anthem of Denmark</p>
+      <div id="anthem-status" style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:.4rem;">Click to play (YouTube embed in production)</div>
+    </div>
+    <div style="margin-left:auto;text-align:right;">
+      <div style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);">Adopted</div>
+      <div style="font-family:var(--font-display);font-size:2rem;font-weight:700;color:rgba(255,255,255,.5);">1835</div>
+    </div>
+  </div>
+
+  <!-- Languages -->
+  <h3 style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-bottom:1.25rem;">Languages</h3>
+  <div class="lang-grid">
+    <div class="lang-card"><div class="lang-name">Danish</div><div style="font-style:italic;font-size:.88rem;color:var(--muted);">Dansk</div><div style="font-family:var(--font-mono);font-size:.7rem;color:var(--muted);margin:.3rem 0 .4rem;">Latin script · ~86% speakers</div><span class="lang-badge official">Official</span></div>
+    <div class="lang-card"><div class="lang-name">English</div><div style="font-style:italic;font-size:.88rem;color:var(--muted);">English</div><div style="font-family:var(--font-mono);font-size:.7rem;color:var(--muted);margin:.3rem 0 .4rem;">Latin script · ~86% speakers</div><span class="lang-badge">Widely spoken</span></div>
+    <div class="lang-card"><div class="lang-name">German</div><div style="font-style:italic;font-size:.88rem;color:var(--muted);">Deutsch</div><div style="font-family:var(--font-mono);font-size:.7rem;color:var(--muted);margin:.3rem 0 .4rem;">Latin script · ~2% speakers</div><span class="lang-badge">Recognized minority</span></div>
+    <div class="lang-card"><div class="lang-name">Faroese</div><div style="font-style:italic;font-size:.88rem;color:var(--muted);">Føroyskt</div><div style="font-family:var(--font-mono);font-size:.7rem;color:var(--muted);margin:.3rem 0 .4rem;">Latin script · ~1% speakers</div><span class="lang-badge">Recognized minority</span></div>
+    <div class="lang-card"><div class="lang-name">Greenlandic</div><div style="font-style:italic;font-size:.88rem;color:var(--muted);">Kalaallisut</div><div style="font-family:var(--font-mono);font-size:.7rem;color:var(--muted);margin:.3rem 0 .4rem;">Latin script · ~1% speakers</div><span class="lang-badge">Recognized minority</span></div>
+  </div>
+</section>
+
+<!-- ═══════════════ POLITICS ═══════════════════════════════════════════════ -->
+<section class="wp-section" id="sec-politics" data-section="politics">
+  <div class="section-hdr">
+    <div><span class="section-accent"></span><h2 class="section-title">Politics</h2></div>
+    <a href="#sec-history" class="section-more">Full History <i class="fa fa-arrow-right fa-xs"></i></a>
+  </div>
+  <div class="pol-box">
+    <div class="pol-header">
+      <div><div class="pol-stat-value">Constitutional Monarchy</div><div class="pol-stat-label">Government Type</div></div>
+      <div><div class="pol-stat-value">Mette Frederiksen</div><div class="pol-stat-label">Prime Minister</div></div>
+      <div><div class="pol-stat-value">Social Democrats</div><div class="pol-stat-label">Ruling Party</div></div>
+      <div><div class="pol-stat-value">2019</div><div class="pol-stat-label">In Power Since</div></div>
+      <div><div class="pol-stat-value">Folketing</div><div class="pol-stat-label">Parliament</div></div>
+      <div><div class="pol-stat-value">179</div><div class="pol-stat-label">Seats</div></div>
+      <div><div class="pol-stat-value">2026</div><div class="pol-stat-label">Next Election</div></div>
+    </div>
+    <div style="padding:2rem;">
+      <div style="font-family:var(--font-mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem;">Recent Political History</div>
+      <p style="font-size:1rem;line-height:1.8;color:var(--ink-light);">Denmark transitioned from a Social Liberal-led government under Lars Løkke Rasmussen (2016–2019) to a Social Democratic minority government under Mette Frederiksen after the 2019 elections. A historic broad coalition across left and right was formed after the November 2022 snap election — an unprecedented centrist unity government bringing together Social Democrats, centre-right Venstre, and the new Moderates party, aimed at tackling energy security and economic challenges post-Ukraine war.</p>
+      <span class="ideology-tag">Social Democracy</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ DIVISIONS ══════════════════════════════════════════════ -->
+<section class="wp-section" id="sec-divisions" data-section="divisions">
+  <div class="section-hdr">
+    <div><span class="section-accent"></span><h2 class="section-title">Administrative Divisions</h2></div>
+    <a href="#" class="section-more">Full list with phonetics <i class="fa fa-arrow-right fa-xs"></i></a>
+  </div>
+  <p style="color:var(--muted);margin-bottom:2rem;">5 Regions (Regioner) → 98 Municipalities (Kommuner)</p>
+  <div class="div-grid">
+    <div class="div-card">
+      <div class="div-name">Capital Region of Denmark</div>
+      <div class="div-native">Region Hovedstaden</div>
+      <div class="div-phonetic">🔊 REH-gyon HOH-eth-sta-nen</div>
+      <div style="display:flex;gap:1.5rem;margin-bottom:.8rem;flex-wrap:wrap;font-size:.82rem;color:var(--muted);"><span><strong style="color:var(--ink);">1,868,688</strong><br>population</span><span><strong style="color:var(--ink);">2,568 km²</strong><br>area</span><span><strong style="color:var(--ink);">Copenhagen</strong><br>capital</span></div>
+      <p style="font-size:.84rem;color:var(--muted);line-height:1.6;margin-bottom:1rem;">Denmark's most populous region encompassing Copenhagen and North Zealand</p>
+      <a href="#" class="btn-div">Explore Region <i class="fa fa-arrow-right fa-xs"></i></a>
+    </div>
+    <div class="div-card">
+      <div class="div-name">Region Zealand</div>
+      <div class="div-native">Region Sjælland</div>
+      <div class="div-phonetic">🔊 REH-gyon SHEL-lan</div>
+      <div style="display:flex;gap:1.5rem;margin-bottom:.8rem;flex-wrap:wrap;font-size:.82rem;color:var(--muted);"><span><strong style="color:var(--ink);">838,841</strong><br>population</span><span><strong style="color:var(--ink);">7,273 km²</strong><br>area</span><span><strong style="color:var(--ink);">Sorø</strong><br>capital</span></div>
+      <p style="font-size:.84rem;color:var(--muted);line-height:1.6;margin-bottom:1rem;">Agricultural heartland south of Copenhagen with medieval towns and Roskilde</p>
+      <a href="#" class="btn-div">Explore Region <i class="fa fa-arrow-right fa-xs"></i></a>
+    </div>
+    <div class="div-card">
+      <div class="div-name">Region of Southern Denmark</div>
+      <div class="div-native">Region Syddanmark</div>
+      <div class="div-phonetic">🔊 REH-gyon SEW-dan-mark</div>
+      <div style="display:flex;gap:1.5rem;margin-bottom:.8rem;flex-wrap:wrap;font-size:.82rem;color:var(--muted);"><span><strong style="color:var(--ink);">1,223,985</strong><br>population</span><span><strong style="color:var(--ink);">12,191 km²</strong><br>area</span><span><strong style="color:var(--ink);">Vejle</strong><br>capital</span></div>
+      <p style="font-size:.84rem;color:var(--muted);line-height:1.6;margin-bottom:1rem;">Borders Germany; home to Legoland and the ancient city of Ribe</p>
+      <a href="#" class="btn-div">Explore Region <i class="fa fa-arrow-right fa-xs"></i></a>
+    </div>
+    <div class="div-card">
+      <div class="div-name">Central Denmark Region</div>
+      <div class="div-native">Region Midtjylland</div>
+      <div class="div-phonetic">🔊 REH-gyon MID-yoo-lan</div>
+      <div style="display:flex;gap:1.5rem;margin-bottom:.8rem;flex-wrap:wrap;font-size:.82rem;color:var(--muted);"><span><strong style="color:var(--ink);">1,337,459</strong><br>population</span><span><strong style="color:var(--ink);">13,003 km²</strong><br>area</span><span><strong style="color:var(--ink);">Viborg</strong><br>capital</span></div>
+      <p style="font-size:.84rem;color:var(--muted);line-height:1.6;margin-bottom:1rem;">Jutland's heart with Aarhus — Denmark's cultural second city</p>
+      <a href="#" class="btn-div">Explore Region <i class="fa fa-arrow-right fa-xs"></i></a>
+    </div>
+    <div class="div-card">
+      <div class="div-name">North Denmark Region</div>
+      <div class="div-native">Region Nordjylland</div>
+      <div class="div-phonetic">🔊 REH-gyon NOR-yoo-lan</div>
+      <div style="display:flex;gap:1.5rem;margin-bottom:.8rem;flex-wrap:wrap;font-size:.82rem;color:var(--muted);"><span><strong style="color:var(--ink);">591,897</strong><br>population</span><span><strong style="color:var(--ink);">7,928 km²</strong><br>area</span><span><strong style="color:var(--ink);">Aalborg</strong><br>capital</span></div>
+      <p style="font-size:.84rem;color:var(--muted);line-height:1.6;margin-bottom:1rem;">Rugged northern tip with Aalborg and the windswept Skagen where two seas meet</p>
+      <a href="#" class="btn-div">Explore Region <i class="fa fa-arrow-right fa-xs"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PEOPLE ════════════════════════════════════════════════ -->
+<section class="wp-section" id="sec-people" data-section="people">
+  <div class="section-hdr"><div><span class="section-accent"></span><h2 class="section-title">Notable People</h2></div></div>
+  <div class="persons-grid">
+    <div class="person-card"><div class="person-avatar">✍️</div><div class="person-name">Hans Christian Andersen</div><div class="person-years">1805 – 1875</div><div class="person-cat">Literature · Author</div><div class="person-desc">The world's most beloved fairy tale writer whose stories transcend culture and age — The Little Mermaid, The Ugly Duckling, Thumbelina.</div></div>
+    <div class="person-card"><div class="person-avatar">⚛️</div><div class="person-name">Niels Bohr</div><div class="person-years">1885 – 1962</div><div class="person-cat">Science · Physics</div><div class="person-desc">Nobel Prize-winning physicist who made foundational contributions to atomic structure and quantum theory.</div></div>
+    <div class="person-card"><div class="person-avatar">📖</div><div class="person-name">Søren Kierkegaard</div><div class="person-years">1813 – 1855</div><div class="person-cat">Philosophy · Existentialism</div><div class="person-desc">Pioneer of existentialist philosophy who profoundly influenced theology, psychology and literature worldwide.</div></div>
+    <div class="person-card"><div class="person-avatar">🎬</div><div class="person-name">Lars von Trier</div><div class="person-years">1956 –</div><div class="person-cat">Film · Director</div><div class="person-desc">Provocateur auteur filmmaker and co-founder of Dogme 95. Known for emotionally intense, unforgettable cinema.</div></div>
+    <div class="person-card"><div class="person-avatar">💻</div><div class="person-name">Bjarne Stroustrup</div><div class="person-years">1950 –</div><div class="person-cat">Technology · Programming</div><div class="person-desc">Creator of C++ — one of the world's most widely used programming languages, still ubiquitous 40+ years on.</div></div>
+    <div class="person-card"><div class="person-avatar">🔭</div><div class="person-name">Tycho Brahe</div><div class="person-years">1546 – 1601</div><div class="person-cat">Science · Astronomy</div><div class="person-desc">Renaissance astronomer whose precise naked-eye observations revolutionised astronomy before telescopes.</div></div>
+    <div class="person-card"><div class="person-avatar">📝</div><div class="person-name">Karen Blixen</div><div class="person-years">1885 – 1962</div><div class="person-cat">Literature · Author</div><div class="person-desc">Author of Out of Africa. Wrote under pen name Isak Dinesen. Famed for her memoir of life on a Kenyan coffee plantation.</div></div>
+    <div class="person-card"><div class="person-avatar">🎭</div><div class="person-name">Viggo Mortensen</div><div class="person-years">1958 –</div><div class="person-cat">Film · Actor</div><div class="person-desc">Oscar-nominated actor known globally as Aragorn in Lord of the Rings. Also a respected poet and painter.</div></div>
+  </div>
+</section>
+
+<!-- ═══════════════ FESTIVALS ════════════════════════════════════════════════ -->
+<section class="wp-section" id="sec-festivals" data-section="festivals">
+  <div class="section-hdr"><div><span class="section-accent"></span><h2 class="section-title">Festivals & Celebrations</h2></div></div>
+  <div class="cards-grid">
+    <div class="wp-card"><div class="card-img-area">🕯️</div><div class="card-body"><div class="card-cat">Cultural · Religious</div><div class="card-title">Christmas / Jul</div><div class="card-text">Denmark's most celebrated festive season. Danes embrace hygge most intensely during Jul — decorated trees, æbleskiver, and family gatherings with roast duck or goose.</div><div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);margin-top:.75rem;">📅 December · Public Holiday</div></div></div>
+    <div class="wp-card"><div class="card-img-area">🎊</div><div class="card-body"><div class="card-cat">Cultural</div><div class="card-title">Fastelavn</div><div class="card-text">Denmark's carnival held 7 weeks before Easter. Children dress in costumes and beat a barrel filled with candy. Fastelavn buns are traditional.</div><div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);margin-top:.75rem;">📅 February · 3 days</div></div></div>
+    <div class="wp-card"><div class="card-img-area">🔥</div><div class="card-body"><div class="card-cat">Cultural</div><div class="card-title">Sankt Hans Aften</div><div class="card-text">Celebrated June 23rd, Danes light enormous bonfires on beaches to ward off witches. Communities gather for singing across the country.</div><div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);margin-top:.75rem;">📅 June 23rd</div></div></div>
+    <div class="wp-card"><div class="card-img-area">🎵</div><div class="card-body"><div class="card-cat">Music</div><div class="card-title">Roskilde Festival</div><div class="card-text">One of Europe's largest and most prestigious music festivals. Non-profit event attracting 130,000+ visitors with global headliners across dozens of stages.</div><div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);margin-top:.75rem;">📅 June-July · 8 days</div></div></div>
+    <div class="wp-card"><div class="card-img-area">🎷</div><div class="card-body"><div class="card-cat">Music</div><div class="card-title">Copenhagen Jazz Festival</div><div class="card-text">World-renowned 10-day jazz festival transforming Copenhagen with 1000+ concerts across 100+ venues. Free and ticketed events make jazz accessible to all.</div><div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);margin-top:.75rem;">📅 July · 10 days</div></div></div>
+    <div class="wp-card"><div class="card-img-area">🎨</div><div class="card-body"><div class="card-cat">Arts</div><div class="card-title">Aarhus Festival Week</div><div class="card-text">Denmark's biggest arts festival featuring theatre, music, visual arts, food and debate. Transforms the entire city of Aarhus into a cultural playground.</div><div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);margin-top:.75rem;">📅 August · 9 days</div></div></div>
+    <div class="wp-card"><div class="card-img-area">✨</div><div class="card-body"><div class="card-cat">Cultural</div><div class="card-title">Christmas Markets</div><div class="card-text">Beautiful Christmas markets appear across Danish cities from late November. Copenhagen's Tivoli and Aarhus markets are particularly magical with lights and crafts.</div><div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);margin-top:.75rem;">📅 Nov–Dec</div></div></div>
+    <div class="wp-card"><div class="card-img-area">🌸</div><div class="card-body"><div class="card-cat">Cultural</div><div class="card-title">Valborg</div><div class="card-text">Celebrated April 30th, originally a pagan fire festival. University students celebrate with outdoor gatherings and bonfires marking the end of winter.</div><div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);margin-top:.75rem;">📅 April 30th</div></div></div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOD ═══════════════════════════════════════════════════ -->
+<section class="wp-section" id="sec-food" data-section="food">
+  <div class="section-hdr"><div><span class="section-accent"></span><h2 class="section-title">Food & Cuisine</h2></div></div>
+  <div class="foods-grid">
+    <div class="food-card"><div class="food-emoji">🥪</div><div class="food-body"><div class="food-name">Smørrebrød</div><div class="food-native">Smørrebrød</div><div class="food-desc">Open-faced rye bread sandwiches — Denmark's most iconic food. Topped with pickled herring, cold cuts, eggs, liver pâté or shrimp. An art form with strict topping conventions.</div><span class="iconic-badge">⭐ Iconic</span></div></div>
+    <div class="food-card"><div class="food-emoji">🥐</div><div class="food-body"><div class="food-name">Wienerbrød</div><div class="food-native">Danish Pastry</div><div class="food-desc">Flaky laminated pastry the world calls "Danish." In Denmark there are dozens of varieties — spandauer, kanelsnegle (cinnamon rolls), kringle and more.</div><span class="iconic-badge">⭐ Iconic</span></div></div>
+    <div class="food-card"><div class="food-emoji">🍞</div><div class="food-body"><div class="food-name">Rugbrød</div><div class="food-native">Dark Rye Bread</div><div class="food-desc">Dense sourdough rye bread — the backbone of Danish cuisine. Darker, denser and more nutritious than most European breads. Essential base for smørrebrød.</div><span class="iconic-badge">⭐ Iconic</span></div></div>
+    <div class="food-card"><div class="food-emoji">🍖</div><div class="food-body"><div class="food-name">Flæskesteg</div><div class="food-native">Crispy Roast Pork</div><div class="food-desc">Crispy roast pork with crackling — the quintessential Danish Christmas dinner main course. The crackling (svær) must be perfectly crisp. A point of national pride.</div><span class="iconic-badge">⭐ Iconic</span></div></div>
+    <div class="food-card"><div class="food-emoji">🧇</div><div class="food-body"><div class="food-name">Æbleskiver</div><div class="food-native">Spherical Pancakes</div><div class="food-desc">Spherical pancake-like confections cooked in a special pan. Eaten during Christmas season dusted with powdered sugar and dipped in strawberry jam.</div><span class="iconic-badge">⭐ Iconic</span></div></div>
+    <div class="food-card"><div class="food-emoji">🥓</div><div class="food-body"><div class="food-name">Stegt Flæsk</div><div class="food-native">med Persillesovs</div><div class="food-desc">Fried slices of pork belly with boiled potatoes and parsley sauce — voted Denmark's national dish in 2014 in a public poll.</div><span class="iconic-badge">⭐ National Dish</span></div></div>
+    <div class="food-card"><div class="food-emoji">🌿</div><div class="food-body"><div class="food-name">New Nordic Cuisine</div><div class="food-native">New Nordic</div><div class="food-desc">Culinary movement pioneered by Noma (world's best restaurant multiple times). Celebrates local, seasonal Scandinavian ingredients — foraged herbs, fermented vegetables, Nordic seafood.</div></div></div>
+    <div class="food-card"><div class="food-emoji">🌭</div><div class="food-body"><div class="food-name">Danish Hotdog</div><div class="food-native">Ristet Pølse</div><div class="food-desc">Red sausage sold from iconic orange sausage wagons (pølsevogne) across Danish cities. The purist: squiggly mustard, ketchup, raw onion, crispy onions, remoulade and cucumber.</div></div></div>
+  </div>
+</section>
+
+<!-- ═══════════════ ATTRACTIONS ════════════════════════════════════════════ -->
+<section class="wp-section" id="sec-attractions" data-section="attractions">
+  <div class="section-hdr"><div><span class="section-accent"></span><h2 class="section-title">Tourist Attractions</h2></div></div>
+  <div class="attr-list">
+    <div class="attr-card"><div class="attr-num">01</div><div><div class="attr-title">The Little Mermaid (Den Lille Havfrue)</div><div class="attr-location"><i class="fa fa-location-dot fa-xs"></i> Copenhagen · Capital Region</div><div class="attr-desc">The iconic bronze statue sitting on a rock in Copenhagen harbour. Inspired by Hans Christian Andersen's fairy tale. Though small, it is Denmark's most photographed landmark.</div><div style="margin-top:.6rem;display:flex;gap:.5rem;"><span class="badge-free">Free Entry</span></div></div></div>
+    <div class="attr-card"><div class="attr-num">02</div><div><div class="attr-title">Tivoli Gardens</div><div class="attr-location"><i class="fa fa-location-dot fa-xs"></i> Copenhagen · Capital Region</div><div class="attr-desc">One of the world's oldest amusement parks (1843) and major inspiration for Walt Disney. A magical blend of rides, gardens, restaurants and entertainment. Transforms seasonally.</div></div></div>
+    <div class="attr-card"><div class="attr-num">03</div><div><div class="attr-title">Nyhavn</div><div class="attr-location"><i class="fa fa-location-dot fa-xs"></i> Copenhagen · Capital Region</div><div class="attr-desc">17th-century waterfront canal lined with brightly coloured townhouses, restaurants and old wooden ships. Hans Christian Andersen lived at nos. 20, 67 and 18.</div><div style="margin-top:.6rem;display:flex;gap:.5rem;"><span class="badge-free">Free Entry</span></div></div></div>
+    <div class="attr-card"><div class="attr-num">04</div><div><div class="attr-title">Kronborg Castle (Hamlet's Castle)</div><div class="attr-location"><i class="fa fa-location-dot fa-xs"></i> Helsingør · Capital Region</div><div class="attr-desc">Renaissance castle immortalised as Elsinore in Shakespeare's Hamlet. Guards the narrow strait between Denmark and Sweden.</div><div style="margin-top:.6rem;display:flex;gap:.5rem;"><span class="badge-unesco">UNESCO World Heritage</span></div></div></div>
+    <div class="attr-card"><div class="attr-num">05</div><div><div class="attr-title">Legoland Billund</div><div class="attr-location"><i class="fa fa-location-dot fa-xs"></i> Billund · Southern Denmark</div><div class="attr-desc">The original Legoland, opened 1968 in the hometown of LEGO. A beloved family theme park where everything is made from LEGO bricks. Attracts millions of visitors annually.</div></div></div>
+    <div class="attr-card"><div class="attr-num">06</div><div><div class="attr-title">Roskilde Cathedral</div><div class="attr-location"><i class="fa fa-location-dot fa-xs"></i> Roskilde · Zealand</div><div class="attr-desc">Gothic cathedral and UNESCO World Heritage Site that has been the burial site of Danish kings and queens since the 12th century. Contains 40 royal tombs.</div><div style="margin-top:.6rem;display:flex;gap:.5rem;"><span class="badge-unesco">UNESCO World Heritage</span></div></div></div>
+    <div class="attr-card"><div class="attr-num">07</div><div><div class="attr-title">Skagen (Grenen)</div><div class="attr-location"><i class="fa fa-location-dot fa-xs"></i> Skagen · North Denmark</div><div class="attr-desc">The northernmost tip of Denmark where the North Sea and Baltic Sea visibly meet. A mystical, windswept peninsula beloved by Danish artists. The Skagen Painters made this world-famous.</div><div style="margin-top:.6rem;display:flex;gap:.5rem;"><span class="badge-free">Free Entry</span></div></div></div>
+    <div class="attr-card"><div class="attr-num">08</div><div><div class="attr-title">Louisiana Museum of Modern Art</div><div class="attr-location"><i class="fa fa-location-dot fa-xs"></i> Humlebæk · Capital Region</div><div class="attr-desc">One of Scandinavia's most celebrated art museums perched dramatically on the coast of Øresund. World-class collection in a stunning landscape setting.</div></div></div>
+  </div>
+</section>
+
+<!-- ═══════════════ HISTORY (TIMELINE) ════════════════════════════════════ -->
+<section class="wp-section" id="sec-history" data-section="history">
+  <div class="section-hdr"><div><span class="section-accent"></span><h2 class="section-title">History</h2></div><a href="#" class="section-more">Full timeline <i class="fa fa-arrow-right fa-xs"></i></a></div>
+  <ul class="timeline">
+    <li class="tl-item"><div class="tl-year">793</div><div class="tl-dot crit"></div><div class="tl-content"><div class="tl-era">Viking Age</div><div class="tl-title">Viking Age Begins</div><div class="tl-desc">The raid on Lindisfarne marks the start of the Viking Age. Danish Vikings expand across Europe, establishing settlements from Normandy to Russia.</div></div></li>
+    <li class="tl-item"><div class="tl-year">958</div><div class="tl-dot crit"></div><div class="tl-content"><div class="tl-era">Viking Age</div><div class="tl-title">Harald Bluetooth Unifies Denmark</div><div class="tl-desc">Harald Bluetooth unifies the Danish tribes and converts to Christianity, creating the Kingdom of Denmark. The Bluetooth technology is named after him.</div></div></li>
+    <li class="tl-item"><div class="tl-year">1015</div><div class="tl-dot"></div><div class="tl-content"><div class="tl-era">Medieval</div><div class="tl-title">Canute the Great</div><div class="tl-desc">Danish King Canute rules over Denmark, England, and Norway — one of the most powerful rulers in Europe. The North Sea Empire briefly makes Denmark a European superpower.</div></div></li>
+    <li class="tl-item"><div class="tl-year">1397</div><div class="tl-dot"></div><div class="tl-content"><div class="tl-era">Medieval</div><div class="tl-title">Kalmar Union</div><div class="tl-desc">Denmark leads the Kalmar Union — a personal union uniting Denmark, Norway, and Sweden under one monarch. Denmark is the dominant Scandinavian power.</div></div></li>
+    <li class="tl-item"><div class="tl-year">1658</div><div class="tl-dot crit"></div><div class="tl-content"><div class="tl-era">Early Modern</div><div class="tl-title">Treaty of Roskilde</div><div class="tl-desc">Sweden defeats Denmark in the Second Northern War. Denmark cedes its southern Swedish provinces — permanently shrinking Danish territory and reshaping Scandinavian politics.</div></div></li>
+    <li class="tl-item"><div class="tl-year">1849</div><div class="tl-dot crit"></div><div class="tl-content"><div class="tl-era">Modern</div><div class="tl-title">Constitutional Monarchy Established</div><div class="tl-desc">Denmark peacefully transitions from absolute monarchy to constitutional monarchy with the June Constitution, establishing parliamentary government and civil liberties.</div></div></li>
+    <li class="tl-item"><div class="tl-year">1940</div><div class="tl-dot crit"></div><div class="tl-content"><div class="tl-era">WWII</div><div class="tl-title">Nazi Occupation</div><div class="tl-desc">Germany occupies Denmark on April 9, 1940. Unlike most occupied nations, the Danish government initially cooperates — but resistance grows.</div></div></li>
+    <li class="tl-item"><div class="tl-year">1943</div><div class="tl-dot crit"></div><div class="tl-content"><div class="tl-era">WWII</div><div class="tl-title">Rescue of Danish Jews</div><div class="tl-desc">In an extraordinary act of courage, ordinary Danes organize to rescue virtually all of Denmark's 7,000 Jews by smuggling them by boat to neutral Sweden overnight.</div></div></li>
+    <li class="tl-item"><div class="tl-year">2000</div><div class="tl-dot"></div><div class="tl-content"><div class="tl-era">Modern</div><div class="tl-title">Øresund Bridge Opens</div><div class="tl-desc">The bridge connecting Copenhagen with Malmö, Sweden opens — linking Scandinavia to continental Europe and transforming the Copenhagen-Malmö region into a single metropolitan area.</div></div></li>
+  </ul>
+</section>
+
+<!-- ═══════════════ FILMS ══════════════════════════════════════════════════ -->
+<section class="wp-section" id="sec-movies" data-section="movies">
+  <div class="section-hdr"><div><span class="section-accent"></span><h2 class="section-title">Notable Films</h2></div></div>
+  <div class="movies-grid">
+    <div class="movie-card"><div class="movie-header">🕯️<span class="movie-year-tag">1987</span></div><div class="movie-body"><div class="movie-title">Babette's Feast</div><div class="movie-director">dir. Gabriel Axel</div><div class="movie-desc">A French refugee prepares a magnificent feast for two pious sisters in 19th-century Jutland. Won the Academy Award for Best Foreign Language Film.</div><div class="movie-award">🏆 Academy Award Best Foreign Language Film 1988</div><div class="movie-rating"><i class="fa fa-star fa-xs"></i> 7.8 IMDb</div></div></div>
+    <div class="movie-card"><div class="movie-header">🎭<span class="movie-year-tag">2012</span></div><div class="movie-body"><div class="movie-title">The Hunt (Jagten)</div><div class="movie-director">dir. Thomas Vinterberg</div><div class="movie-desc">A teacher's life is torn apart when a child's lie spreads through a small Danish community. Mads Mikkelsen's greatest performance — harrowing and essential.</div><div class="movie-award">🏆 Cannes Best Actor 2012</div><div class="movie-rating"><i class="fa fa-star fa-xs"></i> 8.3 IMDb</div></div></div>
+    <div class="movie-card"><div class="movie-header">🥃<span class="movie-year-tag">2020</span></div><div class="movie-body"><div class="movie-title">Another Round (Druk)</div><div class="movie-director">dir. Thomas Vinterberg</div><div class="movie-desc">Four teachers test a theory that humans function better with a constant low level of alcohol. Won the Academy Award for Best International Feature Film 2021.</div><div class="movie-award">🏆 Academy Award Best International Feature Film 2021</div><div class="movie-rating"><i class="fa fa-star fa-xs"></i> 7.7 IMDb</div></div></div>
+    <div class="movie-card"><div class="movie-header">🪐<span class="movie-year-tag">2011</span></div><div class="movie-body"><div class="movie-title">Melancholia</div><div class="movie-director">dir. Lars von Trier</div><div class="movie-desc">Two sisters face a rogue planet threatening to collide with Earth. A visually stunning meditation on depression and the end of the world.</div><div class="movie-award">🏆 Cannes Best Actress (Kirsten Dunst)</div><div class="movie-rating"><i class="fa fa-star fa-xs"></i> 7.1 IMDb</div></div></div>
+    <div class="movie-card"><div class="movie-header">🪖<span class="movie-year-tag">2015</span></div><div class="movie-body"><div class="movie-title">A War (Krigen)</div><div class="movie-director">dir. Tobias Lindholm</div><div class="movie-desc">A Danish commander in Afghanistan makes a split-second decision to protect his troops — with devastating consequences back home. Oscar nominated.</div><div class="movie-award">🏆 Oscar Nomination Best Foreign Language Film 2016</div><div class="movie-rating"><i class="fa fa-star fa-xs"></i> 7.6 IMDb</div></div></div>
+    <div class="movie-card"><div class="movie-header">🏛️<span class="movie-year-tag">2010</span></div><div class="movie-body"><div class="movie-title">Borgen (Series)</div><div class="movie-director">dir. Adam Price</div><div class="movie-desc">Denmark's most internationally celebrated political drama — following a female Prime Minister navigating power. Inspired a generation of political dramas worldwide.</div><div class="movie-award">🏆 BAFTA & International Emmy nominee</div><div class="movie-rating"><i class="fa fa-star fa-xs"></i> 8.3 IMDb</div></div></div>
+  </div>
+</section>
+
+<!-- ═══════════════ BOOKS ══════════════════════════════════════════════════ -->
+<section class="wp-section" id="sec-books" data-section="books">
+  <div class="section-hdr"><div><span class="section-accent"></span><h2 class="section-title">Essential Books</h2></div></div>
+  <div class="books-grid">
+    <div class="book-card"><div class="book-title">Out of Africa</div><div class="book-author">Karen Blixen</div><div class="book-year">1937 · Memoir</div><div class="book-desc">Blixen's lyrical memoir of 17 years running a coffee plantation in colonial Kenya. One of the great works of 20th-century literature.</div><a href="https://amazon.com" target="_blank" class="btn-amazon" style="margin-top:1rem;"><i class="fab fa-amazon fa-sm"></i> Find on Amazon</a></div>
+    <div class="book-card"><div class="book-title">The Complete Fairy Tales</div><div class="book-author">Hans Christian Andersen</div><div class="book-year">1835 · Fairy Tales</div><div class="book-desc">The essential collection — The Little Mermaid, The Snow Queen, Thumbelina, The Ugly Duckling and over 150 more. Foundational world literature.</div><a href="https://amazon.com" target="_blank" class="btn-amazon" style="margin-top:1rem;"><i class="fab fa-amazon fa-sm"></i> Find on Amazon</a></div>
+    <div class="book-card"><div class="book-title">Either/Or</div><div class="book-author">Søren Kierkegaard</div><div class="book-year">1843 · Philosophy</div><div class="book-desc">Kierkegaard's masterwork presenting two life philosophies: the aesthetic and the ethical. A foundational text of existentialist philosophy.</div><a href="https://amazon.com" target="_blank" class="btn-amazon" style="margin-top:1rem;"><i class="fab fa-amazon fa-sm"></i> Find on Amazon</a></div>
+    <div class="book-card"><div class="book-title">The Little Book of Hygge</div><div class="book-author">Meik Wiking</div><div class="book-year">2016 · Lifestyle</div><div class="book-desc">The CEO of the Happiness Research Institute explains the Danish concept of hygge — cosiness, togetherness and the art of creating happiness. A global bestseller.</div><a href="https://amazon.com" target="_blank" class="btn-amazon" style="margin-top:1rem;"><i class="fab fa-amazon fa-sm"></i> Find on Amazon</a></div>
+    <div class="book-card"><div class="book-title">Miss Smilla's Feeling for Snow</div><div class="book-author">Peter Høeg</div><div class="book-year">1992 · Thriller</div><div class="book-desc">A half-Greenlandic woman investigates a child's mysterious death in Copenhagen. A thriller and meditation on identity, belonging and Arctic ice.</div><a href="https://amazon.com" target="_blank" class="btn-amazon" style="margin-top:1rem;"><i class="fab fa-amazon fa-sm"></i> Find on Amazon</a></div>
+    <div class="book-card"><div class="book-title">The Danish Way of Parenting</div><div class="book-author">Jessica Joelle Alexander</div><div class="book-year">2016 · Parenting</div><div class="book-desc">Explores how Danish parenting values — free play, authenticity, empathy and togetherness — create some of the world's happiest and most resilient adults.</div><a href="https://amazon.com" target="_blank" class="btn-amazon" style="margin-top:1rem;"><i class="fab fa-amazon fa-sm"></i> Find on Amazon</a></div>
+  </div>
+  <p style="margin-top:1.5rem;font-family:var(--font-mono);font-size:.68rem;color:var(--muted);">* Amazon affiliate links. A small commission helps us stay free.</p>
+</section>
+
+<!-- ═══════════════ PRODUCTS ═══════════════════════════════════════════════ -->
+<section class="wp-section" id="sec-products" data-section="products">
+  <div class="section-hdr"><div><span class="section-accent"></span><h2 class="section-title">Denmark Products</h2><p style="color:var(--muted);font-style:italic;margin-top:.35rem;font-size:.9rem;">Curated Danish finds — affiliate links support this site.</p></div></div>
+  <div class="products-grid">
+    <div class="product-card"><div style="font-size:2rem;">🧱</div><div class="product-cat">Toys</div><div class="product-name">LEGO Classic Set</div><div class="product-desc">Denmark's greatest gift to the world — LEGO bricks invented in Billund in 1932. Perfect Danish souvenir and creative toy for all ages.</div><div class="product-price">$$</div><a href="https://amazon.com" target="_blank" class="btn-amazon"><i class="fab fa-amazon fa-sm"></i> View on Amazon</a></div>
+    <div class="product-card"><div style="font-size:2rem;">💎</div><div class="product-cat">Luxury</div><div class="product-name">Georg Jensen Jewellery</div><div class="product-desc">Iconic Danish silverware and jewellery brand founded in 1904. Represents Danish craftsmanship and minimalist design at its finest.</div><div class="product-price">$$$$</div><a href="https://amazon.com" target="_blank" class="btn-amazon"><i class="fab fa-amazon fa-sm"></i> View on Amazon</a></div>
+    <div class="product-card"><div style="font-size:2rem;">🏺</div><div class="product-cat">Home Decor</div><div class="product-name">Royal Copenhagen Porcelain</div><div class="product-desc">Hand-painted Danish porcelain with distinctive blue floral patterns since 1775. A treasured Danish design classic and collector's item.</div><div class="product-price">$$$$</div><a href="https://amazon.com" target="_blank" class="btn-amazon"><i class="fab fa-amazon fa-sm"></i> View on Amazon</a></div>
+    <div class="product-card"><div style="font-size:2rem;">📚</div><div class="product-cat">Books</div><div class="product-name">Hygge Book Collection</div><div class="product-desc">Explore the Danish art of hygge with bestselling books about Danish happiness, wellbeing and the cosy lifestyle philosophy.</div><div class="product-price">$$</div><a href="https://amazon.com" target="_blank" class="btn-amazon"><i class="fab fa-amazon fa-sm"></i> View on Amazon</a></div>
+    <div class="product-card"><div style="font-size:2rem;">🍪</div><div class="product-cat">Food</div><div class="product-name">Danish Butter Cookies</div><div class="product-desc">The iconic blue tin of Danish butter cookies — the world's most recognisable Danish export. Crispy, buttery and impossibly addictive.</div><div class="product-price">$</div><a href="https://amazon.com" target="_blank" class="btn-amazon"><i class="fab fa-amazon fa-sm"></i> View on Amazon</a></div>
+    <div class="product-card"><div style="font-size:2rem;">🪑</div><div class="product-cat">Furniture</div><div class="product-name">Arne Jacobsen Egg Chair</div><div class="product-desc">The famous Egg Chair designed by Arne Jacobsen in 1958. An icon of mid-century modern design beloved by architects and design lovers worldwide.</div><div class="product-price">$$$$</div><a href="https://amazon.com" target="_blank" class="btn-amazon"><i class="fab fa-amazon fa-sm"></i> View on Amazon</a></div>
+  </div>
+  <p style="margin-top:1.5rem;font-family:var(--font-mono);font-size:.68rem;color:var(--muted);">* As an Amazon Associate we earn from qualifying purchases at no extra cost to you.</p>
+
+  <!-- Coming soon -->
+  <div style="margin-top:3rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;">
+    <div style="background:var(--white);border:1px dashed var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;opacity:.5;">
+      <div style="font-size:1.5rem;margin-bottom:.4rem;">✈️</div>
+      <div style="font-family:var(--font-display);font-size:.95rem;font-weight:700;">Transportation Guide</div>
+      <div style="font-family:var(--font-mono);font-size:.62rem;color:var(--muted);margin-top:.3rem;text-transform:uppercase;letter-spacing:.08em;">+ Flight Affiliate Links</div>
+    </div>
+    <div style="background:var(--white);border:1px dashed var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;opacity:.5;">
+      <div style="font-size:1.5rem;margin-bottom:.4rem;">🎟️</div>
+      <div style="font-family:var(--font-display);font-size:.95rem;font-weight:700;">Event Tickets</div>
+      <div style="font-family:var(--font-mono);font-size:.62rem;color:var(--muted);margin-top:.3rem;text-transform:uppercase;letter-spacing:.08em;">Upcoming Events</div>
+    </div>
+    <div style="background:var(--white);border:1px dashed var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;opacity:.5;">
+      <div style="font-size:1.5rem;margin-bottom:.4rem;">🎨</div>
+      <div style="font-family:var(--font-display);font-size:.95rem;font-weight:700;">Art & Sculptures</div>
+      <div style="font-family:var(--font-mono);font-size:.62rem;color:var(--muted);margin-top:.3rem;text-transform:uppercase;letter-spacing:.08em;">Coming Soon</div>
+    </div>
+    <div style="background:var(--white);border:1px dashed var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;opacity:.5;">
+      <div style="font-size:1.5rem;margin-bottom:.4rem;">🏆</div>
+      <div style="font-family:var(--font-display);font-size:.95rem;font-weight:700;">Major Awards</div>
+      <div style="font-family:var(--font-mono);font-size:.62rem;color:var(--muted);margin-top:.3rem;text-transform:uppercase;letter-spacing:.08em;">Coming Soon</div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<!-- FOOTER -->
+<footer class="wp-footer">
+  <div>
+    <div class="wp-footer-brand">World<span>Pedia</span></div>
+    <div style="margin-top:.35rem;font-size:.82rem;">Free knowledge about every country on Earth.</div>
+  </div>
+  <div style="font-family:var(--font-mono);font-size:.65rem;color:rgba(255,255,255,.25);max-width:300px;text-align:right;line-height:1.6;">
+    * Some links are Amazon affiliate links. We earn a small commission at no extra cost to you. This helps us keep all content free.
+  </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+$(function(){
+  // Section nav scroll spy
+  const $items = $('.snav-item');
+  $(window).on('scroll', function(){
+    const top = $(this).scrollTop() + 150;
+    let cur = '';
+    $('[data-section]').each(function(){
+      if(top >= $(this).offset().top) cur = $(this).data('section');
+    });
+    $items.removeClass('active');
+    $items.filter(`[data-target="${cur}"]`).addClass('active');
+  });
+
+  $items.on('click', function(){
+    const t = $(this).data('target');
+    const $s = $(`[data-section="${t}"]`);
+    if($s.length){
+      $('html,body').animate({scrollTop: $s.offset().top - 124}, 480);
+    }
+  });
+
+  // Anthem toggle
+  let playing = false;
+  $('#anthem-btn').on('click', function(){
+    playing = !playing;
+    $(this).find('i').toggleClass('fa-play fa-pause');
+    $('#anthem-status').text(playing ? 'Playing… (embed in production)' : 'Click to play');
+  });
+
+  // Lazy scroll fade-in
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+        obs.unobserve(e.target);
+      }
+    });
+  }, {threshold: 0.07});
+  document.querySelectorAll('.wp-card,.div-card,.attr-card,.book-card,.movie-card,.food-card,.person-card,.product-card,.tl-content').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(16px)';
+    el.style.transition = 'opacity .5s ease, transform .5s ease';
+    obs.observe(el);
+  });
+});
+</script>
+</body>
+</html>

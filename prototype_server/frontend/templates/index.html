@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% set active_nav = 'home' %}
+
+{% block title %}WorldPedia{% endblock %}
+
+{% block content %}
+
+<!-- ── Homepage Hero ──────────────────────────────────────────────────────── -->
+<section class="home-hero">
+  <div class="home-hero-globe">🌍</div>
+  <div class="home-hero-content fade-up">
+    <div style="font-family:var(--font-mono);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin-bottom:1.5rem;display:flex;align-items:center;justify-content:center;gap:.75rem;">
+      <span style="display:inline-block;width:24px;height:1px;background:var(--red);"></span>
+      Free · Comprehensive · Always Growing
+      <span style="display:inline-block;width:24px;height:1px;background:var(--red);"></span>
+    </div>
+    <h1>World<em>Pedia</em></h1>
+    <p class="home-hero-sub">Comprehensive, curated knowledge on every country — culture, history, people, food, politics & more.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="#countries" class="btn-primary">
+        <i class="fa fa-globe fa-sm"></i> Explore Countries
+      </a>
+      <a href="#" class="btn-secondary" style="border-color:rgba(255,255,255,.15);color:rgba(255,255,255,.7)!important;">
+        <i class="fa fa-circle-info fa-sm"></i> About the Project
+      </a>
+    </div>
+  </div>
+  <div style="position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.25);font-family:var(--font-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;text-align:center;">
+    <i class="fa fa-chevron-down" style="display:block;margin-bottom:.5rem;"></i>
+    Scroll to explore
+  </div>
+</section>
+
+<!-- ── Countries List ─────────────────────────────────────────────────────── -->
+<section id="countries" class="home-countries" style="padding:5rem 0;">
+  <div class="container">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:3rem;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <div class="wp-section-title-accent"></div>
+        <h2 class="wp-section-title">Available Countries</h2>
+        <p style="color:var(--muted);margin-top:.5rem;font-style:italic;">{{ countries|length }} countries available &mdash; more added regularly</p>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;gap:.6rem;border:1px solid var(--border);border-radius:var(--radius);padding:.5rem 1rem;">
+          <i class="fa fa-magnifying-glass fa-sm" style="color:var(--muted);"></i>
+          <input id="country-search" type="text" placeholder="Filter countries…" style="border:none;outline:none;background:transparent;font-family:var(--font-body);font-size:.9rem;width:180px;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Countries -->
+    {% for c in countries %}
+    <div class="country-entry">
+      <div class="country-flag-big">{{ c.flag_emoji }}</div>
+      <div style="flex:1;min-width:200px;">
+        <div class="country-entry-name">{{ c.name }}</div>
+        <div class="country-entry-native">{{ c.native_name }} · {{ c.continent }}</div>
+      </div>
+      <div class="country-entry-stats">
+        <div class="country-entry-stat">
+          <span class="country-entry-stat-value">{{ "{:,.0f}".format(c.population|float) }}</span>
+          <span class="country-entry-stat-label">Population</span>
+        </div>
+        <div class="country-entry-stat">
+          <span class="country-entry-stat-value">{{ c.capital }}</span>
+          <span class="country-entry-stat-label">Capital</span>
+        </div>
+        <div class="country-entry-stat">
+          <span class="country-entry-stat-value">{{ c.currency_symbol }}</span>
+          <span class="country-entry-stat-label">Currency</span>
+        </div>
+      </div>
+      <a href="/country/{{ c.slug }}" class="btn-primary">
+        Explore <i class="fa fa-arrow-right fa-xs"></i>
+      </a>
+    </div>
+    {% endfor %}
+
+    <!-- Coming Soon teaser -->
+    <div style="padding:2rem 0;border-top:1px solid var(--border);margin-top:2rem;display:flex;align-items:center;gap:1.5rem;opacity:.5;">
+      <div style="font-size:2.5rem;">🇬🇧 🇯🇵 🇮🇳 🇧🇷 🇩🇪</div>
+      <div>
+        <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;">More countries coming soon</div>
+        <div style="font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:.25rem;">UK · Japan · India · Brazil · Germany and more</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Mission / Monetisation note ────────────────────────────────────────── -->
+<section style="background:var(--ink);padding:5rem 0;">
+  <div class="container" style="max-width:800px;text-align:center;">
+    <div style="font-family:var(--font-mono);font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin-bottom:1.25rem;">Our Mission</div>
+    <h2 style="font-family:var(--font-display);font-size:clamp(1.8rem,4vw,3rem);font-weight:900;color:var(--white);margin-bottom:1.5rem;letter-spacing:-0.02em;">Free knowledge for a curious world</h2>
+    <p style="font-size:1.05rem;color:rgba(255,255,255,.55);line-height:1.8;">WorldPedia provides comprehensive, carefully curated information about every country for free. We're supported by Amazon affiliate commissions on recommended products and optional premium content — never paywalling essential knowledge.</p>
+    <div style="display:flex;gap:3rem;justify-content:center;margin-top:3rem;flex-wrap:wrap;">
+      {% for item in [("fa-book-open","All Country Data Free"),("fa-heart","Community Curated"),("fa-link","Affiliate Supported")] %}
+      <div style="text-align:center;">
+        <i class="fa {{ item[0] }}" style="font-size:1.5rem;color:var(--red);margin-bottom:.75rem;display:block;"></i>
+        <div style="font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.45);">{{ item[1] }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}

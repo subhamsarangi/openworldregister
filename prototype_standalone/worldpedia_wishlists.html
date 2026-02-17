@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorldPedia — My Wishlists</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0f1117;--ink-light:#2d3142;--cream:#f5f2ec;--cream-dark:#ede8df;
+  --red:#c8102e;--red-dark:#9a0c22;--gold:#b8944a;--blue:#1a4aad;
+  --muted:#6b7280;--border:#d4cfc5;--white:#fff;
+  --visit:#c8102e;--read:#b8944a;--watch:#1a4aad;
+  --visit-bg:rgba(200,16,46,.07);--read-bg:rgba(184,148,74,.07);--watch-bg:rgba(26,74,173,.07);
+  --font-display:'Playfair Display',Georgia,serif;
+  --font-body:'Source Serif 4',Georgia,serif;
+  --font-mono:'DM Mono','Courier New',monospace;
+  --nav-h:60px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh;}
+h1,h2,h3,h4{font-family:var(--font-display);line-height:1.1;}
+a{color:var(--red);text-decoration:none;}
+
+/* Nav */
+.nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:var(--white);border-bottom:2px solid var(--ink);z-index:100;display:flex;align-items:center;padding:0 2rem;gap:1.5rem;}
+.nav-brand{font-family:var(--font-display);font-size:1.4rem;font-weight:900;color:var(--ink);}
+.nav-brand span{color:var(--red);}
+.nav-link{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+.nav-link.active,.nav-link:hover{color:var(--red);}
+.nav-div{flex:1;}
+.nav-user{display:flex;align-items:center;gap:.6rem;font-family:var(--font-mono);font-size:.72rem;color:var(--muted);}
+.nav-avatar{width:28px;height:28px;background:var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--white);font-size:.7rem;}
+
+/* Page layout */
+.page{display:flex;padding-top:var(--nav-h);min-height:100vh;}
+
+/* Sidebar */
+.wl-sidebar{width:280px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);padding:2rem 1.5rem;position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));overflow-y:auto;}
+.wl-sidebar-title{font-family:var(--font-display);font-size:1.5rem;font-weight:900;margin-bottom:.35rem;}
+.wl-sidebar-sub{font-size:.82rem;color:var(--muted);font-style:italic;margin-bottom:2rem;}
+
+/* List tabs */
+.list-tab{display:flex;align-items:center;gap:.85rem;padding:1rem 1rem;border-radius:4px;cursor:pointer;transition:all .2s;margin-bottom:.35rem;border:1px solid transparent;position:relative;}
+.list-tab:hover{background:var(--cream-dark);}
+.list-tab.active-visit{background:var(--visit-bg);border-color:rgba(200,16,46,.2);}
+.list-tab.active-read{background:var(--read-bg);border-color:rgba(184,148,74,.2);}
+.list-tab.active-watch{background:var(--watch-bg);border-color:rgba(26,74,173,.2);}
+.list-tab-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.icon-visit{background:var(--visit-bg);}
+.icon-read{background:var(--read-bg);}
+.icon-watch{background:var(--watch-bg);}
+.list-tab-name{font-family:var(--font-display);font-size:1rem;font-weight:700;}
+.list-tab-count{font-family:var(--font-mono);font-size:.7rem;color:var(--muted);}
+.count-badge{position:absolute;right:1rem;top:50%;transform:translateY(-50%);font-family:var(--font-mono);font-size:.65rem;padding:.2rem .55rem;border-radius:10px;font-weight:600;}
+.badge-visit{background:var(--visit-bg);color:var(--visit);}
+.badge-read{background:var(--read-bg);color:var(--gold);}
+.badge-watch{background:var(--watch-bg);color:var(--blue);}
+
+/* Share / export */
+.sidebar-actions{margin-top:2rem;border-top:1px solid var(--border);padding-top:1.5rem;display:flex;flex-direction:column;gap:.6rem;}
+.btn-action{display:flex;align-items:center;gap:.6rem;font-family:var(--font-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:.6rem .8rem;border-radius:3px;cursor:pointer;transition:all .2s;border:1px solid var(--border);background:transparent;}
+.btn-action:hover{color:var(--ink);border-color:var(--ink);}
+
+/* Stats summary */
+.sidebar-stats{background:var(--cream-dark);border-radius:4px;padding:1rem;margin-bottom:1.5rem;}
+.sidebar-stat{display:flex;justify-content:space-between;align-items:center;padding:.3rem 0;font-size:.8rem;}
+.sidebar-stat-label{color:var(--muted);}
+.sidebar-stat-value{font-family:var(--font-mono);font-size:.85rem;font-weight:600;}
+
+/* Main content */
+.wl-main{flex:1;padding:2.5rem 2.5rem;}
+.wl-panel{display:none;}
+.wl-panel.active{display:block;}
+
+/* Panel header */
+.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.panel-header-left{}
+.panel-type-label{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.5rem;}
+.panel-type-label.visit{color:var(--visit);}
+.panel-type-label.read{color:var(--gold);}
+.panel-type-label.watch{color:var(--blue);}
+.panel-title{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:900;}
+.panel-header-right{display:flex;gap:.6rem;flex-wrap:wrap;}
+.btn-sort{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;padding:.45rem .9rem;border:1px solid var(--border);border-radius:3px;cursor:pointer;background:transparent;color:var(--muted);transition:all .2s;}
+.btn-sort:hover,.btn-sort.active{border-color:var(--ink);color:var(--ink);}
+
+/* Item cards */
+.wl-items{display:flex;flex-direction:column;gap:0;}
+.wl-item{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:1.25rem 1.5rem;margin-bottom:.75rem;display:flex;align-items:flex-start;gap:1.25rem;transition:all .25s;position:relative;overflow:hidden;}
+.wl-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.wl-item.type-visit::before{background:var(--visit);}
+.wl-item.type-read::before{background:var(--gold);}
+.wl-item.type-watch::before{background:var(--blue);}
+.wl-item:hover{box-shadow:0 4px 20px rgba(15,17,23,.08);transform:translateY(-1px);}
+.wl-item-emoji{font-size:2rem;flex-shrink:0;width:44px;text-align:center;margin-top:.1rem;}
+.wl-item-body{flex:1;min-width:0;}
+.wl-item-category{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem;}
+.category-visit{color:var(--visit);}
+.category-read{color:var(--gold);}
+.category-watch{color:var(--blue);}
+.wl-item-title{font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:.2rem;line-height:1.2;}
+.wl-item-sub{font-size:.85rem;color:var(--muted);font-style:italic;margin-bottom:.5rem;}
+.wl-item-desc{font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:.6rem;}
+.wl-item-tags{display:flex;gap:.4rem;flex-wrap:wrap;}
+.wl-tag{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .5rem;border-radius:2px;background:var(--cream-dark);color:var(--muted);}
+.wl-item-actions{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem;flex-shrink:0;}
+.btn-remove{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:50%;cursor:pointer;color:var(--muted);background:transparent;transition:all .2s;font-size:.75rem;}
+.btn-remove:hover{background:rgba(200,16,46,.08);border-color:var(--red);color:var(--red);}
+.btn-done{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;padding:.3rem .6rem;border-radius:2px;cursor:pointer;transition:all .2s;border:1px solid var(--border);background:transparent;color:var(--muted);white-space:nowrap;}
+.btn-done:hover{background:var(--cream-dark);}
+.btn-done.done{background:rgba(26,122,74,.08);border-color:rgba(26,122,74,.3);color:#1a7a4a;}
+.item-date{font-family:var(--font-mono);font-size:.6rem;color:var(--muted);}
+.item-link{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.05em;color:var(--red);display:flex;align-items:center;gap:.3rem;}
+
+/* Empty state */
+.empty-state{text-align:center;padding:5rem 2rem;opacity:.5;}
+.empty-icon{font-size:4rem;margin-bottom:1rem;}
+.empty-title{font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-bottom:.5rem;}
+.empty-sub{font-size:.9rem;color:var(--muted);}
+
+/* Toast notification */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:var(--white);font-family:var(--font-mono);font-size:.78rem;padding:.75rem 1.5rem;border-radius:4px;z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:.6rem;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* Add item demo area */
+.add-demo{background:var(--white);border:1px dashed var(--border);border-radius:4px;padding:1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.add-demo-label{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);flex:1;min-width:200px;}
+.btn-add-demo{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;padding:.5rem 1rem;border-radius:3px;cursor:pointer;transition:all .2s;border:none;display:flex;align-items:center;gap:.4rem;}
+.btn-add-visit{background:var(--visit-bg);color:var(--visit);border:1px solid rgba(200,16,46,.2);}
+.btn-add-read{background:var(--read-bg);color:var(--gold);border:1px solid rgba(184,148,74,.2);}
+.btn-add-watch{background:var(--watch-bg);color:var(--blue);border:1px solid rgba(26,74,173,.2);}
+.btn-add-demo:hover{opacity:.8;}
+
+@media(max-width:768px){
+  .wl-sidebar{display:none;}
+  .wl-main{padding:1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#" class="nav-brand">World<span>Pedia</span></a>
+  <div class="nav-div"></div>
+  <a href="#" class="nav-link">🌍 Countries</a>
+  <a href="#" class="nav-link active">❤️ My Lists</a>
+  <a href="#" class="nav-link">📊 World Data</a>
+  <div class="nav-user">
+    <div class="nav-avatar">U</div>
+    <span>My Account</span>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- SIDEBAR -->
+  <aside class="wl-sidebar">
+    <h2 class="wl-sidebar-title">My Wishlists</h2>
+    <p class="wl-sidebar-sub">Saved items from WorldPedia — synced across devices.</p>
+
+    <!-- Summary stats -->
+    <div class="sidebar-stats">
+      <div class="sidebar-stat"><span class="sidebar-stat-label">Total saved items</span><span class="sidebar-stat-value" id="stat-total">0</span></div>
+      <div class="sidebar-stat"><span class="sidebar-stat-label">Completed</span><span class="sidebar-stat-value" id="stat-done">0</span></div>
+      <div class="sidebar-stat"><span class="sidebar-stat-label">Countries covered</span><span class="sidebar-stat-value" id="stat-countries">0</span></div>
+    </div>
+
+    <!-- List tabs -->
+    <div class="list-tab active-visit" id="tab-visit" onclick="showPanel('visit')">
+      <div class="list-tab-icon icon-visit">✈️</div>
+      <div>
+        <div class="list-tab-name">To Visit</div>
+        <div class="list-tab-count">Countries & places</div>
+      </div>
+      <span class="count-badge badge-visit" id="badge-visit">0</span>
+    </div>
+    <div class="list-tab" id="tab-read" onclick="showPanel('read')">
+      <div class="list-tab-icon icon-read">📚</div>
+      <div>
+        <div class="list-tab-name">To Read</div>
+        <div class="list-tab-count">Books & articles</div>
+      </div>
+      <span class="count-badge badge-read" id="badge-read">0</span>
+    </div>
+    <div class="list-tab" id="tab-watch" onclick="showPanel('watch')">
+      <div class="list-tab-icon icon-watch">🎬</div>
+      <div>
+        <div class="list-tab-name">To Watch</div>
+        <div class="list-tab-count">Films & series</div>
+      </div>
+      <span class="count-badge badge-watch" id="badge-watch">0</span>
+    </div>
+
+    <!-- Actions -->
+    <div class="sidebar-actions">
+      <button class="btn-action" onclick="exportList()"><i class="fa fa-download fa-xs"></i> Export as CSV</button>
+      <button class="btn-action" onclick="shareList()"><i class="fa fa-share-nodes fa-xs"></i> Share list</button>
+      <button class="btn-action" onclick="clearAll()" style="color:var(--red);border-color:rgba(200,16,46,.3);"><i class="fa fa-trash fa-xs"></i> Clear all lists</button>
+    </div>
+  </aside>
+
+  <!-- MAIN PANELS -->
+  <main class="wl-main">
+
+    <!-- Visit Panel -->
+    <div class="wl-panel active" id="panel-visit">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <div class="panel-type-label visit">✈️ To Visit</div>
+          <h2 class="panel-title">Places to Visit</h2>
+        </div>
+        <div class="panel-header-right">
+          <button class="btn-sort active" onclick="sortItems('visit','date')">Recent</button>
+          <button class="btn-sort" onclick="sortItems('visit','alpha')">A–Z</button>
+        </div>
+      </div>
+      <div class="add-demo">
+        <span class="add-demo-label">Demo: Add a country to this list →</span>
+        <button class="btn-add-demo btn-add-visit" onclick="addDemo('visit','Denmark','🇩🇰','Country','Scandinavia','The land of hygge, Vikings and extraordinary design. Copenhagen, Nyhavn, Kronborg Castle.','denmark')">
+          <i class="fa fa-plus fa-xs"></i> Add Denmark
+        </button>
+        <button class="btn-add-demo btn-add-visit" onclick="addDemo('visit','Japan','🇯🇵','Country','East Asia','Ancient temples, bullet trains, cherry blossoms and the most refined food culture on earth.','japan')">
+          <i class="fa fa-plus fa-xs"></i> Add Japan
+        </button>
+      </div>
+      <div class="wl-items" id="items-visit"></div>
+      <div class="empty-state" id="empty-visit">
+        <div class="empty-icon">✈️</div>
+        <div class="empty-title">No places saved yet</div>
+        <div class="empty-sub">Browse countries and click "Add to Wishlist" to save places you want to visit.</div>
+      </div>
+    </div>
+
+    <!-- Read Panel -->
+    <div class="wl-panel" id="panel-read">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <div class="panel-type-label read">📚 To Read</div>
+          <h2 class="panel-title">Books to Read</h2>
+        </div>
+        <div class="panel-header-right">
+          <button class="btn-sort active" onclick="sortItems('read','date')">Recent</button>
+          <button class="btn-sort" onclick="sortItems('read','alpha')">A–Z</button>
+        </div>
+      </div>
+      <div class="add-demo">
+        <span class="add-demo-label">Demo: Add books from Denmark →</span>
+        <button class="btn-add-demo btn-add-read" onclick="addDemo('read','Out of Africa','📖','Book · Karen Blixen','Denmark','Blixen\'s lyrical memoir of her 17 years running a coffee plantation in colonial Kenya.','denmark')">
+          <i class="fa fa-plus fa-xs"></i> Out of Africa
+        </button>
+        <button class="btn-add-demo btn-add-read" onclick="addDemo('read','The Little Book of Hygge','📖','Book · Meik Wiking','Denmark','The definitive guide to the Danish art of cosiness, happiness and togetherness.','denmark')">
+          <i class="fa fa-plus fa-xs"></i> Hygge Book
+        </button>
+      </div>
+      <div class="wl-items" id="items-read"></div>
+      <div class="empty-state" id="empty-read">
+        <div class="empty-icon">📚</div>
+        <div class="empty-title">No books saved yet</div>
+        <div class="empty-sub">Add books from any country's Books section to your reading list.</div>
+      </div>
+    </div>
+
+    <!-- Watch Panel -->
+    <div class="wl-panel" id="panel-watch">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <div class="panel-type-label watch">🎬 To Watch</div>
+          <h2 class="panel-title">Films to Watch</h2>
+        </div>
+        <div class="panel-header-right">
+          <button class="btn-sort active" onclick="sortItems('watch','date')">Recent</button>
+          <button class="btn-sort" onclick="sortItems('watch','alpha')">A–Z</button>
+        </div>
+      </div>
+      <div class="add-demo">
+        <span class="add-demo-label">Demo: Add Danish films →</span>
+        <button class="btn-add-demo btn-add-watch" onclick="addDemo('watch','Another Round (Druk)','🎬','Film · Vinterberg · 2020','Denmark','Four teachers test a theory that humans perform better with a constant low level of alcohol. Academy Award winner.','denmark')">
+          <i class="fa fa-plus fa-xs"></i> Another Round
+        </button>
+        <button class="btn-add-demo btn-add-watch" onclick="addDemo('watch','The Hunt (Jagten)','🎬','Film · Vinterberg · 2012','Denmark','A teacher\'s life is torn apart when a child\'s lie spreads through a small Danish community. Mads Mikkelsen\'s greatest performance.','denmark')">
+          <i class="fa fa-plus fa-xs"></i> The Hunt
+        </button>
+      </div>
+      <div class="wl-items" id="items-watch"></div>
+      <div class="empty-state" id="empty-watch">
+        <div class="empty-icon">🎬</div>
+        <div class="empty-title">No films saved yet</div>
+        <div class="empty-sub">Save films from any country's Films section to your watchlist.</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><i class="fa fa-check fa-xs"></i> <span id="toast-msg">Saved!</span></div>
+
+<script>
+// ── Storage key
+const STORAGE_KEY = 'worldpedia_wishlists_v1';
+
+// ── Load / Save ──────────────────────────────────────────────────────────
+function loadLists() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {visit:[],read:[],watch:[]};
+  } catch(e) { return {visit:[],read:[],watch:[]}; }
+}
+function saveLists(lists) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(lists)); } catch(e) {}
+}
+let lists = loadLists();
+
+// ── Current panel ────────────────────────────────────────────────────────
+let currentPanel = 'visit';
+
+function showPanel(type) {
+  currentPanel = type;
+  ['visit','read','watch'].forEach(t => {
+    document.getElementById(`panel-${t}`).classList.toggle('active', t === type);
+    const tab = document.getElementById(`tab-${t}`);
+    tab.className = 'list-tab';
+    if (t === type) tab.classList.add(`active-${t}`);
+  });
+  renderPanel(type);
+}
+
+// ── Render items ────────────────────────────────────────────────────────
+function renderPanel(type) {
+  const items = lists[type];
+  const container = document.getElementById(`items-${type}`);
+  const empty = document.getElementById(`empty-${type}`);
+
+  container.innerHTML = '';
+  empty.style.display = items.length === 0 ? 'block' : 'none';
+
+  items.forEach(item => {
+    const card = createCard(item, type);
+    container.appendChild(card);
+  });
+  updateStats();
+}
+
+function createCard(item, type) {
+  const div = document.createElement('div');
+  div.className = `wl-item type-${type}`;
+  div.id = `item-${item.id}`;
+  div.innerHTML = `
+    <div class="wl-item-emoji">${item.emoji}</div>
+    <div class="wl-item-body">
+      <div class="wl-item-category category-${type}">${item.category} · ${item.country}</div>
+      <div class="wl-item-title">${item.title}</div>
+      <div class="wl-item-desc">${item.desc}</div>
+      <div class="wl-item-tags">
+        <span class="wl-tag">${item.country}</span>
+        <span class="wl-tag">${type === 'visit' ? '✈️ To Visit' : type === 'read' ? '📚 To Read' : '🎬 To Watch'}</span>
+        ${item.done ? '<span class="wl-tag" style="background:rgba(26,122,74,.1);color:#1a7a4a;">✓ Done</span>' : ''}
+      </div>
+      <div class="item-date" style="margin-top:.5rem;">Added ${formatDate(item.added)}</div>
+    </div>
+    <div class="wl-item-actions">
+      <button class="btn-remove" onclick="removeItem('${type}','${item.id}')" title="Remove"><i class="fa fa-xmark"></i></button>
+      <button class="btn-done ${item.done ? 'done' : ''}" onclick="toggleDone('${type}','${item.id}')" title="Mark done">
+        ${item.done ? '✓ Done' : 'Mark done'}
+      </button>
+      <a href="/country/${item.countrySlug}" class="item-link" target="_blank">
+        View page <i class="fa fa-arrow-up-right-from-square fa-xs"></i>
+      </a>
+    </div>
+  `;
+  return div;
+}
+
+// ── Add item ────────────────────────────────────────────────────────────
+function addDemo(type, title, emoji, category, country, desc, countrySlug) {
+  // Check for duplicate
+  if (lists[type].find(i => i.title === title)) {
+    showToast(`"${title}" is already in your list`);
+    return;
+  }
+  const item = {
+    id: Date.now().toString(),
+    title, emoji, category, country, desc, countrySlug,
+    added: new Date().toISOString(),
+    done: false
+  };
+  lists[type].unshift(item);
+  saveLists(lists);
+  renderPanel(type);
+  updateBadges();
+  showToast(`Added "${title}" to ${type === 'visit' ? 'Places to Visit' : type === 'read' ? 'Reading List' : 'Watchlist'}`);
+}
+
+// Expose globally for country pages to call:
+// WorldPedia.addToWishlist('visit', {title, emoji, category, country, desc, countrySlug})
+window.WorldPedia = {
+  addToWishlist: (type, data) => addDemo(type, data.title, data.emoji, data.category, data.country, data.desc, data.countrySlug),
+  getWishlists: () => lists,
+  isWishlisted: (type, title) => !!lists[type]?.find(i => i.title === title)
+};
+
+// ── Remove item ─────────────────────────────────────────────────────────
+function removeItem(type, id) {
+  const item = lists[type].find(i => i.id === id);
+  lists[type] = lists[type].filter(i => i.id !== id);
+  saveLists(lists);
+  const el = document.getElementById(`item-${id}`);
+  if (el) {
+    el.style.transition = 'opacity .25s, transform .25s';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(20px)';
+    setTimeout(() => { renderPanel(type); updateBadges(); }, 260);
+  }
+  showToast(`Removed "${item?.title || 'item'}" from list`);
+}
+
+// ── Toggle done ─────────────────────────────────────────────────────────
+function toggleDone(type, id) {
+  const item = lists[type].find(i => i.id === id);
+  if (item) {
+    item.done = !item.done;
+    saveLists(lists);
+    renderPanel(type);
+    updateBadges();
+    showToast(item.done ? `Marked "${item.title}" as done ✓` : `Unmarked "${item.title}"`);
+  }
+}
+
+// ── Sort ─────────────────────────────────────────────────────────────────
+function sortItems(type, mode) {
+  if (mode === 'alpha') {
+    lists[type].sort((a,b) => a.title.localeCompare(b.title));
+  } else {
+    lists[type].sort((a,b) => new Date(b.added) - new Date(a.added));
+  }
+  saveLists(lists);
+  renderPanel(type);
+  // Update active sort button
+  document.querySelectorAll(`#panel-${type} .btn-sort`).forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase().includes(mode === 'alpha' ? 'a' : 'rec'));
+  });
+}
+
+// ── Stats ────────────────────────────────────────────────────────────────
+function updateStats() {
+  const all = [...lists.visit, ...lists.read, ...lists.watch];
+  document.getElementById('stat-total').textContent = all.length;
+  document.getElementById('stat-done').textContent = all.filter(i => i.done).length;
+  const countries = new Set(all.map(i => i.countrySlug)).size;
+  document.getElementById('stat-countries').textContent = countries;
+}
+
+function updateBadges() {
+  ['visit','read','watch'].forEach(t => {
+    document.getElementById(`badge-${t}`).textContent = lists[t].length;
+  });
+  updateStats();
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────
+let toastTimeout;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// ── Export ────────────────────────────────────────────────────────────────
+function exportList() {
+  const all = [
+    ...lists.visit.map(i => ({...i, type:'To Visit'})),
+    ...lists.read.map(i => ({...i, type:'To Read'})),
+    ...lists.watch.map(i => ({...i, type:'To Watch'}))
+  ];
+  if (!all.length) { showToast('Your lists are empty'); return; }
+  const csv = ['Type,Title,Category,Country,Added,Done']
+    .concat(all.map(i => `${i.type},"${i.title}","${i.category}",${i.country},${i.added.slice(0,10)},${i.done}`))
+    .join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'worldpedia-wishlists.csv';
+  a.click();
+  showToast('Exported to CSV');
+}
+
+// ── Share ─────────────────────────────────────────────────────────────────
+function shareList() {
+  const url = window.location.href;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => showToast('Share link copied to clipboard'));
+  } else {
+    showToast('Copy this URL to share your list');
+  }
+}
+
+// ── Clear all ─────────────────────────────────────────────────────────────
+function clearAll() {
+  if (confirm('Clear all wishlists? This cannot be undone.')) {
+    lists = {visit:[],read:[],watch:[]};
+    saveLists(lists);
+    renderPanel(currentPanel);
+    updateBadges();
+    showToast('All lists cleared');
+  }
+}
+
+// ── Date formatter ─────────────────────────────────────────────────────────
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+updateBadges();
+renderPanel('visit');
+</script>
+</body>
+</html>
