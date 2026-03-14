@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Primary SEO -->
+  <title>Open World Register — Global Directory of Countries, Cultures & Subdivisions</title>
+  <meta name="description" content="Open World Register is the world's most comprehensive cultural directory — explore detailed information on every country, province, state, territory, and region across the globe." />
+  <meta name="keywords" content="country information, world cultures, cultural directory, countries of the world, provinces and states, world regions, global geography, cultural heritage, country subdivisions, world atlas, nations directory, ethnic groups, languages of the world, world traditions" />
+  <meta name="author" content="Open World Register" />
+  <link rel="canonical" href="https://openworldregister.com/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://openworldregister.com/" />
+  <meta property="og:title" content="Open World Register — Global Cultural Directory" />
+  <meta property="og:description" content="Explore cultural, geographic, and administrative information for every country and its subdivisions. Your definitive reference for the world's nations and regions." />
+  <meta property="og:image" content="https://cdn.openworldregister.com/root/og-image.jpg" />
+  <meta property="og:site_name" content="Open World Register" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Open World Register — Global Cultural Directory" />
+  <meta name="twitter:description" content="The definitive directory of countries, cultures, and subdivisions across the world." />
+  <meta name="twitter:image" content="https://cdn.openworldregister.com/root/og-image.jpg" />
+
+  <!-- Structured Data: WebSite -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Open World Register",
+    "url": "https://openworldregister.com/",
+    "description": "A comprehensive cultural directory of countries, regions, and subdivisions worldwide.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://openworldregister.com/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- Structured Data: Organization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Open World Register",
+    "url": "https://openworldregister.com/",
+    "logo": "https://cdn.openworldregister.com/root/logo.png",
+    "sameAs": []
+  }
+  </script>
+
+  <!-- Fonts: Playfair Display (editorial display), Lora (body serif), DM Sans (UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+  <!-- ===== NAV ===== -->
+  <nav aria-label="Main navigation">
+    <div class="nav-inner">
+      <a href="https://openworldregister.com/" class="nav-logo" aria-label="Open World Register Home">
+        <img src="https://cdn.openworldregister.com/root/logo.png" alt="Open World Register" class="nav-logo-img" width="36" height="36" />
+        <div class="nav-logo-text">
+          Open World Register
+          <span>Global Cultural Directory</span>
+        </div>
+      </a>
+      <ul class="nav-links" role="list">
+        <li><a href="/countries">Countries</a></li>
+        <li><a href="/regions">Regions</a></li>
+        <li><a href="/cultures">Cultures</a></li>
+        <li><a href="/about">About</a></li>
+      </ul>
+      <a href="/explore" class="nav-cta">Explore</a>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero" role="banner">
+    <div class="hero-left">
+      <div class="hero-eyebrow" aria-label="Section label">The World's Cultural Atlas</div>
+      <h1 class="hero-title">Every Nation.<br><em>Every Story.</em></h1>
+      <p class="hero-title-sub">One Open Register.</p>
+      <p class="hero-desc">
+        The most comprehensive directory of cultural, geographic, and administrative information — covering every country, province, state, territory, and region on Earth.
+      </p>
+      <div class="hero-actions">
+        <a href="/explore" class="btn-primary">
+          <span>Start Exploring</span>
+          <span aria-hidden="true">→</span>
+        </a>
+        <a href="/about" class="btn-secondary">
+          <span>How it works</span>
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+      <div class="hero-stats" aria-label="Directory statistics">
+        <div>
+          <div class="hero-stat-num">195</div>
+          <div class="hero-stat-label">Countries</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">4,500+</div>
+          <div class="hero-stat-label">Subdivisions</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">7,000+</div>
+          <div class="hero-stat-label">Cultures</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right" aria-hidden="true">
+      <div class="hero-globe-bg"></div>
+
+      <!-- 3D Globe -->
+      <div id="hero-globe" class="hero-globe-3d">
+        <div class="globe-spinner" id="globe-spinner">
+          <div class="globe-spinner-ring"></div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ===== TICKER ===== -->
+  <div class="ticker" aria-hidden="true" role="presentation">
+    <div class="ticker-inner">
+      <!-- First set -->
+      <span class="ticker-item">🌍 Africa — 54 Countries <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">🌎 Americas — 35 Countries <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">🌏 Asia — 49 Countries <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">🗺 Europe — 44 Countries <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">🌊 Oceania — 14 Countries <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">📜 7,000+ Cultural Traditions <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">🗣 7,100+ Languages Documented <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">🏛 4,500+ Administrative Subdivisions <span class="ticker-dot">◆</span></span>
+      <!-- Duplicate for seamless scroll -->
+      <span class="ticker-item">🌍 Africa — 54 Countries <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">🌎 Americas — 35 Countries <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">🌏 Asia — 49 Countries <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">🗺 Europe — 44 Countries <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">🌊 Oceania — 14 Countries <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">📜 7,000+ Cultural Traditions <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">🗣 7,100+ Languages Documented <span class="ticker-dot">◆</span></span>
+      <span class="ticker-item">🏛 4,500+ Administrative Subdivisions <span class="ticker-dot">◆</span></span>
+    </div>
+  </div>
+
+  <!-- ===== SEARCH SECTION ===== -->
+  <section class="search-section" aria-labelledby="search-heading">
+    <div class="container">
+      <p class="search-label">Find Any Country or Region</p>
+      <h2 id="search-heading" class="search-heading">What are you curious about?</h2>
+      <p class="search-sub">Search by country, province, state, territory, language, ethnic group, or cultural tradition.</p>
+      <div class="search-bar" role="search">
+        <input
+          type="search"
+          id="global-search"
+          name="q"
+          placeholder="Try 'Okinawa Prefecture', 'Basque Country', 'Swahili culture'…"
+          aria-label="Search countries, regions, and cultures"
+          autocomplete="off"
+        />
+        <button type="submit" aria-label="Submit search">Search</button>
+      </div>
+      <div class="search-suggestions" role="navigation" aria-label="Popular searches">
+        <a href="/countries/france" class="suggestion-chip">France</a>
+        <a href="/countries/india/states" class="suggestion-chip">Indian States</a>
+        <a href="/cultures/languages" class="suggestion-chip">World Languages</a>
+        <a href="/countries/nigeria" class="suggestion-chip">Nigeria</a>
+        <a href="/regions/balkans" class="suggestion-chip">The Balkans</a>
+        <a href="/cultures/indigenous" class="suggestion-chip">Indigenous Cultures</a>
+        <a href="/countries/china/provinces" class="suggestion-chip">Chinese Provinces</a>
+        <a href="/cultures/religions" class="suggestion-chip">World Religions</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section class="features" aria-labelledby="features-heading">
+    <div class="container">
+      <div class="section-eyebrow">What we cover</div>
+      <h2 id="features-heading" class="section-heading">A Register of Everything <em>Cultural</em></h2>
+      <p class="section-sub">From national capitals to remote villages, from ancient traditions to contemporary governance — documented with care and depth.</p>
+      <div class="features-grid" role="list">
+        <article class="feature-card fade-up" role="listitem">
+          <div class="feature-num" aria-hidden="true">01</div>
+          <div class="feature-icon" aria-hidden="true">🏛</div>
+          <h3 class="feature-title">Country Profiles</h3>
+          <p class="feature-desc">In-depth profiles for all 195 UN-recognized countries — geography, demographics, government structure, history, and national symbols.</p>
+        </article>
+        <article class="feature-card fade-up" role="listitem" style="transition-delay:0.1s">
+          <div class="feature-num" aria-hidden="true">02</div>
+          <div class="feature-icon" aria-hidden="true">🗺</div>
+          <h3 class="feature-title">Administrative Subdivisions</h3>
+          <p class="feature-desc">States, provinces, territories, counties, oblasts, governorates — every first and second-level subdivision documented and categorized.</p>
+        </article>
+        <article class="feature-card fade-up" role="listitem" style="transition-delay:0.2s">
+          <div class="feature-num" aria-hidden="true">03</div>
+          <div class="feature-icon" aria-hidden="true">🗣</div>
+          <h3 class="feature-title">Languages & Scripts</h3>
+          <p class="feature-desc">Official languages, regional dialects, minority languages, and endangered tongues — with speaker populations and geographic distribution.</p>
+        </article>
+        <article class="feature-card fade-up" role="listitem" style="transition-delay:0.05s">
+          <div class="feature-num" aria-hidden="true">04</div>
+          <div class="feature-icon" aria-hidden="true">🎭</div>
+          <h3 class="feature-title">Traditions & Festivals</h3>
+          <p class="feature-desc">Harvest rituals, religious observances, national holidays, and living cultural practices that define the character of communities.</p>
+        </article>
+        <article class="feature-card fade-up" role="listitem" style="transition-delay:0.15s">
+          <div class="feature-num" aria-hidden="true">05</div>
+          <div class="feature-icon" aria-hidden="true">🍽</div>
+          <h3 class="feature-title">Cuisine & Food Culture</h3>
+          <p class="feature-desc">Regional culinary traditions, staple ingredients, iconic dishes, and food customs that reveal the soul of a place and its people.</p>
+        </article>
+        <article class="feature-card fade-up" role="listitem" style="transition-delay:0.25s">
+          <div class="feature-num" aria-hidden="true">06</div>
+          <div class="feature-icon" aria-hidden="true">⚖️</div>
+          <h3 class="feature-title">Governance & Law</h3>
+          <p class="feature-desc">Constitutional systems, electoral processes, legal traditions, and administrative structures that shape how societies are organized and governed.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== REGIONS ===== -->
+  <section class="regions" aria-labelledby="regions-heading">
+    <div class="container">
+      <div class="section-eyebrow">Browse by Continent</div>
+      <h2 id="regions-heading" class="section-heading">Explore the World's Regions</h2>
+      <p class="section-sub">Pick a region to browse countries, cultures, and subdivisions within it.</p>
+      <nav class="regions-grid" aria-label="Browse by world region">
+        <a href="/regions/africa" class="region-card fade-up">
+          <div class="region-card-body">
+            <span class="region-glyph" aria-hidden="true">🌍</span>
+            <div class="region-name">Africa</div>
+            <div class="region-count">54 countries · 1,500+ cultures</div>
+          </div>
+          <div class="region-bar"><div class="region-bar-fill" style="width:78%"></div></div>
+        </a>
+        <a href="/regions/asia" class="region-card fade-up" style="transition-delay:0.1s">
+          <div class="region-card-body">
+            <span class="region-glyph" aria-hidden="true">🌏</span>
+            <div class="region-name">Asia</div>
+            <div class="region-count">49 countries · 2,000+ cultures</div>
+          </div>
+          <div class="region-bar"><div class="region-bar-fill" style="width:90%"></div></div>
+        </a>
+        <a href="/regions/europe" class="region-card fade-up" style="transition-delay:0.15s">
+          <div class="region-card-body">
+            <span class="region-glyph" aria-hidden="true">🗺</span>
+            <div class="region-name">Europe</div>
+            <div class="region-count">44 countries · 800+ cultures</div>
+          </div>
+          <div class="region-bar"><div class="region-bar-fill" style="width:65%"></div></div>
+        </a>
+        <a href="/regions/americas" class="region-card fade-up" style="transition-delay:0.2s">
+          <div class="region-card-body">
+            <span class="region-glyph" aria-hidden="true">🌎</span>
+            <div class="region-name">Americas</div>
+            <div class="region-count">35 countries · 900+ cultures</div>
+          </div>
+          <div class="region-bar"><div class="region-bar-fill" style="width:55%"></div></div>
+        </a>
+        <a href="/regions/middle-east" class="region-card fade-up" style="transition-delay:0.25s">
+          <div class="region-card-body">
+            <span class="region-glyph" aria-hidden="true">🕌</span>
+            <div class="region-name">Middle East</div>
+            <div class="region-count">18 countries · 400+ cultures</div>
+          </div>
+          <div class="region-bar"><div class="region-bar-fill" style="width:42%"></div></div>
+        </a>
+        <a href="/regions/oceania" class="region-card fade-up" style="transition-delay:0.3s">
+          <div class="region-card-body">
+            <span class="region-glyph" aria-hidden="true">🌊</span>
+            <div class="region-name">Oceania</div>
+            <div class="region-count">14 countries · 900+ cultures</div>
+          </div>
+          <div class="region-bar"><div class="region-bar-fill" style="width:35%"></div></div>
+        </a>
+        <a href="/regions/central-asia" class="region-card fade-up" style="transition-delay:0.35s">
+          <div class="region-card-body">
+            <span class="region-glyph" aria-hidden="true">🏔</span>
+            <div class="region-name">Central Asia</div>
+            <div class="region-count">5 countries · 120+ cultures</div>
+          </div>
+          <div class="region-bar"><div class="region-bar-fill" style="width:22%"></div></div>
+        </a>
+        <a href="/regions/caribbean" class="region-card fade-up" style="transition-delay:0.4s">
+          <div class="region-card-body">
+            <span class="region-glyph" aria-hidden="true">🏝</span>
+            <div class="region-name">Caribbean</div>
+            <div class="region-count">13 countries · 200+ cultures</div>
+          </div>
+          <div class="region-bar"><div class="region-bar-fill" style="width:28%"></div></div>
+        </a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ===== STATS BANNER ===== -->
+  <section class="stats-banner" aria-label="Open World Register by the numbers">
+    <div class="container">
+      <div class="stats-banner-inner">
+        <div class="stat-item-big fade-up">
+          <div class="stat-item-big-num">195</div>
+          <div class="stat-item-big-label">Sovereign countries profiled</div>
+          <div class="stat-item-big-sublabel">UN-recognized nations</div>
+        </div>
+        <div class="stat-item-big fade-up" style="transition-delay:0.1s">
+          <div class="stat-item-big-num">4,500+</div>
+          <div class="stat-item-big-label">Administrative subdivisions</div>
+          <div class="stat-item-big-sublabel">States, provinces & territories</div>
+        </div>
+        <div class="stat-item-big fade-up" style="transition-delay:0.2s">
+          <div class="stat-item-big-num">7,100+</div>
+          <div class="stat-item-big-label">Living languages catalogued</div>
+          <div class="stat-item-big-sublabel">Including endangered tongues</div>
+        </div>
+        <div class="stat-item-big fade-up" style="transition-delay:0.3s">
+          <div class="stat-item-big-num">12,000+</div>
+          <div class="stat-item-big-label">Cultural entries</div>
+          <div class="stat-item-big-sublabel">Traditions, festivals & customs</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTENT TYPES ===== -->
+  <section class="content-types" aria-labelledby="content-heading">
+    <div class="container">
+      <div class="section-eyebrow">Sample Entries</div>
+      <h2 id="content-heading" class="section-heading">The Depth of the Register</h2>
+      <p class="section-sub">Every entry is structured for clarity — whether you're researching, studying, or just curious about the world.</p>
+
+      <div class="content-tabs" role="tablist" aria-label="Content categories">
+        <button class="content-tab active" role="tab" aria-selected="true">Country</button>
+        <button class="content-tab" role="tab" aria-selected="false">Region</button>
+        <button class="content-tab" role="tab" aria-selected="false">Culture</button>
+        <button class="content-tab" role="tab" aria-selected="false">Language</button>
+      </div>
+
+      <div class="content-grid">
+        <div class="content-big-card fade-up">
+          <div class="content-big-card-img">
+            <div class="content-big-card-img-text" aria-hidden="true">🇮🇳</div>
+          </div>
+          <div class="content-big-card-body">
+            <div class="content-big-card-tag">Featured Country · South Asia</div>
+            <h3 class="content-big-card-title">Republic of India</h3>
+            <p class="content-big-card-desc">The world's most populous democracy, India is a subcontinent of extraordinary diversity — spanning 28 states, 8 union territories, 22 official languages, and thousands of distinct cultural traditions spanning millennia.</p>
+          </div>
+        </div>
+        <div class="content-small-cards fade-up" style="transition-delay:0.15s">
+          <div class="content-small-card">
+            <div class="content-small-card-swatch"></div>
+            <div class="content-small-card-body">
+              <div class="content-small-card-tag">Province · Canada</div>
+              <h3 class="content-small-card-title">Québec</h3>
+              <div class="content-small-card-meta">French-speaking · 8.5M population · 1,542,056 km²</div>
+            </div>
+          </div>
+          <div class="content-small-card">
+            <div class="content-small-card-swatch"></div>
+            <div class="content-small-card-body">
+              <div class="content-small-card-tag">Cultural Tradition · West Africa</div>
+              <h3 class="content-small-card-title">Yoruba Festivals</h3>
+              <div class="content-small-card-meta">Nigeria, Benin, Togo · Living tradition · 45M+ practitioners</div>
+            </div>
+          </div>
+          <div class="content-small-card">
+            <div class="content-small-card-swatch"></div>
+            <div class="content-small-card-body">
+              <div class="content-small-card-tag">Language · East Africa</div>
+              <h3 class="content-small-card-title">Swahili (Kiswahili)</h3>
+              <div class="content-small-card-meta">Bantu language · ~200M speakers · Official in 4 countries</div>
+            </div>
+          </div>
+          <div class="content-small-card">
+            <div class="content-small-card-swatch"></div>
+            <div class="content-small-card-body">
+              <div class="content-small-card-tag">Autonomous Region · Spain</div>
+              <h3 class="content-small-card-title">País Vasco (Basque Country)</h3>
+              <div class="content-small-card-meta">Distinct language isolate · 2.2M population · Pre-Indo-European roots</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WHY SECTION ===== -->
+  <section class="why-section" aria-labelledby="why-heading">
+    <div class="container">
+      <div class="why-grid">
+        <div class="why-visual" aria-hidden="true">
+          <div class="why-card-stack">
+            <div class="why-card why-card-1">
+              <div class="why-card-flag-row">🇪🇬 🇩🇿 🇲🇦</div>
+              <h4 class="why-card-title">North Africa</h4>
+              <p class="why-card-detail">6 countries · Arabic, Amazigh, French spoken · Ancient civilizations and modern states</p>
+              <span class="why-card-pill">54 African nations documented</span>
+            </div>
+            <div class="why-card why-card-2">
+              <div class="why-card-flag-row">🇰🇷 🇯🇵 🇨🇳</div>
+              <h4 class="why-card-title">East Asian Cultures</h4>
+              <p class="why-card-detail">Confucian traditions, distinct writing systems, diverse governance models</p>
+              <span class="why-card-pill">Administrative divisions included</span>
+            </div>
+            <div class="why-card why-card-3">
+              <div class="why-card-flag-row">🇧🇴 🇵🇪 🇪🇨</div>
+              <h4 class="why-card-title">Andean Nations</h4>
+              <p class="why-card-detail">Indigenous peoples, Spanish colonial legacy, highland and coastal cultures</p>
+              <span class="why-card-pill">Indigenous groups profiled</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="why-content">
+          <div class="section-eyebrow">Why Open World Register</div>
+          <h2 id="why-heading" class="section-heading">Built for the Curious Mind</h2>
+          <p class="section-sub" style="margin-bottom:0">Whether you're a student, researcher, traveller, or simply someone who finds the world endlessly fascinating — this is your reference.</p>
+          <ul class="why-points" aria-label="Key benefits">
+            <li class="why-point fade-up">
+              <div class="why-point-icon" aria-hidden="true">🔍</div>
+              <div>
+                <h3 class="why-point-title">Structured & Searchable</h3>
+                <p class="why-point-desc">Every country, state, and culture is organized into consistent, comparable data — making cross-cultural research fast and intuitive.</p>
+              </div>
+            </li>
+            <li class="why-point fade-up" style="transition-delay:0.1s">
+              <div class="why-point-icon" aria-hidden="true">🌱</div>
+              <div>
+                <h3 class="why-point-title">Continuously Updated</h3>
+                <p class="why-point-desc">Borders change, languages evolve, and governance shifts. Our register tracks updates to keep records accurate and current.</p>
+              </div>
+            </li>
+            <li class="why-point fade-up" style="transition-delay:0.2s">
+              <div class="why-point-icon" aria-hidden="true">🤝</div>
+              <div>
+                <h3 class="why-point-title">Culturally Respectful</h3>
+                <p class="why-point-desc">Information is presented without bias or hierarchy — every culture, from the most populous to the smallest indigenous group, is documented with equal care.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CALLOUT ===== -->
+  <section class="callout" aria-labelledby="callout-heading">
+    <div class="container">
+      <h2 id="callout-heading" class="callout-heading">The World Is Waiting to Be Explored</h2>
+      <p class="callout-sub">Dive into the Open World Register — a living atlas of humanity's extraordinary cultural diversity.</p>
+      <div class="callout-actions">
+        <a href="/explore" class="btn-white">Browse All Countries</a>
+        <a href="/cultures" class="btn-outline-white">Explore Cultures</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer role="contentinfo">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand-name">
+          <img src="https://cdn.openworldregister.com/root/logo.png" alt="" class="footer-logo-img" width="32" height="32" aria-hidden="true" />
+          Open World Register
+        </div>
+        <p class="footer-brand-desc">The world's most comprehensive free directory of country profiles, cultural traditions, administrative subdivisions, and the languages of humanity.</p>
+        <p style="font-family:var(--ff-ui); font-size:0.75rem; color:rgba(245,239,227,0.35);">openworldregister.com</p>
+      </div>
+      <div>
+        <div class="footer-col-heading">Explore</div>
+        <ul class="footer-links" role="list">
+          <li><a href="/countries">All Countries</a></li>
+          <li><a href="/regions">World Regions</a></li>
+          <li><a href="/subdivisions">Subdivisions</a></li>
+          <li><a href="/cultures">Cultures</a></li>
+          <li><a href="/languages">Languages</a></li>
+          <li><a href="/religions">Religions</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-heading">By Region</div>
+        <ul class="footer-links" role="list">
+          <li><a href="/regions/africa">Africa</a></li>
+          <li><a href="/regions/asia">Asia</a></li>
+          <li><a href="/regions/europe">Europe</a></li>
+          <li><a href="/regions/americas">Americas</a></li>
+          <li><a href="/regions/middle-east">Middle East</a></li>
+          <li><a href="/regions/oceania">Oceania</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-heading">About</div>
+        <ul class="footer-links" role="list">
+          <li><a href="/about">About the Project</a></li>
+          <li><a href="/methodology">Methodology</a></li>
+          <li><a href="/contribute">Contribute</a></li>
+          <li><a href="/api">Data API</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-bottom-text">© 2026 Open World Register. All rights reserved.</p>
+      <div class="footer-bottom-links" role="navigation" aria-label="Legal">
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Use</a>
+        <a href="/sitemap.xml">Sitemap</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Globe.GL -->
+  <script src="https://unpkg.com/globe.gl@2/dist/globe.gl.min.js"></script>
+  <script>
+    (function () {
+      const el = document.getElementById('hero-globe');
+      if (!el || typeof Globe === 'undefined') return;
+
+      const w = el.offsetWidth || 480;
+      const h = el.offsetHeight || 480;
+
+      const pins = [
+        {
+          lat: 35.68, lng: 139.69,
+          flag: '🇯🇵', name: 'Japan',
+          sub: '47 Prefectures', tag: 'East Asia'
+        },
+        {
+          lat: -15.79, lng: -47.88,
+          flag: '🇧🇷', name: 'Brazil',
+          sub: '26 States + DF', tag: 'South America'
+        },
+        {
+          lat: 22.57, lng: 88.36,
+          flag: '🇮🇳', name: 'India',
+          sub: '28 States + 8 UTs', tag: 'South Asia'
+        },
+        {
+          lat: 38.89, lng: -77.03,
+          flag: '🇺🇸', name: 'United States',
+          sub: '50 States + DC', tag: 'North America'
+        },
+        {
+          lat: 50.45, lng: 30.52,
+          flag: '🇺🇦', name: 'Ukraine',
+          sub: '25 Oblasts', tag: 'Eastern Europe'
+        },
+        {
+          lat: -1.29, lng: 36.82,
+          flag: '🇰🇪', name: 'Kenya',
+          sub: '47 Counties', tag: 'East Africa'
+        }
+      ];
+
+      function makeCard(d) {
+        const wrap = document.createElement('div');
+        wrap.className = 'globe-pin-card';
+        wrap.innerHTML = `
+          <div class="globe-pin-dot"></div>
+          <div class="globe-pin-body">
+            <span class="globe-pin-flag">${d.flag}</span>
+            <span class="globe-pin-name">${d.name}</span>
+            <span class="globe-pin-sub">${d.sub}</span>
+            <span class="globe-pin-tag">${d.tag}</span>
+          </div>`;
+        return wrap;
+      }
+
+      const globe = Globe({ animateIn: false })(el)
+        .width(w)
+        .height(h)
+        .backgroundColor('rgba(0,0,0,0)')
+        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-day.jpg')
+        .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+        .atmosphereColor('#e8c96a')
+        .atmosphereAltitude(0.18)
+        .pointOfView({ lat: 20, lng: 10, altitude: 1.8 })
+        .htmlElementsData(pins)
+        .htmlElement(makeCard)
+        .htmlAltitude(0.02)
+        .onGlobeReady(() => {
+          const spinner = document.getElementById('globe-spinner');
+          if (spinner) spinner.style.display = 'none';
+        });
+
+      globe.controls().autoRotate = true;
+      globe.controls().autoRotateSpeed = 0.6;
+      globe.controls().enableZoom = false;
+    })();
+  </script>
+  <script src="scripts.js"></script>
+</body>
+</html>
