@@ -1,0 +1,18 @@
+# robots.txt — Open World Register
+# https://openworldregister.com
+
+User-agent: *
+Allow: /
+
+# Block admin, API, and internal tooling paths
+Disallow: /admin/
+Disallow: /api/
+Disallow: /internal/
+Disallow: /staging/
+Disallow: /dev/
+
+# Block search result pages with query strings (avoid duplicate content)
+Disallow: /search?
+
+# Sitemap
+Sitemap: https://openworldregister.com/sitemap.xml
