@@ -43,3 +43,4 @@ next-env.d.ts
 /meta
 /akshara
 /openworldregister
+/app/generated/prisma

@@ -1,5 +1,5 @@
 import './owr.css';
-import Script from 'next/script';
+import OWRClient from './OWRClient';
 
 export const metadata = {
   title: 'Open World Register — Global Directory of Cultures',
@@ -13,7 +13,7 @@ export default function OWRPage() {
   <!-- ===== NAV ===== -->
   <nav aria-label="Main navigation">
     <div class="nav-inner">
-      <a href="https://openworldregister.com/" class="nav-logo" aria-label="Open World Register Home">
+      <a href="/" class="nav-logo" aria-label="Open World Register Home">
         <img src="https://cdn.openworldregister.com/root/logo.png" alt="Open World Register" class="nav-logo-img" width="36" height="36" />
         <div class="nav-logo-text">
           Open World Register
@@ -21,6 +21,7 @@ export default function OWRPage() {
         </div>
       </a>
       <ul class="nav-links" role="list">
+        <li><a href="/" style="color: #b84a1e; font-weight: bold;">Learn Languages</a></li>
         <li><a href="/countries">Countries</a></li>
         <li><a href="/regions">Regions</a></li>
         <li><a href="/cultures">Cultures</a></li>
@@ -470,88 +471,9 @@ export default function OWRPage() {
     </div>
   </footer>
 
-  <!-- Globe.GL -->
-  <script src="https://unpkg.com/globe.gl@2/dist/globe.gl.min.js"></script>
-  <script>
-    (function () {
-      const el = document.getElementById('hero-globe');
-      if (!el || typeof Globe === 'undefined') return;
-
-      const w = el.offsetWidth || 480;
-      const h = el.offsetHeight || 480;
-
-      const pins = [
-        {
-          lat: 35.68, lng: 139.69,
-          flag: '🇯🇵', name: 'Japan',
-          sub: '47 Prefectures', tag: 'East Asia'
-        },
-        {
-          lat: -15.79, lng: -47.88,
-          flag: '🇧🇷', name: 'Brazil',
-          sub: '26 States + DF', tag: 'South America'
-        },
-        {
-          lat: 22.57, lng: 88.36,
-          flag: '🇮🇳', name: 'India',
-          sub: '28 States + 8 UTs', tag: 'South Asia'
-        },
-        {
-          lat: 38.89, lng: -77.03,
-          flag: '🇺🇸', name: 'United States',
-          sub: '50 States + DC', tag: 'North America'
-        },
-        {
-          lat: 50.45, lng: 30.52,
-          flag: '🇺🇦', name: 'Ukraine',
-          sub: '25 Oblasts', tag: 'Eastern Europe'
-        },
-        {
-          lat: -1.29, lng: 36.82,
-          flag: '🇰🇪', name: 'Kenya',
-          sub: '47 Counties', tag: 'East Africa'
-        }
-      ];
-
-      function makeCard(d) {
-        const wrap = document.createElement('div');
-        wrap.className = 'globe-pin-card';
-        wrap.innerHTML = \`
-          <div class="globe-pin-dot"></div>
-          <div class="globe-pin-body">
-            <span class="globe-pin-flag">\${d.flag}</span>
-            <span class="globe-pin-name">\${d.name}</span>
-            <span class="globe-pin-sub">\${d.sub}</span>
-            <span class="globe-pin-tag">\${d.tag}</span>
-          </div>\`;
-        return wrap;
-      }
-
-      const globe = Globe({ animateIn: false })(el)
-        .width(w)
-        .height(h)
-        .backgroundColor('rgba(0,0,0,0)')
-        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-day.jpg')
-        .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
-        .atmosphereColor('#e8c96a')
-        .atmosphereAltitude(0.18)
-        .pointOfView({ lat: 20, lng: 10, altitude: 1.8 })
-        .htmlElementsData(pins)
-        .htmlElement(makeCard)
-        .htmlAltitude(0.02)
-        .onGlobeReady(() => {
-          const spinner = document.getElementById('globe-spinner');
-          if (spinner) spinner.style.display = 'none';
-        });
-
-      globe.controls().autoRotate = true;
-      globe.controls().autoRotateSpeed = 0.6;
-      globe.controls().enableZoom = false;
-    })();
-  </script>
+  </footer>
   ` }} />
-      <Script src="https://unpkg.com/globe.gl@2/dist/globe.gl.min.js" strategy="beforeInteractive" />
-      <Script src="/owr-scripts.js" strategy="lazyOnload" />
+      <OWRClient />
     </div>
   );
 }

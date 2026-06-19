@@ -1,0 +1,8 @@
+[
+  { "id": "french", "name": "French", "native": "Français", "flag": "🇫🇷", "isActive": true },
+  { "id": "japanese", "name": "Japanese", "native": "日本語", "flag": "🇯🇵", "isActive": true },
+  { "id": "spanish", "name": "Spanish", "native": "Español", "flag": "🇪🇸", "isActive": true },
+  { "id": "arabic", "name": "Arabic", "native": "العربية", "flag": "🇸🇦", "isActive": true },
+  { "id": "hindi", "name": "Hindi", "native": "हिन्दी", "flag": "🇮🇳", "isActive": true },
+  { "id": "russian", "name": "Russian", "native": "Русский", "flag": "🇷🇺", "isActive": true }
+]
