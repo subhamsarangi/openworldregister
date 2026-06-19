@@ -10,3 +10,67 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model Language {
+  id                 String    @id
+  name               String
+  native             String
+  flag               String
+  isActive           Boolean   @default(true)
+  order              Int       @default(0)
+  latitude           Float     @default(0.0)
+  longitude          Float     @default(0.0)
+  
+  // Tab applicability flags
+  lettersApplicable  Boolean   @default(true)
+  wordsApplicable    Boolean   @default(true)
+  patternsApplicable Boolean   @default(true)
+  
+  // Versioned filenames published to R2
+  lettersFile        String?
+  wordsFile          String?
+  patternsFile       String?
+
+  letters            Letter[]
+  words              Word[]
+  patterns           Pattern[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Letter {
+  id             String   @id @default(uuid())
+  languageId     String
+  language       Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  letter         String
+  roman          String
+  type           String   // vowel, consonant, special, etc.
+  example        String
+  pronunciation  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Word {
+  id         String   @id @default(uuid())
+  languageId String
+  language   Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  word       String
+  roman      String
+  meaning    String
+  level      String   // easy, medium, hard
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Pattern {
+  id         String   @id @default(uuid())
+  languageId String
+  language   Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  pattern    String   // e.g. "Are you ___?"
+  blanks     String   // JSON string representing slot values: [{ slotValues: [{ value, roman?, translation }] }]
+  tags       String   // Comma-separated tags
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+

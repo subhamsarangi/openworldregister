@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { RainfallColumn } from "../components/RainfallMarquee";
@@ -17,6 +17,16 @@ const GlobeView = dynamic(() => import("../components/GlobeView"), {
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLocal, setIsLocal] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const host = window.location.hostname;
+      if (host === "localhost" || host === "127.0.0.1" || host.startsWith("192.168.")) {
+        setIsLocal(true);
+      }
+    }
+  }, []);
 
   return (
     <main className="relative w-full min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-12 py-12 md:py-0 overflow-hidden" style={{ backgroundColor: "#faf6ee", color: "#1a1208", fontFamily: "'Lora', Georgia, serif" }}>
@@ -49,6 +59,16 @@ export default function Home() {
           <button onClick={() => setIsModalOpen(true)} className="px-8 py-3 rounded transition-all hover:-translate-y-0.5 shadow text-center" style={{ backgroundColor: "#1a1208", color: "#fffdf8", fontSize: "0.88rem", fontWeight: 500, letterSpacing: "0.04em" }}>
             Start Learning &rarr;
           </button>
+          
+          {isLocal && (
+            <Link 
+              href="/admin" 
+              className="text-xs text-center md:text-left hover:underline opacity-60 hover:opacity-100 transition-opacity mt-1 flex items-center justify-center md:justify-start gap-1"
+              style={{ color: "#6b5740" }}
+            >
+              ⚙️ Admin Portal (Local Only)
+            </Link>
+          )}
         </div>
       </div>
 

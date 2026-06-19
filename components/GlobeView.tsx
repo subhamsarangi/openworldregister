@@ -3,13 +3,31 @@
 import React, { useEffect, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 import { useRouter } from "next/navigation";
+import { getLanguagesFromManifest } from "../app/actions/languages";
 
 export default function GlobeView() {
-  const globeRef = useRef<any>();
+  const globeRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const initializedRef = useRef(false);
   const router = useRouter();
+  const [globeLanguages, setGlobeLanguages] = useState<any[]>([]);
+
+  // Load languages dynamically from manifest / DB fallback
+  useEffect(() => {
+    getLanguagesFromManifest().then((data) => {
+      const activeLangs = data
+        .filter(l => l.isActive)
+        .map(l => ({
+          lat: l.latitude,
+          lng: l.longitude,
+          name: l.name,
+          code: l.id,
+          flag: l.flag
+        }));
+      setGlobeLanguages(activeLangs);
+    });
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -103,31 +121,6 @@ export default function GlobeView() {
     }
   };
 
-  const languageData = [
-    { lat: 35.68, lng: 139.69, name: "Japanese", code: "japanese", flag: "🇯🇵" },
-    { lat: 56.13, lng: -106.34, name: "French", code: "french", flag: "🇨🇦" },
-    { lat: 24.00, lng: 77.00, name: "Hindi", code: "hindi", flag: "🇮🇳" },
-    { lat: 23.63, lng: -102.55, name: "Spanish", code: "spanish", flag: "🇲🇽" },
-    { lat: -1.29, lng: 36.82, name: "Swahili", code: "swahili", flag: "🇰🇪" },
-    { lat: 35.86, lng: 104.19, name: "Chinese", code: "chinese", flag: "🇨🇳" },
-    { lat: 22.00, lng: 91.50, name: "Bengali", code: "bengali", flag: "🇧🇩" },
-    { lat: 23.88, lng: 45.07, name: "Arabic", code: "arabic", flag: "🇸🇦" },
-    { lat: 48.50, lng: 10.45, name: "German", code: "german", flag: "🇩🇪" },
-    { lat: 35.90, lng: 127.76, name: "Korean", code: "korean", flag: "🇰🇷" },
-    { lat: -14.23, lng: -51.92, name: "Portuguese", code: "portuguese", flag: "🇧🇷" },
-    { lat: 61.52, lng: 105.31, name: "Russian", code: "russian", flag: "🇷🇺" },
-    { lat: 38.00, lng: 13.00, name: "Italian", code: "italian", flag: "🇮🇹" },
-    { lat: 38.96, lng: 35.24, name: "Turkish", code: "turkish", flag: "🇹🇷" },
-    { lat: 14.05, lng: 108.27, name: "Vietnamese", code: "vietnamese", flag: "🇻🇳" },
-    { lat: 60.12, lng: 18.64, name: "Swedish", code: "swedish", flag: "🇸🇪" },
-    { lat: 36.00, lng: -110.00, name: "Navajo", code: "navajo", flag: "🇺🇸" },
-    { lat: -25.27, lng: 133.77, name: "English", code: "english", flag: "🇦🇺" },
-    { lat: 9.00, lng: 38.70, name: "Amharic", code: "amharic", flag: "🇪🇹" },
-    { lat: -28.00, lng: 30.00, name: "Zulu", code: "zulu", flag: "🇿🇦" },
-    { lat: 9.00, lng: 80.50, name: "Tamil", code: "tamil", flag: "🇮🇳" },
-    { lat: 29.65, lng: 91.10, name: "Tibetan", code: "tibetan", flag: "🇨🇳" },
-  ];
-
   const htmlElement = (d: any) => {
     const el = document.createElement("div");
     el.innerHTML = `
@@ -158,7 +151,7 @@ export default function GlobeView() {
           backgroundColor="rgba(0,0,0,0)"
           globeImageUrl="https://unpkg.com/three-globe/example/img/earth-day.jpg"
           bumpImageUrl="https://unpkg.com/three-globe/example/img/earth-topology.png"
-          htmlElementsData={languageData}
+          htmlElementsData={globeLanguages}
           htmlAltitude={0}
           htmlElement={htmlElement}
           atmosphereColor="#e8c96a"

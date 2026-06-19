@@ -1,0 +1,384 @@
+{
+  "languages": {
+    "spanish": {
+      "name": "Spanish",
+      "native": "Español",
+      "flag": "🇪🇸",
+      "order": 0,
+      "latitude": 23.63,
+      "longitude": -102.55,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "chinese": {
+      "name": "Chinese",
+      "native": "中文",
+      "flag": "🇨🇳",
+      "order": 1,
+      "latitude": 35.86,
+      "longitude": 104.19,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "arabic": {
+      "name": "Arabic",
+      "native": "العربية",
+      "flag": "🇸🇦",
+      "order": 2,
+      "latitude": 23.88,
+      "longitude": 45.07,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "hindi": {
+      "name": "Hindi",
+      "native": "हिन्दी",
+      "flag": "🇮🇳",
+      "order": 3,
+      "latitude": 24,
+      "longitude": 77,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "german": {
+      "name": "German",
+      "native": "Deutsch",
+      "flag": "🇩🇪",
+      "order": 4,
+      "latitude": 48.5,
+      "longitude": 10.45,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "russian": {
+      "name": "Russian",
+      "native": "Русский",
+      "flag": "🇷🇺",
+      "order": 5,
+      "latitude": 61.52,
+      "longitude": 105.31,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "japanese": {
+      "name": "Japanese",
+      "native": "日本語",
+      "flag": "🇯🇵",
+      "order": 6,
+      "latitude": 35.68,
+      "longitude": 139.69,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "french": {
+      "name": "French",
+      "native": "Français",
+      "flag": "🇫🇷",
+      "order": 7,
+      "latitude": 56.13,
+      "longitude": -106.34,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "bengali": {
+      "name": "Bengali",
+      "native": "বাংলা",
+      "flag": "🇧🇩",
+      "order": 8,
+      "latitude": 22,
+      "longitude": 91.5,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "turkish": {
+      "name": "Turkish",
+      "native": "Türkçe",
+      "flag": "🇹🇷",
+      "order": 9,
+      "latitude": 38.96,
+      "longitude": 35.24,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "korean": {
+      "name": "Korean",
+      "native": "한국어",
+      "flag": "🇰🇷",
+      "order": 10,
+      "latitude": 35.9,
+      "longitude": 127.76,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "portuguese": {
+      "name": "Portuguese",
+      "native": "Português",
+      "flag": "🇧🇷",
+      "order": 11,
+      "latitude": -14.23,
+      "longitude": -51.92,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "tamil": {
+      "name": "Tamil",
+      "native": "தமிழ்",
+      "flag": "🇮🇳",
+      "order": 12,
+      "latitude": 9,
+      "longitude": 80.5,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "vietnamese": {
+      "name": "Vietnamese",
+      "native": "Tiếng Việt",
+      "flag": "🇻🇳",
+      "order": 13,
+      "latitude": 14.05,
+      "longitude": 108.27,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "italian": {
+      "name": "Italian",
+      "native": "Italiano",
+      "flag": "🇮🇹",
+      "order": 14,
+      "latitude": 38,
+      "longitude": 13,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "swedish": {
+      "name": "Swedish",
+      "native": "Svenska",
+      "flag": "🇸🇪",
+      "order": 16,
+      "latitude": 60.12,
+      "longitude": 18.64,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "navajo": {
+      "name": "Navajo",
+      "native": "Diné bizaad",
+      "flag": "🇺🇸",
+      "order": 17,
+      "latitude": 36,
+      "longitude": -110,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "english": {
+      "name": "English",
+      "native": "English",
+      "flag": "🇬🇧",
+      "order": 18,
+      "latitude": -25.27,
+      "longitude": 133.77,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "amharic": {
+      "name": "Amharic",
+      "native": "አማርኛ",
+      "flag": "🇪🇹",
+      "order": 19,
+      "latitude": 9,
+      "longitude": 38.7,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    },
+    "zulu": {
+      "name": "Zulu",
+      "native": "isiZulu",
+      "flag": "🇿🇦",
+      "order": 20,
+      "latitude": -28,
+      "longitude": 30,
+      "tabs": {
+        "letters": {
+          "applicable": true
+        },
+        "words": {
+          "applicable": true
+        },
+        "patterns": {
+          "applicable": true
+        }
+      }
+    }
+  }
+}
