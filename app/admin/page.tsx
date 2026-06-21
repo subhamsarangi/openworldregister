@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { getLanguages, updateLanguages, createLanguage, deleteLanguage, LanguageConfig } from "../actions/languages";
+import { getLanguages, updateLanguages, createLanguage, deleteLanguage, saveLanguage, LanguageConfig } from "../actions/languages";
 import {
   getLetters,
   saveLetter,
@@ -147,7 +147,112 @@ function AdminDashboard() {
   );
 }
 
-// 1. LANGUAGES TAB COMPONENT
+const LANGUAGE_FAMILIES_MAP: Record<string, string[]> = {
+  "Afroasiatic": ["Semitic", "Cushitic", "Berber", "Chadic", "Egyptian"],
+  "Austroasiatic": ["Vietic", "Mon-Khmer", "Munda"],
+  "Austronesian": ["Malayo-Polynesian", "Formosan"],
+  "Dravidian": ["Southern", "South-Central", "Central", "Northern"],
+  "Indo-European": [
+    "Balto-Slavic",
+    "Germanic",
+    "Indo-Aryan",
+    "Romance",
+    "Hellenic",
+    "Celtic",
+    "Iranian",
+    "Armenian",
+    "Albanian"
+  ],
+  "Japonic": ["Japanese", "Ryukyuan"],
+  "Kartvelian": ["Georgian", "Zan", "Svan"],
+  "Koreanic": ["Korean", "Jeju"],
+  "Kra-Dai": ["Tai", "Kam-Sui", "Hlai", "Kra"],
+  "Mayan": ["Yucatecan", "Cholan-Tzeltalan", "K'ichean", "Huastecan"],
+  "Mongolic": ["Eastern Mongolic", "Western Mongolic"],
+  "Na-Dene": ["Athabaskan", "Eyak", "Tlingit"],
+  "Niger-Congo": ["Bantu", "Atlantic-Congo", "Mande", "Gur", "Kwa"],
+  "Nilo-Saharan": ["Nilotic", "Central Sudanic", "Songhay"],
+  "Quechuan": ["Quechua I", "Quechua II"],
+  "Sino-Tibetan": ["Sinitic", "Tibeto-Burman"],
+  "Trans-New Guinea": ["Madang", "Finisterre-Huon", "Kainantu-Goroka"],
+  "Tupian": ["Tupi-Guarani", "Munduruku", "Mawé"],
+  "Turkic": ["Oghuz", "Karluk", "Kipchak", "Siberian Turkic", "Oghur"],
+  "Uralic": ["Finno-Ugric", "Samoyedic"],
+  "Uto-Aztecan": ["Nahuatlan", "Numic", "Takic", "Taracahitic"],
+  "Language Isolate": ["Basque", "Ainu", "Burushaski", "Other Isolate"],
+  "Other": ["Other"]
+};
+
+
+const LANGUAGE_GLYPHS: Record<string, string> = {
+  spanish: "ñ",
+  chinese: "文",
+  arabic: "ض",
+  hindi: "अ",
+  german: "ß",
+  russian: "ж",
+  japanese: "あ",
+  french: "ç",
+  bengali: "আ",
+  turkish: "ğ",
+  korean: "한",
+  portuguese: "ã",
+  tamil: "ழ்",
+  vietnamese: "đ",
+  italian: "è",
+  swedish: "å",
+  navajo: "ł",
+  english: "e",
+  amharic: "ሀ",
+  zulu: "q"
+};
+
+const getLanguageGlyph = (slug: string, nativeName: string, name: string): string => {
+  const s = slug.toLowerCase().trim();
+  if (LANGUAGE_GLYPHS[s]) {
+    return LANGUAGE_GLYPHS[s];
+  }
+  const text = nativeName || name;
+  return text ? Array.from(text)[0] : "🌐";
+};
+
+const WRITING_SYSTEMS = [
+  "Latin / Latina",
+  "Latin (Chữ Quốc ngữ) / Chữ Quốc ngữ",
+  "Arabic alphabet / أبجدية عربية",
+  "Armenian alphabet / Հայոց այბუბեն",
+  "Bengali-Assamese script / বাংলা-অসমীয়া লিপি",
+  "Burmese script / မြန်မာအက္ခရာ",
+  "Cherokee syllabary / ᏣᎳᎩ ᏗᏕᎶᏆᏍᏙᏗ",
+  "Chinese characters / 中文",
+  "Cyrillic / Кириллица",
+  "Devanagari / देवनागरी",
+  "Ge'ez script / ግዕዝ",
+  "Georgian script / ქართული დამწერლობა",
+  "Greek alphabet / Ελληνικό αλφάβητο",
+  "Gujarati script / ગુજરાતી લિપિ",
+  "Gurmukhi (Punjabi) / ਗੁਰਮੁਖੀ",
+  "Hangul / 한글",
+  "Hebrew alphabet / אלפבית עברי",
+  "Japanese (Kana and Kanji) / 日本語",
+  "Kannada script / ಕನ್ನಡ ಲಿಪಿ",
+  "Khmer script / អក្សរខ្មែរ",
+  "Lao script / ອັກສອນລາວ",
+  "Malayalam script / മലയാളലിപി",
+  "Mongolian script / Монгол бичиг",
+  "Odia script / ଓଡ଼ିଆ ଲିପિ",
+  "Sinhala script / සිංහල අක්ෂර მාලාව",
+  "Syriac alphabet / ܐܠܦܒܝܬ ܣܘܪܝܝܐ",
+  "Tamil script / தமிழ் எழுத்துமுறை",
+  "Telugu script / తెలుగు లిపి",
+  "Thaana (Maldivian) / ތާނަ",
+  "Thai script / อักษรไทย",
+  "Tibetan script / བོད་ཡིག",
+  "Tifinagh (Berber) / ⵜⵉⴼⵉⵏ ⴰⵖ",
+  "Unified Canadian Aboriginal Syllabics / ᒐᓇᑕᒥ ᐊᓪᓚᖑᐊᒐᐃᑦ",
+  "Other / Other"
+];
+
 interface LanguagesTabProps {
   languages: LanguageConfig[];
   setLanguages: React.Dispatch<React.SetStateAction<LanguageConfig[]>>;
@@ -160,23 +265,17 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
   const [newId, setNewId] = useState("");
   const [newName, setNewName] = useState("");
   const [newNative, setNewNative] = useState("");
-  const [newFlag, setNewFlag] = useState("");
   const [newLat, setNewLat] = useState("0.0");
   const [newLng, setNewLng] = useState("0.0");
-  const [creating, setCreating] = useState(false);
-  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [newIso1, setNewIso1] = useState("");
+  const [newIso3, setNewIso3] = useState("");
   const [newFamily, setNewFamily] = useState("");
   const [newBranch, setNewBranch] = useState("");
   const [newWritingSystem, setNewWritingSystem] = useState("");
   const [newTotalSpeakers, setNewTotalSpeakers] = useState("");
-  const [newIso1, setNewIso1] = useState("");
-  const [newIso3, setNewIso3] = useState("");
-
-  const handleFieldChange = (index: number, field: keyof LanguageConfig, value: any) => {
-    const newLangs = [...languages];
-    (newLangs[index] as any)[field] = value;
-    setLanguages(newLangs);
-  };
+  const [creating, setCreating] = useState(false);
+  const [editForm, setEditForm] = useState<LanguageConfig | null>(null);
+  const [savingIndividual, setSavingIndividual] = useState(false);
 
   const dragItem = React.useRef<number | null>(null);
   const dragOverItem = React.useRef<number | null>(null);
@@ -207,31 +306,63 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
     setLanguages(newLangs);
   };
 
-  const toggleActive = (index: number) => {
-    const newLangs = [...languages];
-    newLangs[index].isActive = !newLangs[index].isActive;
-    setLanguages(newLangs);
+  const toggleActive = async (index: number) => {
+    const updated = { ...languages[index], isActive: !languages[index].isActive };
+    const res = await saveLanguage(updated);
+    if (res.success) {
+      const newLangs = [...languages];
+      newLangs[index] = updated;
+      setLanguages(newLangs);
+    } else {
+      alert(`Error toggling active state: ${res.error}`);
+    }
   };
 
-  const toggleApplicable = (index: number, tab: "letters" | "words" | "patterns") => {
-    const newLangs = [...languages];
-    if (tab === "letters") newLangs[index].lettersApplicable = !newLangs[index].lettersApplicable;
-    if (tab === "words") newLangs[index].wordsApplicable = !newLangs[index].wordsApplicable;
-    if (tab === "patterns") newLangs[index].patternsApplicable = !newLangs[index].patternsApplicable;
-    setLanguages(newLangs);
+  const toggleApplicable = async (index: number, tab: "letters" | "words" | "patterns") => {
+    const updated = { ...languages[index] };
+    if (tab === "letters") updated.lettersApplicable = !updated.lettersApplicable;
+    if (tab === "words") updated.wordsApplicable = !updated.wordsApplicable;
+    if (tab === "patterns") updated.patternsApplicable = !updated.patternsApplicable;
+    
+    const res = await saveLanguage(updated);
+    if (res.success) {
+      const newLangs = [...languages];
+      newLangs[index] = updated;
+      setLanguages(newLangs);
+    } else {
+      alert(`Error toggling tab applicability: ${res.error}`);
+    }
   };
 
   const handleSave = async () => {
     setSaving(true);
     await updateLanguages(languages);
     setSaving(false);
-    alert("Languages configuration saved!");
+    alert("Sorting order saved successfully!");
+  };
+
+  const handleSaveIndividual = async () => {
+    if (!editForm) return;
+    if (!editForm.name || !editForm.nativeName || !editForm.iso6393 || !editForm.slug) {
+      alert("Please fill in all required fields (Name, Native Name, Slug, ISO 639-3).");
+      return;
+    }
+    setSavingIndividual(true);
+    const res = await saveLanguage(editForm);
+    setSavingIndividual(false);
+    if (res.success) {
+      alert(`${editForm.name} saved successfully!`);
+      setEditForm(null);
+      onRefresh();
+    } else {
+      alert(`Error saving language: ${res.error}`);
+    }
   };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newId || !newName || !newNative || !newFlag || !newIso3) {
-      alert("All fields marked with * are required (Slug, Name, Native Name, Flag, ISO 639-3)");
+    if (!newId || !newName || !newNative || !newIso3) {
+      alert("All fields marked with * are required (Slug, Name, Native Name, ISO 639-3)");
       return;
     }
     setCreating(true);
@@ -241,7 +372,7 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
       iso6393: newIso3,
       name: newName,
       nativeName: newNative,
-      flag: newFlag,
+      flag: "🌐",
       latitude: parseFloat(newLat) || 0.0,
       longitude: parseFloat(newLng) || 0.0,
       family: newFamily || undefined,
@@ -254,7 +385,6 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
       setNewId("");
       setNewName("");
       setNewNative("");
-      setNewFlag("");
       setNewLat("0.0");
       setNewLng("0.0");
       setNewFamily("");
@@ -347,17 +477,6 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1">Flag Emoji</label>
-            <input
-              type="text"
-              placeholder="e.g. 🇰🇪"
-              value={newFlag}
-              onChange={e => setNewFlag(e.target.value)}
-              className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
-            />
-          </div>
-
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">Latitude</label>
@@ -384,36 +503,49 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">Language Family</label>
-              <input
-                type="text"
-                placeholder="e.g. Niger-Congo"
+              <select
                 value={newFamily}
-                onChange={e => setNewFamily(e.target.value)}
-                className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
-              />
+                onChange={e => {
+                  setNewFamily(e.target.value);
+                  setNewBranch("");
+                }}
+                className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white cursor-pointer"
+              >
+                <option value="">Select Family...</option>
+                {Object.keys(LANGUAGE_FAMILIES_MAP).map(fam => (
+                  <option key={fam} value={fam}>{fam}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">Branch</label>
-              <input
-                type="text"
-                placeholder="e.g. Bantu"
+              <select
                 value={newBranch}
                 onChange={e => setNewBranch(e.target.value)}
-                className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
-              />
+                disabled={!newFamily}
+                className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="">Select Branch...</option>
+                {newFamily && LANGUAGE_FAMILIES_MAP[newFamily]?.map(br => (
+                  <option key={br} value={br}>{br}</option>
+                ))}
+              </select>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">Writing System</label>
-              <input
-                type="text"
-                placeholder="e.g. Latin"
+              <select
                 value={newWritingSystem}
                 onChange={e => setNewWritingSystem(e.target.value)}
-                className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
-              />
+                className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white cursor-pointer"
+              >
+                <option value="">Select Writing System...</option>
+                {WRITING_SYSTEMS.map(ws => (
+                  <option key={ws} value={ws}>{ws}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">Total Speakers</label>
@@ -482,127 +614,24 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
                   <button onClick={() => moveUp(idx)} disabled={idx === 0} className="text-gray-500 hover:text-black disabled:opacity-20 text-[10px] px-1 py-0.5 leading-none">▲</button>
                   <button onClick={() => moveDown(idx)} disabled={idx === languages.length - 1} className="text-gray-500 hover:text-black disabled:opacity-20 text-[10px] px-1 py-0.5 leading-none">▼</button>
                 </div>
-                
-                {editingIdx === idx ? (
-                  <div className="flex flex-wrap gap-2 items-center w-full">
-                    <input 
-                      type="text" 
-                      value={lang.flag} 
-                      onChange={e => handleFieldChange(idx, "flag", e.target.value)}
-                      className="w-12 p-1.5 rounded border border-black/15 text-center text-lg outline-none text-[#1a1208] bg-white"
-                      title="Flag Emoji"
-                    />
-                    <div className="flex flex-col gap-1.5 flex-1 min-w-[120px]">
-                      <input 
-                        type="text" 
-                        value={lang.name} 
-                        onChange={e => handleFieldChange(idx, "name", e.target.value)}
-                        className="w-full p-1.5 rounded border border-black/15 text-xs font-bold outline-none text-[#1a1208] bg-white"
-                        placeholder="Language Name"
-                      />
-                      <input 
-                        type="text" 
-                        value={lang.nativeName} 
-                        onChange={e => handleFieldChange(idx, "nativeName", e.target.value)}
-                        className="w-full p-1.5 rounded border border-black/15 text-xs outline-none text-[#1a1208] bg-white"
-                        placeholder="Native Name"
-                      />
-                      <div className="flex gap-1">
-                        <input 
-                          type="number" 
-                          step="any"
-                          value={lang.latitude} 
-                          onChange={e => handleFieldChange(idx, "latitude", parseFloat(e.target.value) || 0)}
-                          className="w-1/2 p-1 rounded border border-black/15 text-[10px] outline-none text-[#1a1208] bg-white"
-                          placeholder="Lat"
-                        />
-                        <input 
-                          type="number" 
-                          step="any"
-                          value={lang.longitude} 
-                          onChange={e => handleFieldChange(idx, "longitude", parseFloat(e.target.value) || 0)}
-                          className="w-1/2 p-1 rounded border border-black/15 text-[10px] outline-none text-[#1a1208] bg-white"
-                          placeholder="Lng"
-                        />
-                      </div>
-                      <div className="flex gap-1">
-                        <input 
-                          type="text" 
-                          value={lang.family || ""} 
-                          onChange={e => handleFieldChange(idx, "family", e.target.value || null)}
-                          className="w-1/2 p-1 rounded border border-black/15 text-[9px] outline-none text-[#1a1208] bg-white"
-                          placeholder="Family"
-                        />
-                        <input 
-                          type="text" 
-                          value={lang.branch || ""} 
-                          onChange={e => handleFieldChange(idx, "branch", e.target.value || null)}
-                          className="w-1/2 p-1 rounded border border-black/15 text-[9px] outline-none text-[#1a1208] bg-white"
-                          placeholder="Branch"
-                        />
-                      </div>
-                      <div className="flex gap-1">
-                        <input 
-                          type="text" 
-                          value={lang.writingSystem || ""} 
-                          onChange={e => handleFieldChange(idx, "writingSystem", e.target.value || null)}
-                          className="w-1/2 p-1 rounded border border-black/15 text-[9px] outline-none text-[#1a1208] bg-white"
-                          placeholder="Writing System"
-                        />
-                        <input 
-                          type="number" 
-                          value={lang.totalSpeakers !== null ? lang.totalSpeakers : ""} 
-                          onChange={e => handleFieldChange(idx, "totalSpeakers", e.target.value ? parseInt(e.target.value) : null)}
-                          className="w-1/2 p-1 rounded border border-black/15 text-[9px] outline-none text-[#1a1208] bg-white"
-                          placeholder="Speakers count"
-                        />
-                      </div>
-                      <div className="flex gap-1">
-                        <input 
-                          type="text" 
-                          maxLength={2}
-                          value={lang.iso6391 || ""} 
-                          onChange={e => handleFieldChange(idx, "iso6391", e.target.value.toLowerCase().trim() || null)}
-                          className="w-1/2 p-1 rounded border border-black/15 text-[9px] outline-none text-[#1a1208] bg-white"
-                          placeholder="ISO 639-1"
-                        />
-                        <input 
-                          type="text" 
-                          maxLength={3}
-                          value={lang.iso6393 || ""} 
-                          onChange={e => handleFieldChange(idx, "iso6393", e.target.value.toLowerCase().trim() || "")}
-                          className="w-1/2 p-1 rounded border border-black/15 text-[9px] outline-none text-[#1a1208] bg-white"
-                          placeholder="ISO 639-3 *"
-                        />
-                      </div>
-                    </div>
+                <span className="w-8 h-8 rounded-full bg-[#f5efe3] text-[#b84a1e] font-bold text-sm flex items-center justify-center border border-black/5 flex-shrink-0 select-none">
+                  {getLanguageGlyph(lang.slug, lang.nativeName, lang.name)}
+                </span>
+                <button
+                  onClick={() => setEditForm({ ...lang })}
+                  className="flex-1 min-w-0 text-left hover:text-[#b84a1e] transition-colors focus:outline-none group cursor-pointer"
+                  title="Click to view and edit language details"
+                >
+                  <div className="font-bold text-base flex items-center gap-1.5 group-hover:underline decoration-[#b84a1e]">
+                    {lang.name}
+                    {lang.iso6393 && (
+                      <span className="text-[9px] px-1 py-0.5 rounded bg-black/5 text-gray-500 font-mono font-normal no-underline">
+                        {lang.iso6393}
+                      </span>
+                    )}
                   </div>
-                ) : (
-                  <>
-                    <span className="text-3xl">{lang.flag}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-bold text-base flex items-center gap-1.5">
-                        {lang.name}
-                        {lang.iso6393 && (
-                          <span className="text-[9px] px-1 py-0.5 rounded bg-black/5 text-gray-500 font-mono">
-                            {lang.iso6393}
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-xs text-gray-500">{lang.nativeName} {`(${lang.latitude.toFixed(2)}, ${lang.longitude.toFixed(2)})`}</div>
-                      {(lang.family || lang.branch || lang.writingSystem || lang.totalSpeakers !== null) && (
-                        <div className="text-[10px] text-gray-400 mt-1 flex flex-wrap gap-x-2 gap-y-0.5 bg-black/[0.02] p-1 rounded border border-black/[0.03]">
-                          {lang.family && <span>📁 {lang.family}</span>}
-                          {lang.branch && <span>🌿 {lang.branch}</span>}
-                          {lang.writingSystem && <span>✍️ {lang.writingSystem}</span>}
-                          {lang.totalSpeakers !== null && (
-                            <span>👥 {lang.totalSpeakers.toLocaleString()}</span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
+                  <div className="text-xs text-gray-500">{lang.nativeName}</div>
+                </button>
               </div>
 
               {/* Col 5-6: Letters checkbox */}
@@ -647,7 +676,7 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
                 </label>
               </div>
 
-              {/* Col 11-12: Visibility Toggle & Done/Edit & Delete */}
+              {/* Col 11-12: Visibility Toggle & Edit & Delete */}
               <div className="col-span-1 lg:col-span-2 flex items-center justify-between lg:justify-end gap-2">
                 <label className="flex items-center gap-2 cursor-pointer bg-white px-2 py-1.5 rounded border border-black/5 shadow-xs">
                   <input 
@@ -659,26 +688,7 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
                   />
                   <span className="font-medium text-xs whitespace-nowrap">{lang.isActive ? "Show" : "Hidden"}</span>
                 </label>
-                
                 <div className="flex items-center gap-1.5">
-                  {editingIdx === idx ? (
-                    <button
-                      onClick={() => setEditingIdx(null)}
-                      className="px-2.5 py-1.5 rounded text-xs font-bold text-white bg-green-700 hover:bg-green-800 transition-all shadow-xs"
-                      title="Done editing fields"
-                    >
-                      ✓
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setEditingIdx(idx)}
-                      className="px-2.5 py-1.5 rounded text-xs font-medium border border-black/10 hover:bg-black/5 transition-all text-gray-600"
-                      title="Edit fields"
-                    >
-                      ✏️
-                    </button>
-                  )}
-                  
                   <button 
                     onClick={() => handleDeleteLang(lang.id, lang.name)}
                     className="px-2.5 py-1.5 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded font-semibold transition-all"
@@ -692,6 +702,236 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
           ))}
         </div>
       </div>
+
+      {editForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 overflow-y-auto">
+          <div 
+            className="bg-[#fffdf8] rounded-2xl w-full max-w-2xl shadow-2xl border border-black/10 overflow-hidden my-8"
+            style={{ color: "#1a1208", fontFamily: "'DM Sans', sans-serif" }}
+          >
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-black/5 bg-white flex justify-between items-center">
+              <h3 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "'Playfair Display', serif" }}>
+                <span className="w-8 h-8 rounded-full bg-[#f5efe3] text-[#b84a1e] font-bold text-sm flex items-center justify-center border border-black/5 select-none">
+                  {getLanguageGlyph(editForm.slug, editForm.nativeName, editForm.name)}
+                </span> Edit {editForm.name}
+              </h3>
+              <button 
+                onClick={() => setEditForm(null)}
+                className="text-gray-400 hover:text-black text-xl font-semibold leading-none"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 flex flex-col gap-4 max-h-[70vh] overflow-y-auto" style={{ scrollbarWidth: "thin" }}>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Display Name *</label>
+                  <input 
+                    type="text" 
+                    value={editForm.name} 
+                    onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                    className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Native Name *</label>
+                  <input 
+                    type="text" 
+                    value={editForm.nativeName} 
+                    onChange={e => setEditForm({ ...editForm, nativeName: e.target.value })}
+                    className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">ISO 639-1 (2 chars)</label>
+                  <input 
+                    type="text" 
+                    maxLength={2}
+                    value={editForm.iso6391 || ""} 
+                    onChange={e => setEditForm({ ...editForm, iso6391: e.target.value.toLowerCase().trim() || null })}
+                    className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">ISO 639-3 * (3 chars)</label>
+                  <input 
+                    type="text" 
+                    maxLength={3}
+                    value={editForm.iso6393} 
+                    onChange={e => setEditForm({ ...editForm, iso6393: e.target.value.toLowerCase().trim() })}
+                    className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Slug *</label>
+                  <input 
+                    type="text" 
+                    value={editForm.slug} 
+                    onChange={e => setEditForm({ ...editForm, slug: e.target.value.toLowerCase().trim() })}
+                    className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Latitude</label>
+                  <input 
+                    type="number" 
+                    step="any"
+                    value={editForm.latitude} 
+                    onChange={e => setEditForm({ ...editForm, latitude: parseFloat(e.target.value) || 0 })}
+                    className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Longitude</label>
+                  <input 
+                    type="number" 
+                    step="any"
+                    value={editForm.longitude} 
+                    onChange={e => setEditForm({ ...editForm, longitude: parseFloat(e.target.value) || 0 })}
+                    className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Language Family</label>
+                  <select
+                    value={editForm.family || ""}
+                    onChange={e => setEditForm({ ...editForm, family: e.target.value || null, branch: null })}
+                    className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white cursor-pointer"
+                  >
+                    <option value="">Select Family...</option>
+                    {Object.keys(LANGUAGE_FAMILIES_MAP).map(fam => (
+                      <option key={fam} value={fam}>{fam}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Branch</label>
+                  <select
+                    value={editForm.branch || ""}
+                    onChange={e => setEditForm({ ...editForm, branch: e.target.value || null })}
+                    disabled={!editForm.family}
+                    className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="">Select Branch...</option>
+                    {editForm.family && LANGUAGE_FAMILIES_MAP[editForm.family]?.map(br => (
+                      <option key={br} value={br}>{br}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Writing System</label>
+                  <select
+                    value={editForm.writingSystem || ""}
+                    onChange={e => setEditForm({ ...editForm, writingSystem: e.target.value || null })}
+                    className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white cursor-pointer"
+                  >
+                    <option value="">Select Writing System...</option>
+                    {WRITING_SYSTEMS.map(ws => (
+                      <option key={ws} value={ws}>{ws}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Total Speakers</label>
+                  <input 
+                    type="number" 
+                    value={editForm.totalSpeakers !== null ? editForm.totalSpeakers : ""} 
+                    onChange={e => setEditForm({ ...editForm, totalSpeakers: e.target.value ? parseInt(e.target.value) : null })}
+                    className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208] bg-white"
+                  />
+                </div>
+              </div>
+
+              <div className="border-t border-black/5 pt-4 mt-2 grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Applicable Tabs</span>
+                  <div className="flex flex-col gap-2">
+                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={editForm.lettersApplicable} 
+                        onChange={e => setEditForm({ ...editForm, lettersApplicable: e.target.checked })}
+                        className="w-4 h-4" 
+                        style={{ accentColor: "#b84a1e" }}
+                      />
+                      Letters/Script Tab
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={editForm.wordsApplicable} 
+                        onChange={e => setEditForm({ ...editForm, wordsApplicable: e.target.checked })}
+                        className="w-4 h-4" 
+                        style={{ accentColor: "#b84a1e" }}
+                      />
+                      Words/Vocab Tab
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={editForm.patternsApplicable} 
+                        onChange={e => setEditForm({ ...editForm, patternsApplicable: e.target.checked })}
+                        className="w-4 h-4" 
+                        style={{ accentColor: "#b84a1e" }}
+                      />
+                      Patterns/Phrases Tab
+                    </label>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Status</span>
+                  <div>
+                    <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={editForm.isActive} 
+                        onChange={e => setEditForm({ ...editForm, isActive: e.target.checked })}
+                        className="w-4 h-4" 
+                        style={{ accentColor: "#b84a1e" }}
+                      />
+                      Show on Globe & Enable Language
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-black/5 bg-white flex justify-end gap-3">
+              <button 
+                onClick={() => setEditForm(null)}
+                disabled={savingIndividual}
+                className="px-4 py-2 border border-black/10 rounded-lg text-sm text-gray-600 hover:bg-black/5 transition-all"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleSaveIndividual}
+                disabled={savingIndividual}
+                className="px-5 py-2 rounded-lg text-white font-bold bg-[#b84a1e] hover:opacity-90 transition-all flex items-center gap-2 text-sm"
+              >
+                {savingIndividual ? "Saving..." : "Save Language"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -804,7 +1044,7 @@ function LettersTab({ languages, selectedLanguageId, setSelectedLanguageId, sele
               className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none"
             >
               {languages.map(l => (
-                <option key={l.id} value={l.id}>{l.flag} {l.name}</option>
+                <option key={l.id} value={l.id}>{l.name}</option>
               ))}
             </select>
           </div>
@@ -1026,7 +1266,7 @@ function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId, select
               className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none"
             >
               {languages.map(l => (
-                <option key={l.id} value={l.id}>{l.flag} {l.name}</option>
+                <option key={l.id} value={l.id}>{l.name}</option>
               ))}
             </select>
           </div>
@@ -1260,7 +1500,7 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
               className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none"
             >
               {languages.map(l => (
-                <option key={l.id} value={l.id}>{l.flag} {l.name}</option>
+                <option key={l.id} value={l.id}>{l.name}</option>
               ))}
             </select>
           </div>
@@ -1431,7 +1671,9 @@ function PublishTab({ languages, onRefresh }: { languages: LanguageConfig[]; onR
         {languages.map((lang) => (
           <div key={lang.id} className="p-5 rounded-xl border border-black/5 bg-[#fffdf8] flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <span className="text-4xl">{lang.flag}</span>
+              <span className="w-10 h-10 rounded-full bg-[#f5efe3] text-[#b84a1e] font-bold text-lg flex items-center justify-center border border-black/5 select-none">
+                {getLanguageGlyph(lang.slug, lang.nativeName, lang.name)}
+              </span>
               <div>
                 <h4 className="font-bold text-lg">{lang.name}</h4>
                 <div className="flex gap-4 text-xs text-gray-500 mt-1">

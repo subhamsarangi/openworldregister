@@ -8,6 +8,38 @@ interface ModalProps {
   onClose: () => void;
 }
 
+const LANGUAGE_GLYPHS: Record<string, string> = {
+  spanish: "ñ",
+  chinese: "文",
+  arabic: "ض",
+  hindi: "अ",
+  german: "ß",
+  russian: "ж",
+  japanese: "あ",
+  french: "ç",
+  bengali: "আ",
+  turkish: "ğ",
+  korean: "한",
+  portuguese: "ã",
+  tamil: "ழ்",
+  vietnamese: "đ",
+  italian: "è",
+  swedish: "å",
+  navajo: "ł",
+  english: "e",
+  amharic: "ሀ",
+  zulu: "q"
+};
+
+const getLanguageGlyph = (slug: string, nativeName: string, name: string): string => {
+  const s = slug.toLowerCase().trim();
+  if (LANGUAGE_GLYPHS[s]) {
+    return LANGUAGE_GLYPHS[s];
+  }
+  const text = nativeName || name;
+  return text ? Array.from(text)[0] : "🌐";
+};
+
 export function StartLearningModal({ isOpen, onClose }: ModalProps) {
   const [show, setShow] = useState(false);
   const [languages, setLanguages] = useState<LanguageConfig[]>([]);
@@ -129,7 +161,9 @@ export function StartLearningModal({ isOpen, onClose }: ModalProps) {
                   style={{ backgroundColor: "#fffdf8", border: "1px solid rgba(107, 87, 64, 0.1)", boxShadow: "0 4px 12px rgba(26, 18, 8, 0.03)" }}
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-3xl">{lang.flag}</span>
+                    <span className="w-10 h-10 rounded-full bg-[#f5efe3] text-[#b84a1e] font-bold text-base flex items-center justify-center border border-black/5 select-none transition-all group-hover:bg-[#b84a1e] group-hover:text-white flex-shrink-0">
+                      {getLanguageGlyph(lang.slug, lang.nativeName, lang.name)}
+                    </span>
                     <div className="flex flex-col">
                       <span className="font-bold text-base" style={{ color: "#1a1208" }}>{lang.name}</span>
                       <span className="text-xs" style={{ color: "#6b5740" }}>{lang.nativeName}</span>

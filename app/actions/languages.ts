@@ -97,22 +97,7 @@ export async function updateLanguages(languages: LanguageConfig[]) {
       const { error } = await supabase
         .from("languages")
         .update({
-          name: lang.name,
-          native_name: lang.nativeName,
-          flag: lang.flag,
-          latitude: lang.latitude,
-          longitude: lang.longitude,
-          is_active: lang.isActive,
           display_order: i,
-          letters_applicable: lang.lettersApplicable ?? true,
-          words_applicable: lang.wordsApplicable ?? true,
-          patterns_applicable: lang.patternsApplicable ?? true,
-          family: lang.family || null,
-          branch: lang.branch || null,
-          writing_system: lang.writingSystem || null,
-          total_speakers: lang.totalSpeakers || null,
-          iso_639_1: lang.iso6391 || null,
-          iso_639_3: lang.iso6393,
         })
         .eq("id", lang.id);
 
@@ -121,6 +106,38 @@ export async function updateLanguages(languages: LanguageConfig[]) {
     return { success: true };
   } catch (err) {
     console.error("Error updating languages in Supabase:", err);
+    return { success: false, error: String(err) };
+  }
+}
+
+export async function saveLanguage(lang: LanguageConfig) {
+  try {
+    const { error } = await supabase
+      .from("languages")
+      .update({
+        name: lang.name.trim(),
+        native_name: lang.nativeName.trim(),
+        flag: lang.flag.trim(),
+        latitude: lang.latitude,
+        longitude: lang.longitude,
+        is_active: lang.isActive,
+        letters_applicable: lang.lettersApplicable ?? true,
+        words_applicable: lang.wordsApplicable ?? true,
+        patterns_applicable: lang.patternsApplicable ?? true,
+        family: lang.family || null,
+        branch: lang.branch || null,
+        writing_system: lang.writingSystem || null,
+        total_speakers: lang.totalSpeakers || null,
+        iso_639_1: lang.iso6391 || null,
+        iso_639_3: lang.iso6393,
+        slug: lang.slug.toLowerCase().trim(),
+      })
+      .eq("id", lang.id);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error("Error saving language in Supabase:", err);
     return { success: false, error: String(err) };
   }
 }
