@@ -165,6 +165,12 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
   const [newLng, setNewLng] = useState("0.0");
   const [creating, setCreating] = useState(false);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [newFamily, setNewFamily] = useState("");
+  const [newBranch, setNewBranch] = useState("");
+  const [newWritingSystem, setNewWritingSystem] = useState("");
+  const [newTotalSpeakers, setNewTotalSpeakers] = useState("");
+  const [newIso1, setNewIso1] = useState("");
+  const [newIso3, setNewIso3] = useState("");
 
   const handleFieldChange = (index: number, field: keyof LanguageConfig, value: any) => {
     const newLangs = [...languages];
@@ -224,19 +230,24 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newId || !newName || !newNative || !newFlag) {
-      alert("All fields are required");
+    if (!newId || !newName || !newNative || !newFlag || !newIso3) {
+      alert("All fields marked with * are required (Slug, Name, Native Name, Flag, ISO 639-3)");
       return;
     }
     setCreating(true);
     const res = await createLanguage({
       slug: newId,
-      iso6393: newId,
+      iso6391: newIso1 || undefined,
+      iso6393: newIso3,
       name: newName,
       nativeName: newNative,
       flag: newFlag,
       latitude: parseFloat(newLat) || 0.0,
-      longitude: parseFloat(newLng) || 0.0
+      longitude: parseFloat(newLng) || 0.0,
+      family: newFamily || undefined,
+      branch: newBranch || undefined,
+      writingSystem: newWritingSystem || undefined,
+      totalSpeakers: newTotalSpeakers ? parseInt(newTotalSpeakers) : undefined,
     });
     setCreating(false);
     if (res.success) {
@@ -246,6 +257,12 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
       setNewFlag("");
       setNewLat("0.0");
       setNewLng("0.0");
+      setNewFamily("");
+      setNewBranch("");
+      setNewWritingSystem("");
+      setNewTotalSpeakers("");
+      setNewIso1("");
+      setNewIso3("");
       alert("Language added successfully!");
       onRefresh();
     } else {
@@ -273,15 +290,39 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
           Add New Language
         </h3>
         <form onSubmit={handleCreate} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1">Code / ID (lowercase)</label>
-            <input
-              type="text"
-              placeholder="e.g. swahili"
-              value={newId}
-              onChange={e => setNewId(e.target.value)}
-              className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
-            />
+          <div className="grid grid-cols-3 gap-2">
+            <div className="col-span-1">
+              <label className="block text-[10px] font-semibold text-gray-500 mb-1">Slug *</label>
+              <input
+                type="text"
+                placeholder="swahili"
+                value={newId}
+                onChange={e => setNewId(e.target.value.toLowerCase().trim())}
+                className="w-full p-2 rounded border border-black/10 text-xs outline-none text-[#1a1208]"
+              />
+            </div>
+            <div className="col-span-1">
+              <label className="block text-[10px] font-semibold text-gray-500 mb-1">ISO 639-1</label>
+              <input
+                type="text"
+                maxLength={2}
+                placeholder="sw"
+                value={newIso1}
+                onChange={e => setNewIso1(e.target.value.toLowerCase().trim())}
+                className="w-full p-2 rounded border border-black/10 text-xs outline-none text-[#1a1208]"
+              />
+            </div>
+            <div className="col-span-1">
+              <label className="block text-[10px] font-semibold text-gray-500 mb-1">ISO 639-3 *</label>
+              <input
+                type="text"
+                maxLength={3}
+                placeholder="swh"
+                value={newIso3}
+                onChange={e => setNewIso3(e.target.value.toLowerCase().trim())}
+                className="w-full p-2 rounded border border-black/10 text-xs outline-none text-[#1a1208]"
+              />
+            </div>
           </div>
 
           <div>
@@ -335,6 +376,52 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
                 placeholder="e.g. 36.82"
                 value={newLng}
                 onChange={e => setNewLng(e.target.value)}
+                className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">Language Family</label>
+              <input
+                type="text"
+                placeholder="e.g. Niger-Congo"
+                value={newFamily}
+                onChange={e => setNewFamily(e.target.value)}
+                className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">Branch</label>
+              <input
+                type="text"
+                placeholder="e.g. Bantu"
+                value={newBranch}
+                onChange={e => setNewBranch(e.target.value)}
+                className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">Writing System</label>
+              <input
+                type="text"
+                placeholder="e.g. Latin"
+                value={newWritingSystem}
+                onChange={e => setNewWritingSystem(e.target.value)}
+                className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-500 mb-1">Total Speakers</label>
+              <input
+                type="number"
+                placeholder="e.g. 98000000"
+                value={newTotalSpeakers}
+                onChange={e => setNewTotalSpeakers(e.target.value)}
                 className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
               />
             </div>
@@ -438,14 +525,81 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
                           placeholder="Lng"
                         />
                       </div>
+                      <div className="flex gap-1">
+                        <input 
+                          type="text" 
+                          value={lang.family || ""} 
+                          onChange={e => handleFieldChange(idx, "family", e.target.value || null)}
+                          className="w-1/2 p-1 rounded border border-black/15 text-[9px] outline-none text-[#1a1208] bg-white"
+                          placeholder="Family"
+                        />
+                        <input 
+                          type="text" 
+                          value={lang.branch || ""} 
+                          onChange={e => handleFieldChange(idx, "branch", e.target.value || null)}
+                          className="w-1/2 p-1 rounded border border-black/15 text-[9px] outline-none text-[#1a1208] bg-white"
+                          placeholder="Branch"
+                        />
+                      </div>
+                      <div className="flex gap-1">
+                        <input 
+                          type="text" 
+                          value={lang.writingSystem || ""} 
+                          onChange={e => handleFieldChange(idx, "writingSystem", e.target.value || null)}
+                          className="w-1/2 p-1 rounded border border-black/15 text-[9px] outline-none text-[#1a1208] bg-white"
+                          placeholder="Writing System"
+                        />
+                        <input 
+                          type="number" 
+                          value={lang.totalSpeakers !== null ? lang.totalSpeakers : ""} 
+                          onChange={e => handleFieldChange(idx, "totalSpeakers", e.target.value ? parseInt(e.target.value) : null)}
+                          className="w-1/2 p-1 rounded border border-black/15 text-[9px] outline-none text-[#1a1208] bg-white"
+                          placeholder="Speakers count"
+                        />
+                      </div>
+                      <div className="flex gap-1">
+                        <input 
+                          type="text" 
+                          maxLength={2}
+                          value={lang.iso6391 || ""} 
+                          onChange={e => handleFieldChange(idx, "iso6391", e.target.value.toLowerCase().trim() || null)}
+                          className="w-1/2 p-1 rounded border border-black/15 text-[9px] outline-none text-[#1a1208] bg-white"
+                          placeholder="ISO 639-1"
+                        />
+                        <input 
+                          type="text" 
+                          maxLength={3}
+                          value={lang.iso6393 || ""} 
+                          onChange={e => handleFieldChange(idx, "iso6393", e.target.value.toLowerCase().trim() || "")}
+                          className="w-1/2 p-1 rounded border border-black/15 text-[9px] outline-none text-[#1a1208] bg-white"
+                          placeholder="ISO 639-3 *"
+                        />
+                      </div>
                     </div>
                   </div>
                 ) : (
                   <>
                     <span className="text-3xl">{lang.flag}</span>
-                    <div>
-                      <div className="font-bold text-base">{lang.name}</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-base flex items-center gap-1.5">
+                        {lang.name}
+                        {lang.iso6393 && (
+                          <span className="text-[9px] px-1 py-0.5 rounded bg-black/5 text-gray-500 font-mono">
+                            {lang.iso6393}
+                          </span>
+                        )}
+                      </div>
                       <div className="text-xs text-gray-500">{lang.nativeName} {`(${lang.latitude.toFixed(2)}, ${lang.longitude.toFixed(2)})`}</div>
+                      {(lang.family || lang.branch || lang.writingSystem || lang.totalSpeakers !== null) && (
+                        <div className="text-[10px] text-gray-400 mt-1 flex flex-wrap gap-x-2 gap-y-0.5 bg-black/[0.02] p-1 rounded border border-black/[0.03]">
+                          {lang.family && <span>📁 {lang.family}</span>}
+                          {lang.branch && <span>🌿 {lang.branch}</span>}
+                          {lang.writingSystem && <span>✍️ {lang.writingSystem}</span>}
+                          {lang.totalSpeakers !== null && (
+                            <span>👥 {lang.totalSpeakers.toLocaleString()}</span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </>
                 )}

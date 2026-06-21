@@ -19,6 +19,10 @@ export type LanguageConfig = {
   patternsApplicable: boolean;
   iso6391: string | null;
   iso6393: string;
+  family: string | null;
+  branch: string | null;
+  writingSystem: string | null;
+  totalSpeakers: number | null;
 };
 
 // ---------------------------------------------------------------------------
@@ -103,6 +107,12 @@ export async function updateLanguages(languages: LanguageConfig[]) {
           letters_applicable: lang.lettersApplicable ?? true,
           words_applicable: lang.wordsApplicable ?? true,
           patterns_applicable: lang.patternsApplicable ?? true,
+          family: lang.family || null,
+          branch: lang.branch || null,
+          writing_system: lang.writingSystem || null,
+          total_speakers: lang.totalSpeakers || null,
+          iso_639_1: lang.iso6391 || null,
+          iso_639_3: lang.iso6393,
         })
         .eq("id", lang.id);
 
@@ -124,6 +134,10 @@ export async function createLanguage(lang: {
   flag: string;
   latitude: number;
   longitude: number;
+  family?: string;
+  branch?: string;
+  writingSystem?: string;
+  totalSpeakers?: number;
 }) {
   try {
     // Check slug uniqueness
@@ -155,6 +169,10 @@ export async function createLanguage(lang: {
       letters_applicable: true,
       words_applicable: true,
       patterns_applicable: true,
+      family: lang.family?.trim() || null,
+      branch: lang.branch?.trim() || null,
+      writing_system: lang.writingSystem?.trim() || null,
+      total_speakers: lang.totalSpeakers || null,
     });
 
     if (error) throw error;
@@ -202,5 +220,9 @@ function mapRow(row: any): LanguageConfig {
     patternsApplicable: row.patterns_applicable ?? true,
     iso6391: row.iso_639_1 ?? null,
     iso6393: row.iso_639_3,
+    family: row.family ?? null,
+    branch: row.branch ?? null,
+    writingSystem: row.writing_system ?? null,
+    totalSpeakers: row.total_speakers ? Number(row.total_speakers) : null,
   };
 }
