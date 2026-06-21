@@ -47,7 +47,7 @@ export function StartLearningModal({ isOpen, onClose }: ModalProps) {
 
   const filteredLanguages = languages.filter(lang => 
     lang.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    lang.native.toLowerCase().includes(searchQuery.toLowerCase())
+    lang.nativeName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -132,7 +132,7 @@ export function StartLearningModal({ isOpen, onClose }: ModalProps) {
                     <span className="text-3xl">{lang.flag}</span>
                     <div className="flex flex-col">
                       <span className="font-bold text-base" style={{ color: "#1a1208" }}>{lang.name}</span>
-                      <span className="text-xs" style={{ color: "#6b5740" }}>{lang.native}</span>
+                      <span className="text-xs" style={{ color: "#6b5740" }}>{lang.nativeName}</span>
                     </div>
                   </div>
                   <div className="w-8 h-8 rounded-full flex items-center justify-center transition-colors group-hover:bg-[#b84a1e] group-hover:text-white" style={{ color: "#b84a1e", backgroundColor: "#f5efe3" }}>

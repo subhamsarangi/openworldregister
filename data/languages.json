@@ -1,8 +1,8 @@
 [
-  { "id": "french", "name": "French", "native": "Français", "flag": "🇫🇷", "isActive": true },
-  { "id": "japanese", "name": "Japanese", "native": "日本語", "flag": "🇯🇵", "isActive": true },
-  { "id": "spanish", "name": "Spanish", "native": "Español", "flag": "🇪🇸", "isActive": true },
-  { "id": "arabic", "name": "Arabic", "native": "العربية", "flag": "🇸🇦", "isActive": true },
-  { "id": "hindi", "name": "Hindi", "native": "हिन्दी", "flag": "🇮🇳", "isActive": true },
-  { "id": "russian", "name": "Russian", "native": "Русский", "flag": "🇷🇺", "isActive": true }
+  { "id": "french",   "iso3": "fra", "name": "French",   "native": "Français",   "flag": "🇫🇷", "isActive": true, "latitude": 46.23,  "longitude": 2.21   },
+  { "id": "japanese", "iso3": "jpn", "name": "Japanese", "native": "日本語",       "flag": "🇯🇵", "isActive": true, "latitude": 36.20,  "longitude": 138.25 },
+  { "id": "spanish",  "iso3": "spa", "name": "Spanish",  "native": "Español",     "flag": "🇪🇸", "isActive": true, "latitude": 40.46,  "longitude": -3.75  },
+  { "id": "arabic",   "iso3": "ara", "name": "Arabic",   "native": "العربية",     "flag": "🇸🇦", "isActive": true, "latitude": 23.89,  "longitude": 45.08  },
+  { "id": "hindi",    "iso3": "hin", "name": "Hindi",    "native": "हिन्दी",       "flag": "🇮🇳", "isActive": true, "latitude": 20.59,  "longitude": 78.96  },
+  { "id": "russian",  "iso3": "rus", "name": "Russian",  "native": "Русский",     "flag": "🇷🇺", "isActive": true, "latitude": 61.52,  "longitude": 105.32 }
 ]

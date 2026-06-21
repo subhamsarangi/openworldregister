@@ -2,50 +2,62 @@
 
 import fs from "fs/promises";
 import path from "path";
-import { prisma } from "../lib/db";
+import { supabase } from "../lib/supabase";
 
 export type LanguageConfig = {
-  id: string;
+  id: number;          // serial PK from Supabase
+  slug: string;        // human-readable key, e.g. "odia", "tamil"
   name: string;
-  native: string;
+  nativeName: string;
   flag: string;
   isActive: boolean;
-  order: number;
+  displayOrder: number;
   latitude: number;
   longitude: number;
   lettersApplicable: boolean;
   wordsApplicable: boolean;
   patternsApplicable: boolean;
-  lettersFile: string | null;
-  wordsFile: string | null;
-  patternsFile: string | null;
+  iso6391: string | null;
+  iso6393: string;
 };
 
-// Check if languages exist in DB, if not auto-seed from languages.json
+// ---------------------------------------------------------------------------
+// Seeding — auto-populate from data/languages.json on first run
+// ---------------------------------------------------------------------------
 async function ensureSeeded() {
-  const count = await prisma.language.count();
-  if (count === 0) {
+  const { count, error: countError } = await supabase
+    .from("languages")
+    .select("*", { count: "exact", head: true });
+
+  if (countError) {
+    console.error("ensureSeeded: could not count languages:", countError.message);
+    return;
+  }
+
+  if ((count ?? 0) === 0) {
     try {
       const jsonPath = path.join(process.cwd(), "data", "languages.json");
       const jsonData = await fs.readFile(jsonPath, "utf-8");
       const initialLanguages = JSON.parse(jsonData);
-      
+
       console.log("Auto-seeding languages table from languages.json...");
       for (let i = 0; i < initialLanguages.length; i++) {
         const lang = initialLanguages[i];
-        await prisma.language.create({
-          data: {
-            id: lang.id,
-            name: lang.name,
-            native: lang.native,
-            flag: lang.flag,
-            isActive: lang.isActive,
-            order: i,
-            lettersApplicable: true,
-            wordsApplicable: true,
-            patternsApplicable: true,
-          },
+        const { error } = await supabase.from("languages").insert({
+          iso_639_3: lang.iso3 ?? lang.id.slice(0, 3),  // proper ISO 639-3 code
+          slug: lang.id,
+          name: lang.name,
+          native_name: lang.native,
+          flag: lang.flag,
+          is_active: lang.isActive ?? true,
+          display_order: i,
+          latitude: lang.latitude ?? 0,
+          longitude: lang.longitude ?? 0,
+          letters_applicable: true,
+          words_applicable: true,
+          patterns_applicable: true,
         });
+        if (error) console.error(`Auto-seeding failed for ${lang.name}:`, error.message);
       }
       console.log("Auto-seeding complete.");
     } catch (err) {
@@ -54,115 +66,98 @@ async function ensureSeeded() {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Queries
+// ---------------------------------------------------------------------------
 export async function getLanguages(): Promise<LanguageConfig[]> {
   try {
     await ensureSeeded();
-    const dbLanguages = await prisma.language.findMany({
-      orderBy: { order: "asc" },
-    });
-    
-    return dbLanguages.map(lang => ({
-      id: lang.id,
-      name: lang.name,
-      native: lang.native,
-      flag: lang.flag,
-      isActive: lang.isActive,
-      order: lang.order,
-      latitude: lang.latitude,
-      longitude: lang.longitude,
-      lettersApplicable: lang.lettersApplicable,
-      wordsApplicable: lang.wordsApplicable,
-      patternsApplicable: lang.patternsApplicable,
-      lettersFile: lang.lettersFile,
-      wordsFile: lang.wordsFile,
-      patternsFile: lang.patternsFile,
-    }));
+    const { data, error } = await supabase
+      .from("languages")
+      .select("*")
+      .order("display_order", { ascending: true });
+
+    if (error) throw error;
+
+    return (data ?? []).map(mapRow);
   } catch (err) {
-    console.error("Error reading languages from database:", err);
+    console.error("Error reading languages from Supabase:", err);
     return [];
   }
 }
 
-export async function updateLanguages(languages: any[]) {
+export async function updateLanguages(languages: LanguageConfig[]) {
   try {
-    // Perform bulk updates in a transaction
-    await prisma.$transaction(
-      languages.map((lang, index) =>
-        prisma.language.update({
-          where: { id: lang.id },
-          data: {
-            isActive: lang.isActive,
-            order: index, // Use current array index as order
-            lettersApplicable: lang.lettersApplicable !== undefined ? lang.lettersApplicable : true,
-            wordsApplicable: lang.wordsApplicable !== undefined ? lang.wordsApplicable : true,
-            patternsApplicable: lang.patternsApplicable !== undefined ? lang.patternsApplicable : true,
-          },
+    for (let i = 0; i < languages.length; i++) {
+      const lang = languages[i];
+      const { error } = await supabase
+        .from("languages")
+        .update({
+          name: lang.name,
+          native_name: lang.nativeName,
+          flag: lang.flag,
+          latitude: lang.latitude,
+          longitude: lang.longitude,
+          is_active: lang.isActive,
+          display_order: i,
+          letters_applicable: lang.lettersApplicable ?? true,
+          words_applicable: lang.wordsApplicable ?? true,
+          patterns_applicable: lang.patternsApplicable ?? true,
         })
-      )
-    );
+        .eq("id", lang.id);
+
+      if (error) throw error;
+    }
     return { success: true };
   } catch (err) {
-    console.error("Error writing languages to database:", err);
+    console.error("Error updating languages in Supabase:", err);
     return { success: false, error: String(err) };
   }
 }
 
-export async function getLanguagesFromManifest(): Promise<LanguageConfig[]> {
+export async function createLanguage(lang: {
+  slug: string;
+  iso6391?: string;
+  iso6393: string;
+  name: string;
+  nativeName: string;
+  flag: string;
+  latitude: number;
+  longitude: number;
+}) {
   try {
-    const manifestPath = path.join(process.cwd(), "public", "r2", "manifest.json");
-    const manifestData = await fs.readFile(manifestPath, "utf-8");
-    const manifest = JSON.parse(manifestData);
-    
-    const langs: LanguageConfig[] = [];
-    let order = 0;
-    for (const [id, lang] of Object.entries(manifest.languages) as [string, any][]) {
-      langs.push({
-        id,
-        name: lang.name,
-        native: lang.native || "",
-        flag: lang.flag || "🌍",
-        isActive: true,
-        order: typeof lang.order === "number" ? lang.order : order++,
-        latitude: lang.latitude || 0.0,
-        longitude: lang.longitude || 0.0,
-        lettersApplicable: lang.tabs.letters?.applicable ?? false,
-        wordsApplicable: lang.tabs.words?.applicable ?? false,
-        patternsApplicable: lang.tabs.patterns?.applicable ?? false,
-        lettersFile: lang.tabs.letters?.file ?? null,
-        wordsFile: lang.tabs.words?.file ?? null,
-        patternsFile: lang.tabs.patterns?.file ?? null,
-      });
-    }
-    return langs.sort((a, b) => a.order - b.order);
-  } catch (err) {
-    console.log("Manifest not found or failed to load, falling back to database query...");
-    return getLanguages();
-  }
-}
+    // Check slug uniqueness
+    const { data: existing } = await supabase
+      .from("languages")
+      .select("id")
+      .eq("slug", lang.slug.toLowerCase().trim())
+      .maybeSingle();
 
-export async function createLanguage(lang: { id: string; name: string; native: string; flag: string; latitude: number; longitude: number }) {
-  try {
-    const existing = await prisma.language.findUnique({ where: { id: lang.id } });
     if (existing) {
-      return { success: false, error: "Language with this Code/ID already exists." };
+      return { success: false, error: "A language with this slug already exists." };
     }
 
-    const count = await prisma.language.count();
-    await prisma.language.create({
-      data: {
-        id: lang.id.toLowerCase().trim(),
-        name: lang.name.trim(),
-        native: lang.native.trim(),
-        flag: lang.flag.trim(),
-        latitude: lang.latitude,
-        longitude: lang.longitude,
-        isActive: true,
-        order: count,
-        lettersApplicable: true,
-        wordsApplicable: true,
-        patternsApplicable: true,
-      },
+    const { count } = await supabase
+      .from("languages")
+      .select("*", { count: "exact", head: true });
+
+    const { error } = await supabase.from("languages").insert({
+      slug: lang.slug.toLowerCase().trim(),
+      iso_639_1: lang.iso6391 || null,
+      iso_639_3: lang.iso6393.toLowerCase().trim(),
+      name: lang.name.trim(),
+      native_name: lang.nativeName.trim(),
+      flag: lang.flag.trim(),
+      latitude: lang.latitude,
+      longitude: lang.longitude,
+      is_active: true,
+      display_order: count ?? 0,
+      letters_applicable: true,
+      words_applicable: true,
+      patterns_applicable: true,
     });
+
+    if (error) throw error;
     return { success: true };
   } catch (err) {
     console.error("Error creating language:", err);
@@ -170,9 +165,10 @@ export async function createLanguage(lang: { id: string; name: string; native: s
   }
 }
 
-export async function deleteLanguage(id: string) {
+export async function deleteLanguage(id: number) {
   try {
-    await prisma.language.delete({ where: { id } });
+    const { error } = await supabase.from("languages").delete().eq("id", id);
+    if (error) throw error;
     return { success: true };
   } catch (err) {
     console.error("Error deleting language:", err);
@@ -180,5 +176,31 @@ export async function deleteLanguage(id: string) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Manifest fallback (kept for backwards compat during transition)
+// ---------------------------------------------------------------------------
+export async function getLanguagesFromManifest(): Promise<LanguageConfig[]> {
+  return getLanguages();
+}
 
-
+// ---------------------------------------------------------------------------
+// Internal row mapper
+// ---------------------------------------------------------------------------
+function mapRow(row: any): LanguageConfig {
+  return {
+    id: row.id,
+    slug: row.slug ?? row.iso_639_3,
+    name: row.name,
+    nativeName: row.native_name ?? "",
+    flag: row.flag ?? "🌍",
+    isActive: row.is_active ?? true,
+    displayOrder: row.display_order ?? 0,
+    latitude: row.latitude ?? 0,
+    longitude: row.longitude ?? 0,
+    lettersApplicable: row.letters_applicable ?? true,
+    wordsApplicable: row.words_applicable ?? true,
+    patternsApplicable: row.patterns_applicable ?? true,
+    iso6391: row.iso_639_1 ?? null,
+    iso6393: row.iso_639_3,
+  };
+}

@@ -11,58 +11,26 @@ import {
   getPatterns,
   savePattern,
   deletePattern,
-  publishLanguage,
-  regenerateManifest,
   DBLetter,
   DBWord,
   DBPattern
 } from "../actions/adminActions";
 
-export default function AdminPage() {
-  const [password, setPassword] = useState("");
-  const [auth, setAuth] = useState(false);
-  
-  if (!auth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#faf6ee]">
-        <form 
-          onSubmit={(e) => { 
-            e.preventDefault(); 
-            if (password === "admin") setAuth(true); 
-            else alert("Incorrect password");
-          }} 
-          className="p-8 shadow-xl rounded-2xl w-full max-w-sm"
-          style={{ backgroundColor: "#fffdf8", border: "1px solid rgba(184, 74, 30, 0.2)" }}
-        >
-          <div className="text-center mb-6">
-            <span className="text-4xl">🌍</span>
-            <h1 className="text-2xl font-bold mt-2" style={{ color: "#1a1208", fontFamily: "'Playfair Display', serif" }}>Admin Portal</h1>
-          </div>
-          <input 
-            type="password" 
-            placeholder="Password (hint: admin)"
-            value={password} 
-            onChange={e => setPassword(e.target.value)} 
-            className="w-full p-3 rounded mb-4 outline-none text-[#1a1208]"
-            style={{ border: "1px solid rgba(107, 87, 64, 0.2)", backgroundColor: "#faf6ee" }}
-          />
-          <button className="w-full py-3 rounded text-white font-bold transition-transform hover:-translate-y-0.5" style={{ backgroundColor: "#b84a1e" }}>
-            Login
-          </button>
-        </form>
-      </div>
-    );
-  }
+import { useRouter } from "next/navigation";
+import { createSupabaseBrowserClient } from "../lib/supabase-browser";
 
+export default function AdminPage() {
   return <AdminDashboard />;
 }
 
-type TabType = "languages" | "letters" | "words" | "patterns" | "publish";
+type TabType = "languages" | "letters" | "words" | "patterns";
 
 function AdminDashboard() {
+  const router = useRouter();
+  const supabase = createSupabaseBrowserClient();
   const [activeTab, setActiveTab] = useState<TabType>("languages");
   const [languages, setLanguages] = useState<LanguageConfig[]>([]);
-  const [selectedLanguageId, setSelectedLanguageId] = useState<string>("");
+  const [selectedLanguageId, setSelectedLanguageId] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -79,6 +47,11 @@ function AdminDashboard() {
   useEffect(() => {
     fetchLangs();
   }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.refresh();
+  };
 
   const selectedLang = languages.find(l => l.id === selectedLanguageId);
 
@@ -104,24 +77,31 @@ function AdminDashboard() {
           </div>
         </div>
 
-        {/* Tab Selection */}
-        <nav className="flex gap-2">
-          {[
-            { id: "languages", label: "Languages" },
-            { id: "letters", label: "Letters" },
-            { id: "words", label: "Words" },
-            { id: "patterns", label: "Patterns" },
-            { id: "publish", label: "Publish Center" }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as TabType)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? "bg-[#b84a1e] text-white shadow-sm" : "hover:bg-black/5 text-[#6b5740]"}`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
+        {/* Tab Selection & Logout */}
+        <div className="flex items-center gap-4">
+          <nav className="flex gap-2">
+            {[
+              { id: "languages", label: "Languages" },
+              { id: "letters", label: "Letters" },
+              { id: "words", label: "Words" },
+              { id: "patterns", label: "Patterns" },
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as TabType)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? "bg-[#b84a1e] text-white shadow-sm" : "hover:bg-black/5 text-[#6b5740]"}`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 rounded-lg text-sm font-medium border border-[#b84a1e]/20 text-[#b84a1e] hover:bg-[#b84a1e]/5 transition-all"
+          >
+            Logout
+          </button>
+        </div>
       </header>
 
       {/* Main Content Area */}
@@ -155,18 +135,11 @@ function AdminDashboard() {
         )}
 
         {activeTab === "patterns" && (
-          <PatternsTab 
-            languages={languages} 
-            selectedLanguageId={selectedLanguageId} 
-            setSelectedLanguageId={setSelectedLanguageId} 
+          <PatternsTab
+            languages={languages}
+            selectedLanguageId={selectedLanguageId}
+            setSelectedLanguageId={setSelectedLanguageId}
             selectedLang={selectedLang}
-          />
-        )}
-
-        {activeTab === "publish" && (
-          <PublishTab 
-            languages={languages} 
-            onRefresh={fetchLangs}
           />
         )}
       </main>
@@ -191,6 +164,13 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
   const [newLat, setNewLat] = useState("0.0");
   const [newLng, setNewLng] = useState("0.0");
   const [creating, setCreating] = useState(false);
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+
+  const handleFieldChange = (index: number, field: keyof LanguageConfig, value: any) => {
+    const newLangs = [...languages];
+    (newLangs[index] as any)[field] = value;
+    setLanguages(newLangs);
+  };
 
   const dragItem = React.useRef<number | null>(null);
   const dragOverItem = React.useRef<number | null>(null);
@@ -238,9 +218,8 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
   const handleSave = async () => {
     setSaving(true);
     await updateLanguages(languages);
-    await regenerateManifest();
     setSaving(false);
-    alert("Languages configuration saved and manifest regenerated successfully!");
+    alert("Languages configuration saved!");
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -251,9 +230,10 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
     }
     setCreating(true);
     const res = await createLanguage({
-      id: newId,
+      slug: newId,
+      iso6393: newId,
       name: newName,
-      native: newNative,
+      nativeName: newNative,
       flag: newFlag,
       latitude: parseFloat(newLat) || 0.0,
       longitude: parseFloat(newLng) || 0.0
@@ -273,7 +253,7 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
     }
   };
 
-  const handleDeleteLang = async (id: string, name: string) => {
+  const handleDeleteLang = async (id: number, name: string) => {
     if (confirm(`Are you sure you want to delete ${name}? This will delete all its letters, words, and patterns as well!`)) {
       const res = await deleteLanguage(id);
       if (res.success) {
@@ -415,11 +395,60 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
                   <button onClick={() => moveUp(idx)} disabled={idx === 0} className="text-gray-500 hover:text-black disabled:opacity-20 text-[10px] px-1 py-0.5 leading-none">▲</button>
                   <button onClick={() => moveDown(idx)} disabled={idx === languages.length - 1} className="text-gray-500 hover:text-black disabled:opacity-20 text-[10px] px-1 py-0.5 leading-none">▼</button>
                 </div>
-                <span className="text-3xl">{lang.flag}</span>
-                <div>
-                  <div className="font-bold text-base">{lang.name}</div>
-                  <div className="text-xs text-gray-500">{lang.native} {`(${lang.latitude.toFixed(2)}, ${lang.longitude.toFixed(2)})`}</div>
-                </div>
+                
+                {editingIdx === idx ? (
+                  <div className="flex flex-wrap gap-2 items-center w-full">
+                    <input 
+                      type="text" 
+                      value={lang.flag} 
+                      onChange={e => handleFieldChange(idx, "flag", e.target.value)}
+                      className="w-12 p-1.5 rounded border border-black/15 text-center text-lg outline-none text-[#1a1208] bg-white"
+                      title="Flag Emoji"
+                    />
+                    <div className="flex flex-col gap-1.5 flex-1 min-w-[120px]">
+                      <input 
+                        type="text" 
+                        value={lang.name} 
+                        onChange={e => handleFieldChange(idx, "name", e.target.value)}
+                        className="w-full p-1.5 rounded border border-black/15 text-xs font-bold outline-none text-[#1a1208] bg-white"
+                        placeholder="Language Name"
+                      />
+                      <input 
+                        type="text" 
+                        value={lang.nativeName} 
+                        onChange={e => handleFieldChange(idx, "nativeName", e.target.value)}
+                        className="w-full p-1.5 rounded border border-black/15 text-xs outline-none text-[#1a1208] bg-white"
+                        placeholder="Native Name"
+                      />
+                      <div className="flex gap-1">
+                        <input 
+                          type="number" 
+                          step="any"
+                          value={lang.latitude} 
+                          onChange={e => handleFieldChange(idx, "latitude", parseFloat(e.target.value) || 0)}
+                          className="w-1/2 p-1 rounded border border-black/15 text-[10px] outline-none text-[#1a1208] bg-white"
+                          placeholder="Lat"
+                        />
+                        <input 
+                          type="number" 
+                          step="any"
+                          value={lang.longitude} 
+                          onChange={e => handleFieldChange(idx, "longitude", parseFloat(e.target.value) || 0)}
+                          className="w-1/2 p-1 rounded border border-black/15 text-[10px] outline-none text-[#1a1208] bg-white"
+                          placeholder="Lng"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <span className="text-3xl">{lang.flag}</span>
+                    <div>
+                      <div className="font-bold text-base">{lang.name}</div>
+                      <div className="text-xs text-gray-500">{lang.nativeName} {`(${lang.latitude.toFixed(2)}, ${lang.longitude.toFixed(2)})`}</div>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Col 5-6: Letters checkbox */}
@@ -464,9 +493,9 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
                 </label>
               </div>
 
-              {/* Col 11-12: Visibility Toggle & Delete */}
-              <div className="col-span-1 lg:col-span-2 flex items-center justify-between lg:justify-end gap-3">
-                <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded border border-black/5 shadow-xs">
+              {/* Col 11-12: Visibility Toggle & Done/Edit & Delete */}
+              <div className="col-span-1 lg:col-span-2 flex items-center justify-between lg:justify-end gap-2">
+                <label className="flex items-center gap-2 cursor-pointer bg-white px-2 py-1.5 rounded border border-black/5 shadow-xs">
                   <input 
                     type="checkbox" 
                     checked={lang.isActive} 
@@ -474,15 +503,36 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
                     className="w-4 h-4" 
                     style={{ accentColor: "#b84a1e" }}
                   />
-                  <span className="font-medium text-xs">{lang.isActive ? "Show on Globe" : "Hidden"}</span>
+                  <span className="font-medium text-xs whitespace-nowrap">{lang.isActive ? "Show" : "Hidden"}</span>
                 </label>
-                <button 
-                  onClick={() => handleDeleteLang(lang.id, lang.name)}
-                  className="p-2 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded font-semibold transition-all"
-                  title="Delete Language"
-                >
-                  🗑️
-                </button>
+                
+                <div className="flex items-center gap-1.5">
+                  {editingIdx === idx ? (
+                    <button
+                      onClick={() => setEditingIdx(null)}
+                      className="px-2.5 py-1.5 rounded text-xs font-bold text-white bg-green-700 hover:bg-green-800 transition-all shadow-xs"
+                      title="Done editing fields"
+                    >
+                      ✓
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setEditingIdx(idx)}
+                      className="px-2.5 py-1.5 rounded text-xs font-medium border border-black/10 hover:bg-black/5 transition-all text-gray-600"
+                      title="Edit fields"
+                    >
+                      ✏️
+                    </button>
+                  )}
+                  
+                  <button 
+                    onClick={() => handleDeleteLang(lang.id, lang.name)}
+                    className="px-2.5 py-1.5 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded font-semibold transition-all"
+                    title="Delete Language"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -495,21 +545,21 @@ function LanguagesTab({ languages, setLanguages, saving, setSaving, onRefresh }:
 // 2. LETTERS TAB COMPONENT
 interface ContentTabProps {
   languages: LanguageConfig[];
-  selectedLanguageId: string;
-  setSelectedLanguageId: (id: string) => void;
+  selectedLanguageId: number;
+  setSelectedLanguageId: (id: number) => void;
   selectedLang?: LanguageConfig;
 }
 
 function LettersTab({ languages, selectedLanguageId, setSelectedLanguageId, selectedLang }: ContentTabProps) {
-  const [letters, setLetters] = useState<any[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [letters, setLetters] = useState<DBLetter[]>([]);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   // Form states
-  const [letter, setLetter] = useState("");
-  const [roman, setRoman] = useState("");
-  const [type, setType] = useState("consonant");
+  const [character, setCharacter] = useState("");
+  const [transliteration, setTransliteration] = useState("");
+  const [charType, setCharType] = useState("consonant");
   const [example, setExample] = useState("");
-  const [pronunciation, setPronunciation] = useState("");
+  const [pronunciationNote, setPronunciationNote] = useState("");
 
   const refreshData = () => {
     if (selectedLanguageId) {
@@ -523,30 +573,30 @@ function LettersTab({ languages, selectedLanguageId, setSelectedLanguageId, sele
   }, [selectedLanguageId]);
 
   const resetForm = () => {
-    setLetter("");
-    setRoman("");
-    setType("consonant");
+    setCharacter("");
+    setTransliteration("");
+    setCharType("consonant");
     setExample("");
-    setPronunciation("");
+    setPronunciationNote("");
     setEditingId(null);
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!letter || !roman) {
-      alert("Letter and Roman spelling are required");
+    if (!character) {
+      alert("Character is required");
       return;
     }
-    
+
     try {
       await saveLetter({
-        id: editingId || undefined,
+        id: editingId ?? undefined,
         languageId: selectedLanguageId,
-        letter,
-        roman,
-        type,
-        example,
-        pronunciation: pronunciation || null,
+        character,
+        transliteration,
+        charType,
+        example: example || null,
+        pronunciationNote: pronunciationNote || null,
       });
       refreshData();
       resetForm();
@@ -555,16 +605,16 @@ function LettersTab({ languages, selectedLanguageId, setSelectedLanguageId, sele
     }
   };
 
-  const handleEdit = (item: any) => {
-    setEditingId(item.id);
-    setLetter(item.letter);
-    setRoman(item.roman);
-    setType(item.type);
-    setExample(item.example);
-    setPronunciation(item.pronunciation || "");
+  const handleEdit = (item: DBLetter) => {
+    setEditingId(item.id ?? null);
+    setCharacter(item.character);
+    setTransliteration(item.transliteration);
+    setCharType(item.charType);
+    setExample(item.example ?? "");
+    setPronunciationNote(item.pronunciationNote ?? "");
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this letter?")) {
       try {
         await deleteLetter(id);
@@ -596,7 +646,7 @@ function LettersTab({ languages, selectedLanguageId, setSelectedLanguageId, sele
             <label className="block text-xs font-semibold text-gray-500 mb-1">Select Language</label>
             <select
               value={selectedLanguageId}
-              onChange={e => setSelectedLanguageId(e.target.value)}
+              onChange={e => setSelectedLanguageId(Number(e.target.value))}
               className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none"
             >
               {languages.map(l => (
@@ -610,8 +660,8 @@ function LettersTab({ languages, selectedLanguageId, setSelectedLanguageId, sele
             <input
               type="text"
               placeholder="e.g. é"
-              value={letter}
-              onChange={e => setLetter(e.target.value)}
+              value={character}
+              onChange={e => setCharacter(e.target.value)}
               className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
             />
           </div>
@@ -621,8 +671,8 @@ function LettersTab({ languages, selectedLanguageId, setSelectedLanguageId, sele
             <input
               type="text"
               placeholder="e.g. e"
-              value={roman}
-              onChange={e => setRoman(e.target.value)}
+              value={transliteration}
+              onChange={e => setTransliteration(e.target.value)}
               className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
             />
           </div>
@@ -630,8 +680,8 @@ function LettersTab({ languages, selectedLanguageId, setSelectedLanguageId, sele
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Type</label>
             <select
-              value={type}
-              onChange={e => setType(e.target.value)}
+              value={charType}
+              onChange={e => setCharType(e.target.value)}
               className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none"
             >
               <option value="vowel">Vowel</option>
@@ -656,8 +706,8 @@ function LettersTab({ languages, selectedLanguageId, setSelectedLanguageId, sele
             <input
               type="text"
               placeholder="e.g. /ay/"
-              value={pronunciation}
-              onChange={e => setPronunciation(e.target.value)}
+              value={pronunciationNote}
+              onChange={e => setPronunciationNote(e.target.value)}
               className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
             />
           </div>
@@ -701,18 +751,18 @@ function LettersTab({ languages, selectedLanguageId, setSelectedLanguageId, sele
               <tbody className="divide-y divide-black/5">
                 {letters.map((item) => (
                   <tr key={item.id} className="hover:bg-black/1">
-                    <td className="py-3.5 px-2 font-bold text-lg text-[#b84a1e]">{item.letter}</td>
-                    <td className="py-3.5 px-2 font-medium">{item.roman}</td>
+                    <td className="py-3.5 px-2 font-bold text-lg text-[#b84a1e]">{item.character}</td>
+                    <td className="py-3.5 px-2 font-medium">{item.transliteration}</td>
                     <td className="py-3.5 px-2">
                       <span className="px-2 py-0.5 rounded-full text-[0.68rem] font-bold bg-[#faf6ee] text-[#6b5740] border border-black/5">
-                        {item.type}
+                        {item.charType}
                       </span>
                     </td>
                     <td className="py-3.5 px-2 text-gray-600">{item.example}</td>
-                    <td className="py-3.5 px-2 text-gray-400 italic">{item.pronunciation || "-"}</td>
+                    <td className="py-3.5 px-2 text-gray-400 italic">{item.pronunciationNote || "-"}</td>
                     <td className="py-3.5 px-2 text-right flex justify-end gap-1.5">
                       <button onClick={() => handleEdit(item)} className="px-2.5 py-1 text-xs bg-black/5 hover:bg-black/10 rounded font-semibold transition-all">Edit</button>
-                      <button onClick={() => handleDelete(item.id)} className="px-2.5 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded font-semibold transition-all">Delete</button>
+                      <button onClick={() => handleDelete(item.id!)} className="px-2.5 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded font-semibold transition-all">Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -727,14 +777,14 @@ function LettersTab({ languages, selectedLanguageId, setSelectedLanguageId, sele
 
 // 3. WORDS TAB COMPONENT
 function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId, selectedLang }: ContentTabProps) {
-  const [words, setWords] = useState<any[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [words, setWords] = useState<DBWord[]>([]);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   // Form states
   const [word, setWord] = useState("");
-  const [roman, setRoman] = useState("");
-  const [meaning, setMeaning] = useState("");
-  const [level, setLevel] = useState("easy");
+  const [transliteration, setTransliteration] = useState("");
+  const [translation, setTranslation] = useState("");
+  const [cefrLevel, setCefrLevel] = useState("A1");
 
   const refreshData = () => {
     if (selectedLanguageId) {
@@ -749,27 +799,27 @@ function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId, select
 
   const resetForm = () => {
     setWord("");
-    setRoman("");
-    setMeaning("");
-    setLevel("easy");
+    setTransliteration("");
+    setTranslation("");
+    setCefrLevel("A1");
     setEditingId(null);
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!word || !meaning) {
-      alert("Word and English Meaning are required");
+    if (!word || !translation) {
+      alert("Word and Translation are required");
       return;
     }
-    
+
     try {
       await saveWord({
-        id: editingId || undefined,
+        id: editingId ?? undefined,
         languageId: selectedLanguageId,
         word,
-        roman,
-        meaning,
-        level,
+        transliteration,
+        translation,
+        cefrLevel,
       });
       refreshData();
       resetForm();
@@ -778,15 +828,15 @@ function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId, select
     }
   };
 
-  const handleEdit = (item: any) => {
-    setEditingId(item.id);
+  const handleEdit = (item: DBWord) => {
+    setEditingId(item.id ?? null);
     setWord(item.word);
-    setRoman(item.roman);
-    setMeaning(item.meaning);
-    setLevel(item.level);
+    setTransliteration(item.transliteration);
+    setTranslation(item.translation);
+    setCefrLevel(item.cefrLevel);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this word?")) {
       try {
         await deleteWord(id);
@@ -818,7 +868,7 @@ function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId, select
             <label className="block text-xs font-semibold text-gray-500 mb-1">Select Language</label>
             <select
               value={selectedLanguageId}
-              onChange={e => setSelectedLanguageId(e.target.value)}
+              onChange={e => setSelectedLanguageId(Number(e.target.value))}
               className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none"
             >
               {languages.map(l => (
@@ -843,33 +893,36 @@ function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId, select
             <input
               type="text"
               placeholder="e.g. bohn-zhoor"
-              value={roman}
-              onChange={e => setRoman(e.target.value)}
+              value={transliteration}
+              onChange={e => setTransliteration(e.target.value)}
               className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1">English Meaning</label>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">English Translation</label>
             <input
               type="text"
               placeholder="e.g. Hello / Good morning"
-              value={meaning}
-              onChange={e => setMeaning(e.target.value)}
+              value={translation}
+              onChange={e => setTranslation(e.target.value)}
               className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1">Level (Difficulty)</label>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">CEFR Level</label>
             <select
-              value={level}
-              onChange={e => setLevel(e.target.value)}
+              value={cefrLevel}
+              onChange={e => setCefrLevel(e.target.value)}
               className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none"
             >
-              <option value="easy">Easy (Elementary)</option>
-              <option value="medium">Medium (Intermediate)</option>
-              <option value="hard">Hard (Advanced)</option>
+              <option value="A1">A1 — Beginner</option>
+              <option value="A2">A2 — Elementary</option>
+              <option value="B1">B1 — Intermediate</option>
+              <option value="B2">B2 — Upper Intermediate</option>
+              <option value="C1">C1 — Advanced</option>
+              <option value="C2">C2 — Proficient</option>
             </select>
           </div>
 
@@ -912,20 +965,20 @@ function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId, select
                 {words.map((item) => (
                   <tr key={item.id} className="hover:bg-black/1">
                     <td className="py-3.5 px-2 font-bold text-[#b84a1e]">{item.word}</td>
-                    <td className="py-3.5 px-2 text-gray-600">{item.roman || "-"}</td>
-                    <td className="py-3.5 px-2 font-medium">{item.meaning}</td>
+                    <td className="py-3.5 px-2 text-gray-600">{item.transliteration || "-"}</td>
+                    <td className="py-3.5 px-2 font-medium">{item.translation}</td>
                     <td className="py-3.5 px-2">
                       <span className={`px-2 py-0.5 rounded-full text-[0.68rem] font-bold ${
-                        item.level === 'easy' ? 'bg-green-50 text-green-700 border border-green-200' :
-                        item.level === 'medium' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                        item.cefrLevel === 'A1' || item.cefrLevel === 'A2' ? 'bg-green-50 text-green-700 border border-green-200' :
+                        item.cefrLevel === 'B1' || item.cefrLevel === 'B2' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
                         'bg-rose-50 text-rose-700 border border-rose-200'
                       }`}>
-                        {item.level}
+                        {item.cefrLevel}
                       </span>
                     </td>
                     <td className="py-3.5 px-2 text-right flex justify-end gap-1.5">
                       <button onClick={() => handleEdit(item)} className="px-2.5 py-1 text-xs bg-black/5 hover:bg-black/10 rounded font-semibold transition-all">Edit</button>
-                      <button onClick={() => handleDelete(item.id)} className="px-2.5 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded font-semibold transition-all">Delete</button>
+                      <button onClick={() => handleDelete(item.id!)} className="px-2.5 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded font-semibold transition-all">Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -940,13 +993,16 @@ function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId, select
 
 // 4. PATTERNS TAB COMPONENT
 function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, selectedLang }: ContentTabProps) {
-  const [patterns, setPatterns] = useState<any[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [patterns, setPatterns] = useState<DBPattern[]>([]);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   // Form states
-  const [pattern, setPattern] = useState("");
-  const [blanks, setBlanks] = useState("");
+  const [template, setTemplate] = useState("");
   const [tags, setTags] = useState("");
+  const [patternType, setPatternType] = useState("");
+  const [exampleNativeText, setExampleNativeText] = useState("");
+  const [exampleTranslation, setExampleTranslation] = useState("");
+  const [slotValuesJson, setSlotValuesJson] = useState("");
 
   const refreshData = () => {
     if (selectedLanguageId) {
@@ -960,52 +1016,61 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
   }, [selectedLanguageId]);
 
   const resetForm = () => {
-    setPattern("");
-    // Pre-populate with default expected json blanks schema
-    setBlanks(JSON.stringify([
-      {
-        slotValues: [
-          { value: "French", roman: "français", translation: "French" }
-        ]
-      }
+    setTemplate("");
+    setTags("");
+    setPatternType("");
+    setExampleNativeText("");
+    setExampleTranslation("");
+    setSlotValuesJson(JSON.stringify([
+      { slotValue: "French", transliteration: "français", translation: "French" }
     ], null, 2));
-    setTags("conversation, nationalities");
     setEditingId(null);
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!pattern || !blanks) {
-      alert("Pattern and Blanks schema JSON are required");
+    if (!template) {
+      alert("Pattern Template is required");
       return;
     }
-    
+
+    let parsedSlots: { slotValue: string; transliteration?: string; translation?: string }[] = [];
     try {
-      // Test JSON validity client-side first
-      JSON.parse(blanks);
-      
+      parsedSlots = JSON.parse(slotValuesJson || "[]");
+    } catch {
+      alert("Invalid JSON in slot values.");
+      return;
+    }
+
+    try {
       await savePattern({
-        id: editingId || undefined,
+        id: editingId ?? undefined,
         languageId: selectedLanguageId,
-        pattern,
-        blanks,
-        tags,
+        template,
+        patternType: patternType || null,
+        tags: tags || null,
+        exampleNativeText: exampleNativeText || null,
+        exampleTranslation: exampleTranslation || null,
+        slotValues: parsedSlots,
       });
       refreshData();
       resetForm();
     } catch (e) {
-      alert("Invalid JSON format in blanks schema. Please check curly braces and brackets.");
+      alert("Error saving pattern.");
     }
   };
 
-  const handleEdit = (item: any) => {
-    setEditingId(item.id);
-    setPattern(item.pattern);
-    setBlanks(JSON.stringify(JSON.parse(item.blanks), null, 2));
-    setTags(item.tags);
+  const handleEdit = (item: DBPattern) => {
+    setEditingId(item.id ?? null);
+    setTemplate(item.template);
+    setTags(item.tags ?? "");
+    setPatternType(item.patternType ?? "");
+    setExampleNativeText(item.exampleNativeText ?? "");
+    setExampleTranslation(item.exampleTranslation ?? "");
+    setSlotValuesJson(JSON.stringify(item.slotValues ?? [], null, 2));
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this pattern?")) {
       try {
         await deletePattern(id);
@@ -1037,7 +1102,7 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
             <label className="block text-xs font-semibold text-gray-500 mb-1">Select Language</label>
             <select
               value={selectedLanguageId}
-              onChange={e => setSelectedLanguageId(e.target.value)}
+              onChange={e => setSelectedLanguageId(Number(e.target.value))}
               className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none"
             >
               {languages.map(l => (
@@ -1051,11 +1116,26 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
             <input
               type="text"
               placeholder="e.g. Are you ___?"
-              value={pattern}
-              onChange={e => setPattern(e.target.value)}
+              value={template}
+              onChange={e => setTemplate(e.target.value)}
               className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
             />
             <p className="text-[0.68rem] text-gray-400 mt-1">Use `___` (3 underscores) to specify the blank slot.</p>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">Pattern Type (Optional)</label>
+            <select
+              value={patternType}
+              onChange={e => setPatternType(e.target.value)}
+              className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none"
+            >
+              <option value="">— none —</option>
+              <option value="affirmative">Affirmative</option>
+              <option value="interrogative">Interrogative</option>
+              <option value="negative">Negative</option>
+              <option value="modal">Modal</option>
+            </select>
           </div>
 
           <div>
@@ -1070,14 +1150,37 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1">Slot Values Schema (JSON)</label>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">Example Sentence (Native)</label>
+            <input
+              type="text"
+              placeholder="e.g. Tu es français?"
+              value={exampleNativeText}
+              onChange={e => setExampleNativeText(e.target.value)}
+              className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">Example Translation (English)</label>
+            <input
+              type="text"
+              placeholder="e.g. Are you French?"
+              value={exampleTranslation}
+              onChange={e => setExampleTranslation(e.target.value)}
+              className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 mb-1">Slot Values (JSON array)</label>
             <textarea
-              rows={8}
-              placeholder="Input valid JSON schema"
-              value={blanks}
-              onChange={e => setBlanks(e.target.value)}
+              rows={6}
+              placeholder='[{"slotValue":"French","transliteration":"français","translation":"French"}]'
+              value={slotValuesJson}
+              onChange={e => setSlotValuesJson(e.target.value)}
               className="w-full p-2.5 rounded border border-black/10 text-xs font-mono outline-none text-[#1a1208] bg-[#faf6ee]"
             />
+            <p className="text-[0.68rem] text-gray-400 mt-1">Each object: slotValue (required), transliteration, translation (optional)</p>
           </div>
 
           <div className="flex gap-2 mt-2">
@@ -1106,45 +1209,48 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
         ) : (
           <div className="flex flex-col gap-4">
             {patterns.map((item) => {
-              let parsedBlanks = [];
-              try {
-                parsedBlanks = JSON.parse(item.blanks);
-              } catch (e) {}
-
               return (
                 <div key={item.id} className="p-4 rounded-xl border border-black/5 bg-[#fffdf8] hover:shadow-xs transition-shadow">
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-bold text-base text-[#b84a1e]">{item.pattern}</h4>
+                    <h4 className="font-bold text-base text-[#b84a1e]">{item.template}</h4>
                     <div className="flex gap-1.5">
                       <button onClick={() => handleEdit(item)} className="px-2.5 py-1 text-xs bg-black/5 hover:bg-black/10 rounded font-semibold transition-all">Edit</button>
-                      <button onClick={() => handleDelete(item.id)} className="px-2.5 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded font-semibold transition-all">Delete</button>
+                      <button onClick={() => handleDelete(item.id!)} className="px-2.5 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded font-semibold transition-all">Delete</button>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-1 mb-3">
-                    {item.tags.split(",").map((t: string) => t.trim()).filter(Boolean).map((tag: string, idx: number) => (
+                    {(item.tags ?? "").split(",").map((t: string) => t.trim()).filter(Boolean).map((tag: string, idx: number) => (
                       <span key={idx} className="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-[#faf6ee] text-[#6b5740] border border-black/5">
                         #{tag}
                       </span>
                     ))}
+                    {item.patternType && (
+                      <span className="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                        {item.patternType}
+                      </span>
+                    )}
                   </div>
 
-                  {/* Slot values previews */}
-                  <div className="text-xs border-t border-black/5 pt-2.5 mt-2">
-                    <span className="font-semibold text-gray-500 block mb-1">Example Slot Variations:</span>
-                    <div className="flex flex-col gap-1 text-gray-600 bg-black/2 p-2 rounded">
-                      {parsedBlanks.map((b: any, bIdx: number) => (
-                        <div key={bIdx} className="flex gap-3 items-center">
-                          {b.slotValues?.slice(0, 3).map((sv: any, svIdx: number) => (
-                            <span key={svIdx} className="bg-white px-2 py-0.5 rounded border border-black/5">
-                              {sv.value} {sv.roman ? `(${sv.roman})` : ""} &rarr; <span className="text-gray-400">{sv.translation}</span>
-                            </span>
-                          ))}
-                          {b.slotValues?.length > 3 && <span className="text-gray-400">+{b.slotValues.length - 3} more</span>}
-                        </div>
-                      ))}
+                  {item.slotValues && item.slotValues.length > 0 && (
+                    <div className="text-xs border-t border-black/5 pt-2.5 mt-2">
+                      <span className="font-semibold text-gray-500 block mb-1">Slot Variations:</span>
+                      <div className="flex flex-wrap gap-1.5 text-gray-600 bg-black/2 p-2 rounded">
+                        {item.slotValues.slice(0, 4).map((sv: any, svIdx: number) => (
+                          <span key={svIdx} className="bg-white px-2 py-0.5 rounded border border-black/5">
+                            {sv.slotValue} {sv.transliteration ? `(${sv.transliteration})` : ""} {sv.translation ? `→ ${sv.translation}` : ""}
+                          </span>
+                        ))}
+                        {item.slotValues.length > 4 && <span className="text-gray-400">+{item.slotValues.length - 4} more</span>}
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {item.exampleNativeText && (
+                    <div className="text-xs border-t border-black/5 pt-2 mt-2 text-gray-500 italic">
+                      e.g. &ldquo;{item.exampleNativeText}&rdquo; — {item.exampleTranslation}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -1155,55 +1261,16 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
   );
 }
 
-// 5. PUBLISHING CENTER TAB COMPONENT
-interface PublishTabProps {
-  languages: LanguageConfig[];
-  onRefresh: () => void;
-}
-
-function PublishTab({ languages, onRefresh }: PublishTabProps) {
-  const [publishing, setPublishing] = useState<Record<string, boolean>>({});
-  const [globalPublishing, setGlobalPublishing] = useState(false);
-
-  const handlePublish = async (langId: string) => {
-    setPublishing(prev => ({ ...prev, [langId]: true }));
-    const result = await publishLanguage(langId);
-    setPublishing(prev => ({ ...prev, [langId]: false }));
-    
-    if (result.success) {
-      alert(`Published ${langId} bundles successfully to R2 mock!`);
-      onRefresh();
-    } else {
-      alert(`Failed to publish: ${result.error}`);
-    }
-  };
-
-  const handlePublishManifest = async () => {
-    setGlobalPublishing(true);
-    const result = await regenerateManifest();
-    setGlobalPublishing(false);
-    
-    if (result.success) {
-      alert("Regenerated manifest.json successfully!");
-    } else {
-      alert("Failed to regenerate manifest.");
-    }
-  };
-
+// 5. SUPABASE STATUS TAB
+function PublishTab({ languages, onRefresh }: { languages: LanguageConfig[]; onRefresh: () => void }) {
   return (
     <div className="bg-[#fffdf8] p-8 rounded-2xl shadow-sm border border-black/5">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>Publishing Dashboard</h2>
-          <p className="text-sm text-gray-500">Compile database state into versioned static bundles and update the manifest file.</p>
-        </div>
-        <button
-          onClick={handlePublishManifest}
-          disabled={globalPublishing}
-          className="px-6 py-2 rounded text-white font-bold bg-[#1a1208] hover:opacity-90 transition-all text-sm"
-        >
-          {globalPublishing ? "Publishing Manifest..." : "Publish Manifest Only"}
-        </button>
+      <div className="mb-6">
+        <h2 className="text-xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>Supabase Status</h2>
+        <p className="text-sm text-gray-500 mt-1">
+          Content is now served directly from Supabase — no publishing step needed.
+          Add or edit content in any tab and it is live immediately.
+        </p>
       </div>
 
       <div className="flex flex-col gap-4">
@@ -1214,20 +1281,16 @@ function PublishTab({ languages, onRefresh }: PublishTabProps) {
               <div>
                 <h4 className="font-bold text-lg">{lang.name}</h4>
                 <div className="flex gap-4 text-xs text-gray-500 mt-1">
-                  <span>Letters: <strong className="text-[#b84a1e]">{lang.lettersFile || "None"}</strong></span>
-                  <span>Words: <strong className="text-[#b84a1e]">{lang.wordsFile || "None"}</strong></span>
-                  <span>Patterns: <strong className="text-[#b84a1e]">{lang.patternsFile || "None"}</strong></span>
+                  <span>Slug: <strong className="text-[#b84a1e]">{lang.slug}</strong></span>
+                  <span>Letters: <strong className={lang.lettersApplicable ? "text-green-600" : "text-gray-400"}>{lang.lettersApplicable ? "Enabled" : "N/A"}</strong></span>
+                  <span>Words: <strong className={lang.wordsApplicable ? "text-green-600" : "text-gray-400"}>{lang.wordsApplicable ? "Enabled" : "N/A"}</strong></span>
+                  <span>Patterns: <strong className={lang.patternsApplicable ? "text-green-600" : "text-gray-400"}>{lang.patternsApplicable ? "Enabled" : "N/A"}</strong></span>
                 </div>
               </div>
             </div>
-
-            <button
-              onClick={() => handlePublish(lang.id)}
-              disabled={publishing[lang.id]}
-              className="px-5 py-2.5 bg-[#b84a1e] text-white font-bold rounded hover:opacity-90 transition-all text-sm flex items-center gap-2"
-            >
-              {publishing[lang.id] ? "Compiling..." : "Publish Content"}
-            </button>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-50 border border-green-200">
+              <span className="text-green-600 text-sm font-semibold">✓ Live on Supabase</span>
+            </div>
           </div>
         ))}
       </div>
