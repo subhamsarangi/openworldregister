@@ -373,7 +373,6 @@ export async function deletePattern(id: number) {
       .delete()
       .eq("id", id);
     if (error) throw error;
-    return { success: true };
   } catch (err) {
     console.error("Error deleting pattern:", err);
     throw new Error("Failed to delete pattern");

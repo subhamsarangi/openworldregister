@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Copy, Check } from "lucide-react";
 import { getLanguages, updateLanguages, createLanguage, deleteLanguage, saveLanguage, LanguageConfig } from "../actions/languages";
 import {
   getLetters,
@@ -13,6 +13,7 @@ import {
   getPatterns,
   savePattern,
   deletePattern,
+
   DBLetter,
   DBWord,
   DBPattern
@@ -1641,6 +1642,103 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
   const [exampleNativeText, setExampleNativeText] = useState("");
   const [exampleTranslation, setExampleTranslation] = useState("");
   const [slotValuesJson, setSlotValuesJson] = useState("");
+  const [formMode, setFormMode] = useState<"manual" | "json">("manual");
+  const [jsonText, setJsonText] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const jsonTemplateStr = `{
+  "template": "¿Estás ___?",
+  "patternType": "affirmative | interrogative | negative | modal | imperative | conditional | comparative | exclamatory",
+  "tense": "present",
+  "tags": "basic",
+  "exampleNativeText": "¿Estás feliz?",
+  "exampleTranslation": "Are you happy?",
+  "slotValues": [
+    { 
+      "slotValue": "feliz", 
+      "transliteration": "feliz", 
+      "translation": "happy",
+      "sortOrder": 0
+    },
+    { 
+      "slotValue": "ocupado", 
+      "transliteration": "ocupado", 
+      "translation": "busy",
+      "sortOrder": 1
+    },
+    { 
+      "slotValue": "bien", 
+      "transliteration": "bien", 
+      "translation": "okay",
+      "sortOrder": 2
+    }
+  ]
+}`;
+
+  const handleCopyTemplate = () => {
+    navigator.clipboard.writeText(jsonTemplateStr);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleJsonTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const text = e.target.value;
+    setJsonText(text);
+    try {
+      const json = JSON.parse(text);
+      if (json && !Array.isArray(json) && json.template) {
+        setTemplate(json.template || "");
+        setPatternType(json.patternType || "");
+        setTags(json.tags || "");
+        setExampleNativeText(json.exampleNativeText || "");
+        setExampleTranslation(json.exampleTranslation || "");
+        if (json.slotValues) {
+          setSlotValuesJson(JSON.stringify(json.slotValues, null, 2));
+        }
+      }
+    } catch {
+      // Ignore parse errors while typing
+    }
+  };
+
+  const handleJsonSave = async () => {
+    if (!jsonText.trim()) {
+      alert("Please paste some JSON first.");
+      return;
+    }
+
+    try {
+      const json = JSON.parse(jsonText);
+      if (Array.isArray(json)) {
+        alert("Please provide a single JSON object, not an array.");
+        return;
+      }
+      if (!json.template) {
+        alert("Invalid structure: The object must contain a 'template' field.");
+        return;
+      }
+
+      const parsedSlots = json.slotValues && Array.isArray(json.slotValues) ? json.slotValues : [];
+
+      await savePattern({
+        id: editingId ?? undefined,
+        languageId: selectedLanguageId,
+        template: json.template,
+        patternType: json.patternType || null,
+        tags: json.tags || null,
+        exampleNativeText: json.exampleNativeText || null,
+        exampleTranslation: json.exampleTranslation || null,
+        slotValues: parsedSlots,
+      });
+
+      alert("Pattern successfully saved!");
+      setJsonText("");
+      refreshData();
+      resetForm();
+    } catch (e) {
+      alert("Error saving pattern from JSON. Please ensure it is a valid format.");
+    }
+  };
 
   const refreshData = () => {
     if (selectedLanguageId) {
@@ -1719,6 +1817,17 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
     }
   };
 
+  const isManualValid = template.trim().length > 0;
+  let isJsonValid = false;
+  try {
+    const j = JSON.parse(jsonText);
+    if (j && !Array.isArray(j) && j.template && j.template.trim().length > 0) {
+      isJsonValid = true;
+    }
+  } catch (e) {
+    isJsonValid = false;
+  }
+
   if (selectedLang && !selectedLang.patternsApplicable) {
     return (
       <div className="bg-[#fffdf8] p-8 rounded-2xl shadow-sm border border-black/5 text-center">
@@ -1735,20 +1844,48 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
         <h3 className="text-lg font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
           {editingId ? "Edit Pattern" : "Add New Pattern"}
         </h3>
-        <form onSubmit={handleSave} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 mb-1">Select Language</label>
-            <select
-              value={selectedLanguageId}
-              onChange={e => setSelectedLanguageId(Number(e.target.value))}
-              className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none"
-            >
-              {languages.map(l => (
-                <option key={l.id} value={l.id}>{l.name}</option>
-              ))}
-            </select>
-          </div>
 
+        <div className="mb-4">
+          <label className="block text-xs font-semibold text-gray-500 mb-1">Select Language</label>
+          <select
+            value={selectedLanguageId}
+            onChange={e => setSelectedLanguageId(Number(e.target.value))}
+            className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none"
+          >
+            {languages.map(l => (
+              <option key={l.id} value={l.id}>{l.name}</option>
+            ))}
+          </select>
+        </div>
+        
+        {/* Mode Tabs */}
+        <div className="flex border-b border-black/5 gap-4 mb-4">
+          <button
+            type="button"
+            onClick={() => setFormMode("manual")}
+            className={`pb-2 text-xs font-bold uppercase tracking-wider transition-all border-b-2 ${
+              formMode === "manual"
+                ? "border-[#b84a1e] text-[#b84a1e]"
+                : "border-transparent text-gray-400 hover:text-gray-600"
+            }`}
+          >
+            Manual Entry
+          </button>
+          <button
+            type="button"
+            onClick={() => setFormMode("json")}
+            className={`pb-2 text-xs font-bold uppercase tracking-wider transition-all border-b-2 ${
+              formMode === "json"
+                ? "border-[#b84a1e] text-[#b84a1e]"
+                : "border-transparent text-gray-400 hover:text-gray-600"
+            }`}
+          >
+            Paste JSON
+          </button>
+        </div>
+
+        {formMode === "manual" ? (
+        <form onSubmit={handleSave} className="flex flex-col gap-4">
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Pattern Template</label>
             <input
@@ -1773,6 +1910,10 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
               <option value="interrogative">Interrogative</option>
               <option value="negative">Negative</option>
               <option value="modal">Modal</option>
+              <option value="imperative">Imperative</option>
+              <option value="conditional">Conditional</option>
+              <option value="comparative">Comparative</option>
+              <option value="exclamatory">Exclamatory</option>
             </select>
           </div>
 
@@ -1822,7 +1963,11 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
           </div>
 
           <div className="flex gap-2 mt-2">
-            <button type="submit" className="flex-1 py-2.5 bg-[#b84a1e] text-white text-sm rounded font-bold hover:opacity-90 transition-all">
+            <button 
+              type="submit" 
+              disabled={!isManualValid}
+              className={`flex-1 py-2.5 text-white text-sm rounded font-bold transition-all ${isManualValid ? "bg-[#b84a1e] hover:opacity-90" : "bg-gray-400 opacity-50 cursor-not-allowed"}`}
+            >
               {editingId ? "Save Changes" : "Add Pattern"}
             </button>
             {editingId && (
@@ -1832,6 +1977,43 @@ function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, sel
             )}
           </div>
         </form>
+        ) : (
+          <div className="flex flex-col gap-3">
+            <div className="flex justify-between items-end mb-1">
+              <label className="block text-xs font-semibold text-gray-500">Paste JSON Object</label>
+              <button
+                type="button"
+                onClick={handleCopyTemplate}
+                className="flex items-center gap-1 text-[10px] font-bold text-[#b84a1e] hover:text-[#a6421a] hover:bg-[#b84a1e]/10 px-2 py-1 rounded transition-all"
+              >
+                {copied ? <Check size={12} /> : <Copy size={12} />}
+                {copied ? "Copied!" : "Copy Template"}
+              </button>
+            </div>
+            <textarea
+              rows={15}
+              placeholder={jsonTemplateStr}
+              value={jsonText}
+              onChange={handleJsonTextChange}
+              className="w-full p-2.5 rounded border border-black/10 text-xs font-mono outline-none text-[#1a1208] bg-white resize-y"
+            />
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={handleJsonSave}
+                disabled={!isJsonValid}
+                className={`w-full py-2 text-white text-xs font-bold rounded shadow-sm transition-all ${isJsonValid ? "bg-[#b84a1e] hover:bg-[#a6421a]" : "bg-gray-400 opacity-50 cursor-not-allowed"}`}
+              >
+                Save from JSON
+              </button>
+              {editingId && (
+                <button type="button" onClick={resetForm} className="px-4 py-2.5 bg-black/5 hover:bg-black/10 text-sm rounded font-semibold transition-all">
+                  Cancel
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Patterns List */}
