@@ -106,6 +106,73 @@ export async function saveLetter(data: DBLetter) {
   }
 }
 
+export async function importLettersBulk(languageId: number, letters: Omit<DBLetter, "id" | "languageId">[]) {
+  try {
+    // 1. Fetch existing letters for this language
+    const { data: existing, error: fetchError } = await supabase
+      .from("alphabet_entries")
+      .select("id, character, transliteration, char_type, example, pronunciation_note, audio_url, sort_order")
+      .eq("language_id", languageId);
+
+    if (fetchError) throw fetchError;
+
+    // 2. Build a lookup map of character -> existing record
+    const existingMap = new Map<string, any>();
+    if (existing) {
+      for (const row of existing) {
+        existingMap.set(row.character, row);
+      }
+    }
+
+    // 3. Partition into inserts and updates
+    const inserts: any[] = [];
+    const updates: any[] = [];
+
+    for (const item of letters) {
+      const existingRow = existingMap.get(item.character);
+      const rowData = {
+        language_id: languageId,
+        character: item.character,
+        transliteration: item.transliteration || existingRow?.transliteration || "",
+        char_type: item.charType || existingRow?.char_type || "consonant",
+        example: item.example !== undefined ? item.example : (existingRow?.example || null),
+        pronunciation_note: item.pronunciationNote !== undefined ? item.pronunciationNote : (existingRow?.pronunciation_note || null),
+        audio_url: existingRow ? existingRow.audio_url : null,
+        sort_order: existingRow ? existingRow.sort_order : null
+      };
+
+      if (existingRow) {
+        updates.push({
+          id: existingRow.id,
+          ...rowData
+        });
+      } else {
+        inserts.push(rowData);
+      }
+    }
+
+    // 4. Perform database operations
+    if (inserts.length > 0) {
+      const { error: insertError } = await supabase
+        .from("alphabet_entries")
+        .insert(inserts);
+      if (insertError) throw insertError;
+    }
+
+    if (updates.length > 0) {
+      const { error: updateError } = await supabase
+        .from("alphabet_entries")
+        .upsert(updates);
+      if (updateError) throw updateError;
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error("Error bulk importing letters:", err);
+    return { success: false, error: String(err) };
+  }
+}
+
 export async function deleteLetter(id: number) {
   try {
     const { error } = await supabase

@@ -2,7 +2,8 @@ import './owr.css';
 import OWRClient from './OWRClient';
 
 export const metadata = {
-  title: 'Open World Register — Global Directory of Cultures',
+  title: 'Open World Register | Global Directory of Cultures',
+  description: 'A comprehensive directory of cultural, geographic, and administrative information for every country, subdivision, and region on Earth.',
 };
 
 export default function OWRPage() {
