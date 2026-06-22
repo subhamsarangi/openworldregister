@@ -19,6 +19,7 @@ export interface ContentTabProps {
 
 export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageId, selectedLang }: ContentTabProps) {
   const [letters, setLetters] = useState<DBLetter[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
 
   // Form states
@@ -113,7 +114,11 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
 
   const refreshData = () => {
     if (selectedLanguageId) {
-      getLetters(selectedLanguageId).then(setLetters);
+      setLoadingData(true);
+      getLetters(selectedLanguageId).then((data) => {
+        setLetters(data);
+        setLoadingData(false);
+      });
     }
   };
 
@@ -382,9 +387,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
               type="button"
               onClick={() => setViewMode("table")}
               className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
-                viewMode === "table"
-                  ? "bg-white text-[#b84a1e] shadow-sm"
-                  : "text-gray-500 hover:text-gray-900"
+                viewMode === "table" ? "bg-white shadow-sm text-gray-800" : "text-gray-500 hover:text-gray-700"
               }`}
             >
               Table
@@ -393,9 +396,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
               type="button"
               onClick={() => setViewMode("grid")}
               className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
-                viewMode === "grid"
-                  ? "bg-white text-[#b84a1e] shadow-sm"
-                  : "text-gray-500 hover:text-gray-900"
+                viewMode === "grid" ? "bg-white shadow-sm text-gray-800" : "text-gray-500 hover:text-gray-700"
               }`}
             >
               Grid
@@ -403,7 +404,11 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
           </div>
         </div>
         
-        {letters.length === 0 ? (
+        {loadingData ? (
+          <div className="py-12 flex justify-center items-center">
+            <div className="w-8 h-8 rounded-full border-4 border-black/10 border-t-[#b84a1e] animate-spin" />
+          </div>
+        ) : letters.length === 0 ? (
           <div className="py-12 text-center text-gray-500 border-2 border-dashed border-black/5 rounded-xl">
             No letters added yet. Fill the form to create the first character!
           </div>

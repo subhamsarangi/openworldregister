@@ -13,6 +13,7 @@ export interface ContentTabProps {
 
 export function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId, selectedLang }: ContentTabProps) {
   const [words, setWords] = useState<DBWord[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isFormVisible, setIsFormVisible] = useState(true);
 
@@ -24,7 +25,11 @@ export function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId,
 
   const refreshData = () => {
     if (selectedLanguageId) {
-      getWords(selectedLanguageId).then(setWords);
+      setLoadingData(true);
+      getWords(selectedLanguageId).then((data) => {
+        setWords(data);
+        setLoadingData(false);
+      });
     }
   };
 
@@ -114,7 +119,11 @@ export function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId,
         listTitle="Current Vocabulary List"
         listCount={words.length}
         listChildren={
-          words.length === 0 ? (
+          loadingData ? (
+            <div className="py-12 flex justify-center items-center">
+              <div className="w-8 h-8 rounded-full border-4 border-black/10 border-t-[#b84a1e] animate-spin" />
+            </div>
+          ) : words.length === 0 ? (
             <div className="py-12 text-center text-gray-500 border-2 border-dashed border-black/5 rounded-xl">
               No vocabulary added yet.
             </div>

@@ -14,6 +14,7 @@ export interface ContentTabProps {
 
 export function PatternsTab({ languages, selectedLanguageId, setSelectedLanguageId, selectedLang }: ContentTabProps) {
   const [patterns, setPatterns] = useState<DBPattern[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isFormVisible, setIsFormVisible] = useState(true);
 
@@ -82,7 +83,13 @@ export function PatternsTab({ languages, selectedLanguageId, setSelectedLanguage
   };
 
   const refreshData = () => {
-    if (selectedLanguageId) getPatterns(selectedLanguageId).then(setPatterns);
+    if (selectedLanguageId) {
+      setLoadingData(true);
+      getPatterns(selectedLanguageId).then((data) => {
+        setPatterns(data);
+        setLoadingData(false);
+      });
+    }
   };
 
   useEffect(() => { refreshData(); resetForm(); }, [selectedLanguageId]);
@@ -158,7 +165,11 @@ export function PatternsTab({ languages, selectedLanguageId, setSelectedLanguage
         listTitle="Current Patterns List"
         listCount={patterns.length}
         listChildren={
-          patterns.length === 0 ? (
+          loadingData ? (
+            <div className="py-12 flex justify-center items-center">
+              <div className="w-8 h-8 rounded-full border-4 border-black/10 border-t-[#b84a1e] animate-spin" />
+            </div>
+          ) : patterns.length === 0 ? (
             <div className="py-12 text-center text-gray-500 border-2 border-dashed border-black/5 rounded-xl">No patterns added yet.</div>
           ) : (
             <div className="flex flex-col gap-4">
