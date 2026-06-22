@@ -30,6 +30,8 @@ export default function Home() {
 
   return (
     <main className="relative w-full min-h-screen flex flex-col md:flex-row items-center justify-between px-6 md:px-12 py-12 md:py-0 overflow-hidden" style={{ backgroundColor: "#faf6ee", color: "#1a1208", fontFamily: "'Lora', Georgia, serif" }}>
+      <link rel="preload" as="image" href="https://unpkg.com/three-globe/example/img/earth-day.jpg" fetchPriority="high" />
+      <link rel="preload" as="image" href="https://unpkg.com/three-globe/example/img/earth-topology.png" fetchPriority="high" />
       {/* Background pattern similar to OWR */}
       <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 50% 50%, rgba(200,154,46,0.08) 0%, transparent 60%)" }}></div>
 
