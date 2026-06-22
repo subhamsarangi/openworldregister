@@ -156,7 +156,7 @@ export function StartLearningModal({ isOpen, onClose }: ModalProps) {
               filteredLanguages.map((lang) => (
                 <Link 
                   key={lang.id} 
-                  href={`/learn/${lang.id}`}
+                  href={`/learn/${lang.slug}`}
                   className="group flex items-center justify-between p-4 rounded-xl transition-all hover:-translate-y-0.5"
                   style={{ backgroundColor: "#fffdf8", border: "1px solid rgba(107, 87, 64, 0.1)", boxShadow: "0 4px 12px rgba(26, 18, 8, 0.03)" }}
                 >

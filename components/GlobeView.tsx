@@ -22,7 +22,7 @@ export default function GlobeView() {
           lat: l.latitude,
           lng: l.longitude,
           name: l.name,
-          code: l.id,
+          code: l.slug,
           flag: l.flag
         }));
       setGlobeLanguages(activeLangs);

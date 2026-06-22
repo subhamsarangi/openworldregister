@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import {
   getLetters,
   saveLetter,
@@ -28,6 +28,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
   const [example, setExample] = useState("");
   const [pronunciationNote, setPronunciationNote] = useState("");
   const [importing, setImporting] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(true);
   const [importMode, setImportMode] = useState<"upload" | "paste">("upload");
   const [jsonText, setJsonText] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
@@ -161,6 +162,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
     setCharType(item.charType);
     setExample(item.example ?? "");
     setPronunciationNote(item.pronunciationNote ?? "");
+    setIsFormVisible(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -204,15 +206,19 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="flex flex-col lg:flex-row gap-8 items-start overflow-hidden">
       {/* Left Column: Form + Bulk Import */}
-      <div className="flex flex-col gap-8">
-        {/* Edit/Add Form */}
-        <div className="bg-[#fffdf8] p-6 rounded-2xl shadow-sm border border-black/5 h-fit">
-        <h3 className="text-lg font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
-          {editingId ? "Edit Letter" : "Add New Letter"}
-        </h3>
-        <form onSubmit={handleSave} className="flex flex-col gap-4">
+      <div className={`flex flex-col transition-all duration-300 ease-in-out shrink-0 overflow-hidden ${isFormVisible ? 'w-full lg:w-[320px] xl:w-[380px] gap-8 opacity-100' : 'w-0 h-0 lg:h-auto opacity-0'}`}>
+        <div className="w-full lg:w-[320px] xl:w-[380px] flex flex-col gap-8 pb-4">
+          {/* Edit/Add Form */}
+          <div className="bg-[#fffdf8] p-6 rounded-2xl shadow-sm border border-black/5 h-fit relative">
+            <button type="button" onClick={() => setIsFormVisible(false)} className="absolute top-4 right-4 p-1.5 text-gray-400 hover:text-[#b84a1e] hover:bg-[#b84a1e]/10 rounded-md transition-all" title="Hide Form">
+              <PanelLeftClose size={18} />
+            </button>
+            <h3 className="text-lg font-bold mb-4 pr-8" style={{ fontFamily: "'Playfair Display', serif" }}>
+              {editingId ? "Edit Letter" : "Add New Letter"}
+            </h3>
+            <form onSubmit={handleSave} className="flex flex-col gap-4">
 
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Letter / Character</label>
@@ -354,13 +360,21 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
           )}
         </div>
       </div>
+      </div>
 
       {/* Letters List */}
-      <div className="lg:col-span-2 bg-[#fffdf8] p-6 rounded-2xl shadow-sm border border-black/5">
+      <div className="flex-1 min-w-0 w-full bg-[#fffdf8] p-6 rounded-2xl shadow-sm border border-black/5 transition-all duration-300">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>
-            Current Letters List ({letters.length})
-          </h3>
+          <div className="flex items-center gap-3">
+            {!isFormVisible && (
+              <button type="button" onClick={() => setIsFormVisible(true)} className="p-1.5 text-gray-500 hover:text-[#b84a1e] hover:bg-[#b84a1e]/10 rounded-md transition-all shadow-sm bg-white border border-black/5" title="Show Form">
+                <PanelLeftOpen size={16} />
+              </button>
+            )}
+            <h3 className="text-lg font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Current Letters List ({letters.length})
+            </h3>
+          </div>
           
           {/* View Mode Toggle */}
           <div className="inline-flex rounded-lg p-0.5 bg-black/5 gap-0.5">
@@ -432,57 +446,46 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
             {letters.map((item) => (
               <div
                 key={item.id}
-                className="bg-white p-4 rounded-xl shadow-sm border border-black/5 hover:border-[#b84a1e]/20 transition-all flex flex-col items-center text-center relative group"
+                className="bg-white p-3 rounded-xl shadow-sm border border-black/5 hover:border-[#b84a1e]/30 transition-all flex flex-col relative group text-left"
               >
-                {/* Character display */}
-                <div className="text-3xl font-extrabold text-[#b84a1e] mb-2 select-all leading-tight">
-                  {item.character}
-                </div>
-
-                {/* Transliteration */}
-                <div className="text-sm font-bold text-gray-800 mb-1 leading-snug">
-                  /{item.transliteration}/
-                </div>
-
-                {/* Tag for Type */}
-                <div className="mb-2">
-                  <span className="px-2 py-0.5 rounded-full text-[0.62rem] font-bold bg-[#faf6ee] text-[#6b5740] border border-black/5">
-                    {item.charType}
+                {/* Top Row: Character, Roman, Type */}
+                <div className="flex items-end justify-between mb-3">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-extrabold text-[#b84a1e] select-all leading-none">{item.character}</span>
+                    <span className="text-sm font-bold text-gray-400">/{item.transliteration}/</span>
+                  </div>
+                  <span className="px-1.5 py-0.5 rounded text-[0.6rem] font-bold bg-[#faf6ee] text-[#6b5740] border border-black/5 uppercase tracking-wider whitespace-nowrap">
+                    {item.charType === "consonant" ? "cons" : item.charType}
                   </span>
                 </div>
 
-                {/* Example word */}
-                {item.example && (
-                  <div className="text-xs text-gray-600 mb-0.5">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase mr-1">Ex:</span>
-                    <span className="font-semibold">{item.example}</span>
-                  </div>
-                )}
+                {/* Bottom Section: Details */}
+                <div className="bg-black/5 rounded p-2 mt-auto flex flex-col gap-1 min-h-[3.5rem] justify-center">
+                  {item.example && (
+                    <div className="text-xs text-gray-800 truncate w-full">
+                      <span className="text-[9px] font-bold text-gray-500 uppercase mr-1">Ex:</span>
+                      <span className="font-semibold">{item.example}</span>
+                    </div>
+                  )}
+                  {item.pronunciationNote && (
+                    <div className="text-[10px] text-gray-600 italic leading-tight line-clamp-2" title={item.pronunciationNote}>
+                      {item.pronunciationNote}
+                    </div>
+                  )}
+                  {!item.example && !item.pronunciationNote && (
+                    <div className="text-[10px] text-gray-400 italic">No details</div>
+                  )}
+                </div>
 
-                {/* Pronunciation Note */}
-                {item.pronunciationNote && (
-                  <div className="text-[10px] text-gray-400 italic mb-3 max-w-full truncate" title={item.pronunciationNote}>
-                    {item.pronunciationNote}
-                  </div>
-                )}
-
-                {/* Edit Icon (Top Right) */}
-                <button
-                  onClick={() => handleEdit(item)}
-                  className="absolute top-2 right-2 p-1.5 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-all opacity-0 group-hover:opacity-100"
-                  title="Edit"
-                >
-                  <Pencil size={14} />
-                </button>
-
-                {/* Delete Icon (Bottom Right) */}
-                <button
-                  onClick={() => handleDelete(item.id!)}
-                  className="absolute bottom-2 right-2 p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-all opacity-0 group-hover:opacity-100"
-                  title="Delete"
-                >
-                  <Trash2 size={14} />
-                </button>
+                {/* Hover Actions (Floating Toolbar) */}
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-white shadow-sm rounded border border-black/5 p-0.5 z-10">
+                  <button onClick={() => handleEdit(item)} className="p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-900 rounded transition-colors" title="Edit">
+                    <Pencil size={12} />
+                  </button>
+                  <button onClick={() => handleDelete(item.id!)} className="p-1.5 text-gray-500 hover:bg-red-50 hover:text-red-600 rounded transition-colors" title="Delete">
+                    <Trash2 size={12} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
