@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getWords, saveWord, deleteWord, DBWord } from "../../actions/adminActions";
 import { LanguageConfig } from "../../actions/languages";
+import { FormPanel } from "./FormPanel";
 
 export interface ContentTabProps {
   languages: LanguageConfig[];
@@ -13,6 +14,7 @@ export interface ContentTabProps {
 export function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId, selectedLang }: ContentTabProps) {
   const [words, setWords] = useState<DBWord[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [isFormVisible, setIsFormVisible] = useState(true);
 
   // Form states
   const [word, setWord] = useState("");
@@ -45,16 +47,8 @@ export function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId,
       alert("Word and Translation are required");
       return;
     }
-
     try {
-      await saveWord({
-        id: editingId ?? undefined,
-        languageId: selectedLanguageId,
-        word,
-        transliteration,
-        translation,
-        cefrLevel,
-      });
+      await saveWord({ id: editingId ?? undefined, languageId: selectedLanguageId, word, transliteration, translation, cefrLevel });
       refreshData();
       resetForm();
     } catch (e) {
@@ -68,6 +62,7 @@ export function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId,
     setTransliteration(item.transliteration);
     setTranslation(item.translation);
     setCefrLevel(item.cefrLevel);
+    setIsFormVisible(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -111,53 +106,73 @@ export function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId,
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      {/* Edit/Add Form */}
-      <div className="bg-[#fffdf8] p-6 rounded-2xl shadow-sm border border-black/5 h-fit">
-        <h3 className="text-lg font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
-          {editingId ? "Edit Word" : "Add New Word"}
-        </h3>
+      <FormPanel
+        isVisible={isFormVisible}
+        onHide={() => setIsFormVisible(false)}
+        onShow={() => setIsFormVisible(true)}
+        title={editingId ? "Edit Word" : "Add New Word"}
+        listTitle="Current Vocabulary List"
+        listCount={words.length}
+        listChildren={
+          words.length === 0 ? (
+            <div className="py-12 text-center text-gray-500 border-2 border-dashed border-black/5 rounded-xl">
+              No vocabulary added yet.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-black/5 text-gray-400 font-bold uppercase text-[0.72rem] tracking-wider">
+                    <th className="py-3 px-2">Word</th>
+                    <th className="py-3 px-2">Roman</th>
+                    <th className="py-3 px-2">Meaning</th>
+                    <th className="py-3 px-2">Level</th>
+                    <th className="py-3 px-2 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-black/5">
+                  {words.map((item) => (
+                    <tr key={item.id} className="hover:bg-black/1">
+                      <td className="py-3.5 px-2 font-bold text-[#b84a1e]">{item.word}</td>
+                      <td className="py-3.5 px-2 text-gray-600">{item.transliteration || "-"}</td>
+                      <td className="py-3.5 px-2 font-medium">{item.translation}</td>
+                      <td className="py-3.5 px-2">
+                        <span className={`px-2 py-0.5 rounded-full text-[0.68rem] font-bold ${
+                          item.cefrLevel === 'A1' || item.cefrLevel === 'A2' ? 'bg-green-50 text-green-700 border border-green-200' :
+                          item.cefrLevel === 'B1' || item.cefrLevel === 'B2' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                          'bg-rose-50 text-rose-700 border border-rose-200'
+                        }`}>
+                          {item.cefrLevel}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-2 text-right flex justify-end gap-1.5">
+                        <button onClick={() => handleEdit(item)} className="px-2.5 py-1 text-xs bg-black/5 hover:bg-black/10 rounded font-semibold transition-all">Edit</button>
+                        <button onClick={() => handleDelete(item.id!)} className="px-2.5 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded font-semibold transition-all">Delete</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        }
+      >
         <form onSubmit={handleSave} className="flex flex-col gap-4">
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Word / Phrase</label>
-            <input
-              type="text"
-              placeholder="e.g. Bonjour"
-              value={word}
-              onChange={e => setWord(e.target.value)}
-              className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
-            />
+            <input type="text" placeholder="e.g. Bonjour" value={word} onChange={e => setWord(e.target.value)} className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]" />
           </div>
-
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Romanized Spelling / Pronunciation</label>
-            <input
-              type="text"
-              placeholder="e.g. bohn-zhoor"
-              value={transliteration}
-              onChange={e => setTransliteration(e.target.value)}
-              className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
-            />
+            <input type="text" placeholder="e.g. bohn-zhoor" value={transliteration} onChange={e => setTransliteration(e.target.value)} className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]" />
           </div>
-
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">English Translation</label>
-            <input
-              type="text"
-              placeholder="e.g. Hello / Good morning"
-              value={translation}
-              onChange={e => setTranslation(e.target.value)}
-              className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]"
-            />
+            <input type="text" placeholder="e.g. Hello / Good morning" value={translation} onChange={e => setTranslation(e.target.value)} className="w-full p-2.5 rounded border border-black/10 text-sm outline-none text-[#1a1208]" />
           </div>
-
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">CEFR Level</label>
-            <select
-              value={cefrLevel}
-              onChange={e => setCefrLevel(e.target.value)}
-              className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none"
-            >
+            <select value={cefrLevel} onChange={e => setCefrLevel(e.target.value)} className="w-full p-2.5 rounded border border-black/10 bg-white text-sm outline-none">
               <option value="A1">A1 — Beginner</option>
               <option value="A2">A2 — Elementary</option>
               <option value="B1">B1 — Intermediate</option>
@@ -166,69 +181,16 @@ export function WordsTab({ languages, selectedLanguageId, setSelectedLanguageId,
               <option value="C2">C2 — Proficient</option>
             </select>
           </div>
-
           <div className="flex gap-2 mt-2">
             <button type="submit" className="flex-1 py-2.5 bg-[#b84a1e] text-white text-sm rounded font-bold hover:opacity-90 transition-all">
               {editingId ? "Save Changes" : "Add Word"}
             </button>
             {editingId && (
-              <button type="button" onClick={resetForm} className="px-4 py-2.5 bg-black/5 hover:bg-black/10 text-sm rounded font-semibold transition-all">
-                Cancel
-              </button>
+              <button type="button" onClick={resetForm} className="px-4 py-2.5 bg-black/5 hover:bg-black/10 text-sm rounded font-semibold transition-all">Cancel</button>
             )}
           </div>
         </form>
-      </div>
-
-      {/* Words List */}
-      <div className="lg:col-span-2 bg-[#fffdf8] p-6 rounded-2xl shadow-sm border border-black/5">
-        <h3 className="text-lg font-bold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>
-          Current Vocabulary List ({words.length})
-        </h3>
-        
-        {words.length === 0 ? (
-          <div className="py-12 text-center text-gray-500 border-2 border-dashed border-black/5 rounded-xl">
-            No vocabulary added yet.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm border-collapse">
-              <thead>
-                <tr className="border-b border-black/5 text-gray-400 font-bold uppercase text-[0.72rem] tracking-wider">
-                  <th className="py-3 px-2">Word</th>
-                  <th className="py-3 px-2">Roman</th>
-                  <th className="py-3 px-2">Meaning</th>
-                  <th className="py-3 px-2">Level</th>
-                  <th className="py-3 px-2 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-black/5">
-                {words.map((item) => (
-                  <tr key={item.id} className="hover:bg-black/1">
-                    <td className="py-3.5 px-2 font-bold text-[#b84a1e]">{item.word}</td>
-                    <td className="py-3.5 px-2 text-gray-600">{item.transliteration || "-"}</td>
-                    <td className="py-3.5 px-2 font-medium">{item.translation}</td>
-                    <td className="py-3.5 px-2">
-                      <span className={`px-2 py-0.5 rounded-full text-[0.68rem] font-bold ${
-                        item.cefrLevel === 'A1' || item.cefrLevel === 'A2' ? 'bg-green-50 text-green-700 border border-green-200' :
-                        item.cefrLevel === 'B1' || item.cefrLevel === 'B2' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                        'bg-rose-50 text-rose-700 border border-rose-200'
-                      }`}>
-                        {item.cefrLevel}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-2 text-right flex justify-end gap-1.5">
-                      <button onClick={() => handleEdit(item)} className="px-2.5 py-1 text-xs bg-black/5 hover:bg-black/10 rounded font-semibold transition-all">Edit</button>
-                      <button onClick={() => handleDelete(item.id!)} className="px-2.5 py-1 text-xs bg-red-50 text-red-600 hover:bg-red-100 rounded font-semibold transition-all">Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    </div>
+      </FormPanel>
     </div>
   );
 }
