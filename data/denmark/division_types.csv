@@ -1,0 +1,3 @@
+id,country_id,division_type,division_level,total_count,description
+1,1,Region,1,5,Denmark is divided into 5 administrative regions established in 2007
+2,1,Municipality,2,98,The 5 regions contain 98 municipalities (kommuner) responsible for local services

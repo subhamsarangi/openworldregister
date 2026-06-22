@@ -1,0 +1,6 @@
+id,country_id,parent_id,division_type_id,slug,name_official,name_native,name_transliteration,name_phonetic,capital,population,area_km2,lat,lng,description
+1,1,,1,capital-region,Capital Region of Denmark,Region Hovedstaden,Region Hovudstaden,REH-gyon HOH-eth-sta-nen,Copenhagen,1868688,2568,55.6761,12.5683,"Denmark's most populous region encompassing Copenhagen and North Zealand"
+2,1,,1,zealand,Region Zealand,Region Sjælland,Region Sjellann,REH-gyon SHEL-lan,Sorø,838841,7273,55.4761,11.7560,"Agricultural heartland south of Copenhagen with medieval towns"
+3,1,,1,southern-denmark,Region of Southern Denmark,Region Syddanmark,Region Sü-Dänmark,REH-gyon SEW-dan-mark,Vejle,1223985,12191,55.3059,9.4721,"Borders Germany; home to Legoland and the ancient Ribe"
+4,1,,1,central-denmark,Central Denmark Region,Region Midtjylland,Region Mid-Yulland,REH-gyon MID-yoo-lan,Viborg,1337459,13003,56.1629,9.5018,"Jutland's heart with Aarhus — Denmark's cultural second city"
+5,1,,1,north-denmark,North Denmark Region,Region Nordjylland,Region Nord-Yulland,REH-gyon NOR-yoo-lan,Aalborg,591897,7928,57.0488,9.9217,"Rugged northern tip with Aalborg and the windswept Skagen"

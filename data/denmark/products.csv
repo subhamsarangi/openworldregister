@@ -1,0 +1,9 @@
+id,country_id,name,category,description,amazon_search,price_range,commission_type
+1,1,LEGO Classic Set,Toys,"Denmark's greatest gift to the world — LEGO bricks invented in Billund in 1932. Perfect Danish souvenir and creative toy for all ages.",LEGO classic set,$$,Amazon Affiliate
+2,1,Georg Jensen Silver Jewellery,Luxury Goods,"Iconic Danish silverware and jewellery brand founded in 1904. Represents Danish craftsmanship and minimalist design at its finest.",Georg Jensen jewellery,$$$$,Amazon Affiliate
+3,1,Royal Copenhagen Porcelain,Home Decor,"Hand-painted Danish porcelain with distinctive blue floral patterns since 1775. A treasured Danish design classic and collector's item.",Royal Copenhagen porcelain,$$$$,Amazon Affiliate
+4,1,Hygge Book Collection,Books,"Explore the Danish art of hygge with bestselling books about Danish happiness, wellbeing and the cosy lifestyle philosophy.",hygge book Denmark,$$,Amazon Affiliate
+5,1,Danish Butter Cookies (Royal Dansk),Food,"The iconic blue tin of Danish butter cookies — the world's most recognisable Danish export. Crispy, buttery and impossibly addictive.",Royal Dansk butter cookies,$,Amazon Affiliate
+6,1,Scandinavian Design Coffee Table Book,Books,"Explore Danish and Scandinavian design heritage — from Arne Jacobsen's chairs to the principles of functional beauty.",Scandinavian design book,$$,Amazon Affiliate
+7,1,Arne Jacobsen Egg Chair Replica,Furniture,"The famous Egg Chair designed by Arne Jacobsen in 1958 for Copenhagen's Radisson Blu Royal Hotel. An icon of mid-century modern design.",Arne Jacobsen egg chair,$$$$,Amazon Affiliate
+8,1,Viking History Books,Books,"Discover the real history of Denmark's Viking heritage — from raiding to trading, settlement and the sagas.",Viking history book,$$,Amazon Affiliate
