@@ -613,7 +613,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                           <button
                             type="button"
                             onClick={() => toggleExpand(item.id!)}
-                            className="px-2.5 py-0.5 rounded text-[0.68rem] font-bold bg-[#b84a1e]/8 text-[#b84a1e] border border-[#b84a1e]/15 hover:bg-[#b84a1e]/15 transition-all cursor-pointer inline-flex items-center gap-1"
+                            className="px-2.5 py-0.5 rounded text-[0.68rem] font-bold bg-[#b84a1e]/8 text-[#b84a1e] border border-[#b84a1e]/15 hover:bg-[#b84a1e]/15 transition-all cursor-pointer inline-flex items-center gap-1 whitespace-nowrap"
                           >
                             <span>{(item.variants ?? []).length} variants</span>
                             {expandedLetterIds[item.id!] ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
@@ -658,7 +658,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
             </table>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6">
             {/* Inline CSS for 3D card flip */}
             <style dangerouslySetInnerHTML={{__html: `
               .flip-card {
@@ -790,8 +790,8 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                         {(item.variants ?? []).map((v, vi) => {
                           const name = v.label || (v.variantType ? v.variantType.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "");
                           return (
-                            <div key={vi} className="bg-white p-2.5 rounded-lg border border-black/5 flex flex-col items-center justify-center text-center shadow-sm hover:border-[#b84a1e]/20 transition-all">
-                              <span className="font-extrabold text-[#b84a1e] text-xl leading-none">{v.variantChar}</span>
+                            <div key={vi} className="bg-white py-2.5 px-1.5 rounded-lg border border-black/5 flex flex-col items-center justify-center text-center shadow-sm hover:border-[#b84a1e]/20 transition-all">
+                              <span className="font-extrabold text-[#b84a1e] text-3xl leading-none">{v.variantChar}</span>
                               <span className="text-[10px] text-gray-500 font-semibold truncate w-full mt-1.5" title={name}>
                                 {name}
                               </span>
