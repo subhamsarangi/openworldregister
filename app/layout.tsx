@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Langtoo | Discover Global Languages & Interactive Scripts",
-  description: "Explore writing systems, vocabulary, and grammar patterns for diverse global languages with an interactive 3D globe and dynamic rainfall marquee.",
+  title: "Langtoo | Learn a Language Too - Discover Global Languages",
+  description: "Langtoo is your interactive platform to explore writing systems, vocabulary, and grammar patterns for diverse global languages with an interactive 3D globe.",
+  keywords: ["langtoo", "learn a language too", "language learning", "open world register", "interactive globe", "writing systems"],
 };
 
 export default function RootLayout({

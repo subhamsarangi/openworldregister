@@ -344,7 +344,20 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
             </div>
           ) : (
             <div className="mt-2 flex flex-col gap-3">
-              <label className="block text-xs font-semibold text-gray-500 mb-1">Paste JSON Text</label>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-xs font-semibold text-gray-500">Paste JSON Text</label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const placeholder = `[\n  {\n    "character": "é",\n    "transliteration": "e",\n    "charType": "vowel",\n    "example": "café",\n    "pronunciationNote": "/ay/"\n  }\n]`;
+                    navigator.clipboard.writeText(placeholder);
+                    alert("Example JSON copied to clipboard!");
+                  }}
+                  className="text-[10px] text-[#b84a1e] hover:underline font-bold bg-transparent border-none cursor-pointer"
+                >
+                  Copy Example JSON
+                </button>
+              </div>
               <textarea
                 rows={6}
                 value={jsonText}

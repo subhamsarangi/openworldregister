@@ -43,14 +43,17 @@ export default function Home() {
         </div>
         
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight" style={{ fontFamily: "'Playfair Display', Georgia, serif", letterSpacing: "-0.02em" }}>
-          <span style={{ color: '#8a0303' }}>L</span>
-          <span style={{ color: '#556b2f' }}>a</span>
-          <span style={{ color: '#4b0082' }}>n</span>
-          <span style={{ color: '#c57e00' }}>g</span>
-          <span style={{ color: '#58111a' }}>t</span>
-          <span style={{ color: '#333333' }}>o</span>
-          <span style={{ color: '#333333' }}>o</span>: <br className="hidden md:block" />
-          <em style={{ color: "#b84a1e", fontStyle: "italic" }}>you can learn a language too.</em>
+          <span className="sr-only">Langtoo: you can learn a language too.</span>
+          <span aria-hidden="true">
+            <span style={{ color: '#8a0303' }}>L</span>
+            <span style={{ color: '#556b2f' }}>a</span>
+            <span style={{ color: '#4b0082' }}>n</span>
+            <span style={{ color: '#c57e00' }}>g</span>
+            <span style={{ color: '#58111a' }}>t</span>
+            <span style={{ color: '#333333' }}>o</span>
+            <span style={{ color: '#333333' }}>o</span>: <br className="hidden md:block" />
+            <em style={{ color: "#b84a1e", fontStyle: "italic" }}>you can learn a language too.</em>
+          </span>
         </h1>
         
         <p className="text-base md:text-lg mb-8 max-w-sm leading-relaxed" style={{ color: "#6b5740" }}>

@@ -1,16 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "../../lib/supabase-browser";
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("error") === "unauthorized") {
+      setError("Unauthorized: You must use the correct admin email to access this portal.");
+      // Clear the URL parameter silently
+      window.history.replaceState({}, "", "/admin/login");
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -222,7 +231,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl font-bold text-sm transition-all relative overflow-hidden"
+              className="w-full py-3.5 rounded-xl font-bold text-sm transition-all relative overflow-hidden cursor-pointer disabled:cursor-not-allowed"
               style={{
                 background: loading
                   ? "rgba(184,74,30,0.4)"
@@ -286,5 +295,13 @@ export default function AdminLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0f0a05] text-white flex items-center justify-center">Loading...</div>}>
+      <AdminLoginForm />
+    </Suspense>
   );
 }

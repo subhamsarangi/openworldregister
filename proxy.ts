@@ -50,6 +50,9 @@ export async function proxy(request: NextRequest) {
     if (!isAuthenticated) {
       const loginUrl = request.nextUrl.clone();
       loginUrl.pathname = "/admin/login";
+      if (user && user.email !== adminEmail) {
+        loginUrl.searchParams.set("error", "unauthorized");
+      }
       return NextResponse.redirect(loginUrl);
     }
   }
