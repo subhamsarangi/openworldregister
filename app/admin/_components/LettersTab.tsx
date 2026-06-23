@@ -599,7 +599,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                           </button>
                         )}
                       </td>
-                      <td className="py-3.5 px-2 font-bold text-lg text-[#b84a1e]">{item.character}</td>
+                      <td className="py-3.5 px-2 font-bold text-2xl text-[#b84a1e]">{item.character}</td>
                       <td className="py-3.5 px-2 font-medium">{item.transliteration}</td>
                       <td className="py-3.5 px-2">
                         <span className="px-2 py-0.5 rounded-full text-[0.68rem] font-bold bg-[#faf6ee] text-[#6b5740] border border-black/5">
@@ -658,7 +658,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
             </table>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
             {/* Inline CSS for 3D card flip */}
             <style dangerouslySetInnerHTML={{__html: `
               .flip-card {
@@ -680,7 +680,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
             {letters.map((item) => (
               <div
                 key={item.id}
-                className="flip-card w-full h-[180px] group text-left relative"
+                className="flip-card w-full h-[210px] group text-left relative"
               >
                 <div
                   className={`flip-card-inner w-full h-full relative transition-transform duration-600 [transform-style:preserve-3d] ${
@@ -692,8 +692,8 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                     {/* Top Row: Character, Roman, Type */}
                     <div className="flex items-end justify-between">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-extrabold text-[#b84a1e] select-all leading-none">{item.character}</span>
-                        <span className="text-sm font-bold text-gray-400">/{item.transliteration}/</span>
+                        <span className="text-4xl sm:text-5xl font-extrabold text-[#b84a1e] select-all leading-none">{item.character}</span>
+                        <span className="text-base font-bold text-gray-400">/{item.transliteration}/</span>
                       </div>
                       <span className="px-1.5 py-0.5 rounded text-[0.6rem] font-bold bg-[#faf6ee] text-[#6b5740] border border-black/5 uppercase tracking-wider whitespace-nowrap">
                         {item.charType === "consonant" ? "cons" : item.charType}
@@ -761,9 +761,9 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                   <div className="flip-card-back absolute inset-0 w-full h-full p-4 rounded-xl shadow-sm border border-[#b84a1e]/20 bg-[#fffdf8] [backface-visibility:hidden] [transform:rotateY(180deg)] flex flex-col justify-between">
                     <div className="flex items-center justify-between border-b border-black/5 pb-2 mb-2 pr-20">
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-sm font-extrabold text-[#b84a1e] select-all leading-none">{item.character}</span>
-                        <span className="text-xs font-bold text-gray-400">/{item.transliteration}/</span>
-                        <span className="text-[10px] text-gray-400 font-medium">({(item.variants ?? []).length})</span>
+                        <span className="text-lg font-extrabold text-[#b84a1e] select-all leading-none">{item.character}</span>
+                        <span className="text-sm font-bold text-gray-400">/{item.transliteration}/</span>
+                        <span className="text-xs text-gray-400 font-medium">({(item.variants ?? []).length})</span>
                       </div>
                     </div>
  
