@@ -1,14 +1,16 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Pencil, Trash2, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { Pencil, Trash2, PanelLeftClose, PanelLeftOpen, Plus, X } from "lucide-react";
 import {
   getLetters,
   saveLetter,
   importLettersBulk,
   deleteLetter,
   DBLetter,
+  DBLetterVariant,
 } from "../../actions/adminActions";
 import { LanguageConfig } from "../../actions/languages";
+import { ImportTemplateModal } from "./ImportTemplateModal";
 
 export interface ContentTabProps {
   languages: LanguageConfig[];
@@ -33,6 +35,8 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
   const [importMode, setImportMode] = useState<"upload" | "paste">("upload");
   const [jsonText, setJsonText] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
+  const [variants, setVariants] = useState<{ variantType: string; variantChar: string; label: string }[]>([]);
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -134,6 +138,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
     setExample("");
     setPronunciationNote("");
     setEditingId(null);
+    setVariants([]);
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -152,6 +157,13 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
         charType,
         example: example || null,
         pronunciationNote: pronunciationNote || null,
+        variants: variants.filter(v => v.variantChar.trim()).map((v, i) => ({
+          letterId: editingId ?? 0,
+          variantType: v.variantType,
+          variantChar: v.variantChar,
+          label: v.label || null,
+          sortOrder: i,
+        })),
       });
       refreshData();
       resetForm();
@@ -167,6 +179,11 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
     setCharType(item.charType);
     setExample(item.example ?? "");
     setPronunciationNote(item.pronunciationNote ?? "");
+    setVariants((item.variants ?? []).map(v => ({
+      variantType: v.variantType,
+      variantChar: v.variantChar,
+      label: v.label ?? "",
+    })));
     setIsFormVisible(true);
   };
 
@@ -191,6 +208,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
   }
 
   return (
+    <>
     <div className="flex flex-col gap-6">
       {/* Language Filter Bar */}
       <div className="bg-[#fffdf8] px-5 py-3.5 rounded-xl border border-black/5 shadow-sm flex items-center gap-4">
@@ -282,12 +300,73 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
             />
           </div>
 
+          {/* Variants Section */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-semibold text-gray-500">Variants</label>
+              <button
+                type="button"
+                onClick={() => setVariants([...variants, { variantType: "", variantChar: "", label: "" }])}
+                className="flex items-center gap-1 text-[10px] text-[#b84a1e] hover:underline font-bold bg-transparent border-none cursor-pointer"
+              >
+                <Plus size={10} /> Add Variant
+              </button>
+            </div>
+            {variants.length === 0 && (
+              <p className="text-[10px] text-gray-400 italic">No variants. Click "Add Variant" for uppercase/lowercase, positional forms, etc.</p>
+            )}
+            {variants.map((v, i) => (
+              <div key={i} className="flex gap-1.5 mb-2 items-center">
+                <input
+                  type="text"
+                  placeholder="Type (e.g. uppercase)"
+                  value={v.variantType}
+                  onChange={e => {
+                    const updated = [...variants];
+                    updated[i].variantType = e.target.value;
+                    setVariants(updated);
+                  }}
+                  className="flex-1 p-1.5 rounded border border-black/10 text-xs outline-none text-[#1a1208]"
+                />
+                <input
+                  type="text"
+                  placeholder="Char"
+                  value={v.variantChar}
+                  onChange={e => {
+                    const updated = [...variants];
+                    updated[i].variantChar = e.target.value;
+                    setVariants(updated);
+                  }}
+                  className="w-14 p-1.5 rounded border border-black/10 text-xs outline-none text-[#1a1208] text-center font-bold"
+                />
+                <input
+                  type="text"
+                  placeholder="Label"
+                  value={v.label}
+                  onChange={e => {
+                    const updated = [...variants];
+                    updated[i].label = e.target.value;
+                    setVariants(updated);
+                  }}
+                  className="flex-1 p-1.5 rounded border border-black/10 text-xs outline-none text-[#1a1208]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setVariants(variants.filter((_, j) => j !== i))}
+                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+
           <div className="flex gap-2 mt-2">
-            <button type="submit" className="flex-1 py-2.5 bg-[#b84a1e] text-white text-sm rounded font-bold hover:opacity-90 transition-all">
+            <button type="submit" className="flex-1 py-2.5 bg-[#b84a1e] text-white text-sm rounded font-bold hover:opacity-90 transition-all cursor-pointer">
               {editingId ? "Save Changes" : "Add Letter"}
             </button>
             {editingId && (
-              <button type="button" onClick={resetForm} className="px-4 py-2.5 bg-black/5 hover:bg-black/10 text-sm rounded font-semibold transition-all">
+              <button type="button" onClick={resetForm} className="px-4 py-2.5 bg-black/5 hover:bg-black/10 text-sm rounded font-semibold transition-all cursor-pointer">
                 Cancel
               </button>
             )}
@@ -348,21 +427,17 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                 <label className="block text-xs font-semibold text-gray-500">Paste JSON Text</label>
                 <button
                   type="button"
-                  onClick={() => {
-                    const placeholder = `[\n  {\n    "character": "é",\n    "transliteration": "e",\n    "charType": "vowel",\n    "example": "café",\n    "pronunciationNote": "/ay/"\n  }\n]`;
-                    navigator.clipboard.writeText(placeholder);
-                    alert("Example JSON copied to clipboard!");
-                  }}
-                  className="text-[10px] text-[#b84a1e] hover:underline font-bold bg-transparent border-none cursor-pointer"
+                  onClick={() => setIsTemplateModalOpen(true)}
+                  className="text-[10px] text-[#b84a1e] hover:underline font-bold bg-transparent border-none cursor-pointer flex items-center gap-1"
                 >
-                  Copy Example JSON
+                  📋 Choose Template
                 </button>
               </div>
               <textarea
-                rows={6}
+                rows={8}
                 value={jsonText}
                 onChange={(e) => setJsonText(e.target.value)}
-                placeholder={`[\n  {\n    "character": "é",\n    "transliteration": "e",\n    "charType": "vowel",\n    "example": "café",\n    "pronunciationNote": "/ay/"\n  }\n]`}
+                placeholder={'Pick a template using "Choose Template" above, or paste your own JSON here.'}
                 disabled={importing}
                 className="w-full p-2 border border-black/10 rounded text-xs font-mono outline-none bg-white resize-y leading-relaxed"
               />
@@ -433,6 +508,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                   <th className="py-3 px-2">Letter</th>
                   <th className="py-3 px-2">Roman</th>
                   <th className="py-3 px-2">Type</th>
+                  <th className="py-3 px-2">Variants</th>
                   <th className="py-3 px-2">Example</th>
                   <th className="py-3 px-2">Pronounce</th>
                   <th className="py-3 px-2 text-right">Actions</th>
@@ -447,6 +523,20 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                       <span className="px-2 py-0.5 rounded-full text-[0.68rem] font-bold bg-[#faf6ee] text-[#6b5740] border border-black/5">
                         {item.charType}
                       </span>
+                    </td>
+                    <td className="py-3.5 px-2">
+                      <div className="flex flex-wrap gap-1">
+                        {(item.variants ?? []).length === 0 ? (
+                          <span className="text-[10px] text-gray-300">—</span>
+                        ) : (
+                          (item.variants ?? []).map((v, vi) => (
+                            <span key={vi} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[0.6rem] font-bold bg-[#b84a1e]/8 text-[#b84a1e] border border-[#b84a1e]/15" title={v.label ?? v.variantType}>
+                              <span className="font-extrabold">{v.variantChar}</span>
+                              <span className="text-[8px] text-gray-500 ml-0.5">{v.variantType}</span>
+                            </span>
+                          ))
+                        )}
+                      </div>
                     </td>
                     <td className="py-3.5 px-2 text-gray-600">{item.example}</td>
                     <td className="py-3.5 px-2 text-gray-400 italic">{item.pronunciationNote || "-"}</td>
@@ -476,6 +566,17 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                     {item.charType === "consonant" ? "cons" : item.charType}
                   </span>
                 </div>
+
+                {/* Variants Badges */}
+                {(item.variants ?? []).length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {(item.variants ?? []).map((v, vi) => (
+                      <span key={vi} className="inline-flex items-center gap-0.5 px-1 py-0.5 rounded text-[9px] font-bold bg-[#b84a1e]/8 text-[#b84a1e] border border-[#b84a1e]/15" title={v.label ?? v.variantType}>
+                        {v.variantChar}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 {/* Bottom Section: Details */}
                 <div className="bg-black/5 rounded p-2 mt-auto flex flex-col gap-1 min-h-[3.5rem] justify-center">
@@ -511,5 +612,12 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
       </div>
     </div>
     </div>
+
+    <ImportTemplateModal
+      isOpen={isTemplateModalOpen}
+      onClose={() => setIsTemplateModalOpen(false)}
+      onSelect={(json) => setJsonText(json)}
+    />
+    </>
   );
 }
