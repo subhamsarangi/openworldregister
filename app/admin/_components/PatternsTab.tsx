@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Copy, Check } from "lucide-react";
 import { getPatterns, savePattern, deletePattern, DBPattern } from "../../actions/adminActions";
 import { LanguageConfig } from "../../actions/languages";
@@ -28,6 +29,12 @@ export function PatternsTab({ languages, selectedLanguageId, setSelectedLanguage
   const [formMode, setFormMode] = useState<"manual" | "json">("manual");
   const [jsonText, setJsonText] = useState("");
   const [copied, setCopied] = useState(false);
+
+  const resetForm = () => {
+    setTemplate(""); setTags(""); setPatternType(""); setExampleNativeText(""); setExampleTranslation("");
+    setSlotValuesJson(JSON.stringify([{ slotValue: "French", transliteration: "français", translation: "French" }], null, 2));
+    setEditingId(null);
+  };
 
   const jsonTemplateStr = `{
   "template": "¿Estás ___?",
@@ -92,13 +99,12 @@ export function PatternsTab({ languages, selectedLanguageId, setSelectedLanguage
     }
   };
 
-  useEffect(() => { refreshData(); resetForm(); }, [selectedLanguageId]);
-
-  const resetForm = () => {
-    setTemplate(""); setTags(""); setPatternType(""); setExampleNativeText(""); setExampleTranslation("");
-    setSlotValuesJson(JSON.stringify([{ slotValue: "French", transliteration: "français", translation: "French" }], null, 2));
-    setEditingId(null);
-  };
+  useEffect(() => {
+    refreshData();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    resetForm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLanguageId]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,12 +155,20 @@ export function PatternsTab({ languages, selectedLanguageId, setSelectedLanguage
   return (
     <div className="flex flex-col gap-6">
       {/* Language Filter Bar */}
-      <div className="bg-[#fffdf8] px-5 py-3.5 rounded-xl border border-black/5 shadow-sm flex items-center gap-4">
+      <div className="bg-[#fffdf8] px-5 py-3.5 rounded-xl border border-black/5 shadow-sm flex items-center gap-4 flex-wrap sm:flex-nowrap">
         <span className="text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">Working on</span>
         <select value={selectedLanguageId} onChange={e => setSelectedLanguageId(Number(e.target.value))} className="flex-1 max-w-xs p-2 rounded border border-black/10 bg-white text-sm font-semibold outline-none text-[#1a1208] cursor-pointer">
           {languages.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
         </select>
         {selectedLang && <span className="text-xs text-gray-500">{selectedLang.nativeName} · {selectedLang.iso6393?.toUpperCase()}</span>}
+        <div className="sm:ml-auto">
+          <Link
+            href="/admin/category-grouper"
+            className="text-xs px-3 py-1.5 rounded-lg bg-[#b84a1e]/8 hover:bg-[#b84a1e]/15 text-[#b84a1e] font-bold transition-all shadow-xs inline-flex items-center gap-1.5"
+          >
+            📋 Category Grouper Tool
+          </Link>
+        </div>
       </div>
 
       <FormPanel
@@ -192,7 +206,7 @@ export function PatternsTab({ languages, selectedLanguageId, setSelectedLanguage
                     <div className="text-xs border-t border-black/5 pt-2.5 mt-2">
                       <span className="font-semibold text-gray-500 block mb-1">Slot Variations:</span>
                       <div className="flex flex-wrap gap-1.5 text-gray-600 bg-black/2 p-2 rounded">
-                        {item.slotValues.slice(0, 4).map((sv: any, svIdx: number) => (
+                        {item.slotValues.slice(0, 4).map((sv: { slotValue: string; transliteration?: string; translation?: string }, svIdx: number) => (
                           <span key={svIdx} className="bg-white px-2 py-0.5 rounded border border-black/5">
                             {sv.slotValue} {sv.transliteration ? `(${sv.transliteration})` : ""} {sv.translation ? `→ ${sv.translation}` : ""}
                           </span>
