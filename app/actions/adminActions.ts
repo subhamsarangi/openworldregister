@@ -86,7 +86,30 @@ export async function getLetters(languageId: number): Promise<DBLetter[]> {
       .eq("language_id", languageId)
       .order("sort_order", { ascending: true, nullsFirst: false });
 
-    if (error) throw error;
+    if (error) {
+      console.warn("Error fetching letters with variants, trying fallback query:", error);
+      
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from("alphabet_entries")
+        .select("*")
+        .eq("language_id", languageId)
+        .order("sort_order", { ascending: true, nullsFirst: false });
+
+      if (fallbackError) throw fallbackError;
+
+      return (fallbackData ?? []).map((row: any) => ({
+        id: row.id,
+        languageId: row.language_id,
+        character: row.character,
+        transliteration: row.transliteration ?? "",
+        charType: row.char_type ?? "",
+        example: row.example ?? null,
+        pronunciationNote: row.pronunciation_note ?? null,
+        audioUrl: row.audio_url ?? null,
+        sortOrder: row.sort_order ?? null,
+        variants: [],
+      }));
+    }
     return (data ?? []).map(mapLetterRow);
   } catch (err) {
     console.error("Error fetching letters:", err);
@@ -163,108 +186,15 @@ export async function saveLetter(data: DBLetter) {
 
 export async function importLettersBulk(languageId: number, letters: any[]) {
   try {
-    // 1. Fetch existing letters for this language
-    const { data: existing, error: fetchError } = await supabase
-      .from("alphabet_entries")
-      .select("id, character, transliteration, char_type, example, pronunciation_note, audio_url, sort_order")
-      .eq("language_id", languageId);
-
-    if (fetchError) throw fetchError;
-
-    // 2. Build a lookup map of character -> existing record
-    const existingMap = new Map<string, any>();
-    if (existing) {
-      for (const row of existing) {
-        existingMap.set(row.character, row);
-      }
-    }
-
-    // 3. Partition into inserts and updates, track variants
-    const inserts: any[] = [];
-    const updates: any[] = [];
-    const variantsByChar: Map<string, any[]> = new Map();
-
-    for (const item of letters) {
-      const existingRow = existingMap.get(item.character);
-      const rowData = {
-        language_id: languageId,
-        character: item.character,
-        transliteration: item.transliteration || existingRow?.transliteration || "",
-        char_type: item.charType || existingRow?.char_type || "consonant",
-        example: item.example !== undefined ? item.example : (existingRow?.example || null),
-        pronunciation_note: item.pronunciationNote !== undefined ? item.pronunciationNote : (existingRow?.pronunciation_note || null),
-        audio_url: existingRow ? existingRow.audio_url : null,
-        sort_order: existingRow ? existingRow.sort_order : null
-      };
-
-      // Track variants for this character
-      if (item.variants && Array.isArray(item.variants) && item.variants.length > 0) {
-        variantsByChar.set(item.character, item.variants);
-      }
-
-      if (existingRow) {
-        updates.push({
-          id: existingRow.id,
-          ...rowData
-        });
-      } else {
-        inserts.push(rowData);
-      }
-    }
-
-    // 4. Perform database operations for letters
-    if (inserts.length > 0) {
-      const { error: insertError } = await supabase
-        .from("alphabet_entries")
-        .insert(inserts);
-      if (insertError) throw insertError;
-    }
-
-    if (updates.length > 0) {
-      const { error: updateError } = await supabase
-        .from("alphabet_entries")
-        .upsert(updates);
-      if (updateError) throw updateError;
-    }
-
-    // 5. Handle variants — re-fetch all letters to get IDs (including newly inserted ones)
-    if (variantsByChar.size > 0) {
-      const { data: allLetters, error: refetchErr } = await supabase
-        .from("alphabet_entries")
-        .select("id, character")
-        .eq("language_id", languageId);
-
-      if (refetchErr) throw refetchErr;
-
-      const charToId = new Map<string, number>();
-      for (const row of allLetters ?? []) {
-        charToId.set(row.character, row.id);
-      }
-
-      for (const [char, variants] of variantsByChar) {
-        const letterId = charToId.get(char);
-        if (!letterId) continue;
-
-        // Delete existing variants for this letter
-        await supabase
-          .from("letter_variants")
-          .delete()
-          .eq("letter_id", letterId);
-
-        // Insert new variants
-        const variantRows = variants.map((v: any, i: number) => ({
-          letter_id: letterId,
-          variant_type: v.variantType,
-          variant_char: v.variantChar,
-          label: v.label ?? null,
-          sort_order: v.sortOrder ?? i,
-        }));
-
-        const { error: varErr } = await supabase
-          .from("letter_variants")
-          .insert(variantRows);
-        if (varErr) throw varErr;
-      }
+    const { data, error } = await supabase.rpc("import_letters_bulk_rpc", {
+      p_language_id: languageId,
+      p_letters: letters
+    });
+    
+    if (error) throw error;
+    
+    if (data && data.success === false) {
+      throw new Error(data.error || "Failed to import letters");
     }
 
     return { success: true };
@@ -285,6 +215,20 @@ export async function deleteLetter(id: number) {
   } catch (err) {
     console.error("Error deleting letter:", err);
     throw new Error("Failed to delete letter");
+  }
+}
+
+export async function deleteAllLetters(languageId: number) {
+  try {
+    const { error } = await supabase
+      .from("alphabet_entries")
+      .delete()
+      .eq("language_id", languageId);
+    if (error) throw error;
+    return { success: true };
+  } catch (err) {
+    console.error("Error deleting all letters:", err);
+    return { success: false, error: String(err) };
   }
 }
 

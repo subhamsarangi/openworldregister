@@ -17,11 +17,11 @@ const TEMPLATES: ImportTemplate[] = [
     hint: "Truly caseless scripts with single-form characters. No uppercase/lowercase, no positional forms, no conjuncts.",
     json: JSON.stringify([
       {
-        character: "ก",
-        transliteration: "k",
+        character: "ภ",
+        transliteration: "ph",
         charType: "consonant",
-        example: "กา (crow)",
-        pronunciationNote: "like 'g' in 'go'"
+        example: "ภาษา (language)",
+        pronunciationNote: "aspirated 'p' sound"
       }
     ], null, 2),
   },
@@ -32,14 +32,16 @@ const TEMPLATES: ImportTemplate[] = [
     hint: "Latin-script languages where each letter has an uppercase and lowercase form.",
     json: JSON.stringify([
       {
-        character: "É",
-        transliteration: "e",
+        character: "I",
+        transliteration: "i",
         charType: "vowel",
-        example: "café",
-        pronunciationNote: "/ay/",
+        example: "idioma (language)",
+        pronunciationNote: "like 'ee' in 'meet'",
         variants: [
-          { variantType: "uppercase", variantChar: "É", label: "Uppercase" },
-          { variantType: "lowercase", variantChar: "é", label: "Lowercase" }
+          { variantType: "uppercase", variantChar: "I", label: "Uppercase" },
+          { variantType: "lowercase", variantChar: "i", label: "Lowercase" },
+          { variantType: "accented_uppercase", variantChar: "Í", label: "Accented Uppercase" },
+          { variantType: "accented_lowercase", variantChar: "í", label: "Accented Lowercase" }
         ]
       }
     ], null, 2),
@@ -51,14 +53,14 @@ const TEMPLATES: ImportTemplate[] = [
     hint: "Cyrillic-script languages with uppercase and lowercase letter forms.",
     json: JSON.stringify([
       {
-        character: "Б",
-        transliteration: "b",
-        charType: "consonant",
-        example: "Брат (brother)",
-        pronunciationNote: "like 'b' in 'box'",
+        character: "Я",
+        transliteration: "ya",
+        charType: "vowel",
+        example: "язык (language)",
+        pronunciationNote: "like 'ya' in 'yard'",
         variants: [
-          { variantType: "uppercase", variantChar: "Б", label: "Uppercase" },
-          { variantType: "lowercase", variantChar: "б", label: "Lowercase" }
+          { variantType: "uppercase", variantChar: "Я", label: "Uppercase" },
+          { variantType: "lowercase", variantChar: "я", label: "Lowercase" }
         ]
       }
     ], null, 2),
@@ -70,16 +72,16 @@ const TEMPLATES: ImportTemplate[] = [
     hint: "Right-to-left scripts where each letter changes shape based on its position in a word.",
     json: JSON.stringify([
       {
-        character: "ع",
-        transliteration: "ayn",
+        character: "ل",
+        transliteration: "l",
         charType: "consonant",
-        example: "عَرَبِيّ",
-        pronunciationNote: "deep throat sound",
+        example: "لُغَة (language)",
+        pronunciationNote: "like 'l' in 'lemon'",
         variants: [
-          { variantType: "isolated", variantChar: "ع", label: "Isolated" },
-          { variantType: "initial", variantChar: "عـ", label: "Initial" },
-          { variantType: "medial", variantChar: "ـعـ", label: "Medial" },
-          { variantType: "final", variantChar: "ـع", label: "Final" }
+          { variantType: "isolated", variantChar: "ل", label: "Isolated" },
+          { variantType: "initial", variantChar: "لـ", label: "Initial" },
+          { variantType: "medial", variantChar: "ـلـ", label: "Medial" },
+          { variantType: "final", variantChar: "ـل", label: "Final" }
         ]
       }
     ], null, 2),
@@ -91,14 +93,14 @@ const TEMPLATES: ImportTemplate[] = [
     hint: "Maps each sound to both Hiragana and Katakana forms.",
     json: JSON.stringify([
       {
-        character: "あ",
-        transliteration: "a",
-        charType: "vowel",
-        example: "あめ (rain)",
-        pronunciationNote: "like 'a' in 'father'",
+        character: "げ",
+        transliteration: "ge",
+        charType: "consonant",
+        example: "げんご (language)",
+        pronunciationNote: "like 'ge' in 'get'",
         variants: [
-          { variantType: "hiragana", variantChar: "あ", label: "Hiragana" },
-          { variantType: "katakana", variantChar: "ア", label: "Katakana" }
+          { variantType: "hiragana", variantChar: "げ", label: "Hiragana" },
+          { variantType: "katakana", variantChar: "ゲ", label: "Katakana" }
         ]
       }
     ], null, 2),
@@ -110,15 +112,15 @@ const TEMPLATES: ImportTemplate[] = [
     hint: "Devanagari or other Indic scripts with combined/conjunct characters (juktakkhor, sanyuktakshar).",
     json: JSON.stringify([
       {
-        character: "क",
-        transliteration: "ka",
+        character: "भ",
+        transliteration: "bha",
         charType: "consonant",
-        example: "कमल (lotus)",
-        pronunciationNote: "like 'k' in 'kite'",
+        example: "भाषा (language)",
+        pronunciationNote: "aspirated 'b' sound",
         variants: [
-          { variantType: "base", variantChar: "क", label: "Base Form" },
-          { variantType: "conjunct", variantChar: "क्ष", label: "क + ष → क्ष (ksha)" },
-          { variantType: "conjunct", variantChar: "क्र", label: "क + र → क्र (kra)" }
+          { variantType: "base", variantChar: "भ", label: "Base Form" },
+          { variantType: "conjunct", variantChar: "भ्य", label: "भ + य → भ्य (bhya)" },
+          { variantType: "conjunct", variantChar: "भ्र", label: "भ + र → भ्र (bhra)" }
         ]
       }
     ], null, 2),
@@ -133,7 +135,7 @@ const TEMPLATES: ImportTemplate[] = [
         character: "ㄱ",
         transliteration: "g/k",
         charType: "consonant",
-        example: "가방 (bag)",
+        example: "국어 (language)",
         pronunciationNote: "like 'g' in 'go'",
         variants: [
           { variantType: "initial", variantChar: "ㄱ", label: "Initial Jamo" },
@@ -161,6 +163,42 @@ const TEMPLATE_ICONS: Record<string, string> = {
   korean: "한",
 };
 
+const copyToClipboard = (text: string): boolean => {
+  const fallback = (txt: string) => {
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = txt;
+      textArea.style.position = "fixed";
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      const successful = document.execCommand("copy");
+      document.body.removeChild(textArea);
+      return successful;
+    } catch (err) {
+      console.error("Fallback copy failed:", err);
+      return false;
+    }
+  };
+
+  if (typeof navigator !== "undefined" && navigator.clipboard) {
+    try {
+      navigator.clipboard.writeText(text).catch((err) => {
+        console.warn("Clipboard API failed, using fallback:", err);
+        fallback(text);
+      });
+      return true;
+    } catch (err) {
+      return fallback(text);
+    }
+  } else {
+    return fallback(text);
+  }
+};
+
 export function ImportTemplateModal({ isOpen, onClose, onSelect }: ImportTemplateModalProps) {
   if (!isOpen) return null;
 
@@ -174,7 +212,7 @@ export function ImportTemplateModal({ isOpen, onClose, onSelect }: ImportTemplat
 
       {/* Modal */}
       <div
-        className="relative w-11/12 max-w-3xl rounded-2xl p-6 md:p-8 shadow-2xl max-h-[85vh] overflow-y-auto"
+        className="relative w-full h-full rounded-none p-6 md:p-10 shadow-2xl overflow-y-auto"
         style={{
           backgroundColor: "#fffdf8",
           border: "1px solid rgba(184, 74, 30, 0.2)",
@@ -197,21 +235,16 @@ export function ImportTemplateModal({ isOpen, onClose, onSelect }: ImportTemplat
             Choose Import Template
           </h2>
           <p className="text-xs text-gray-500">
-            Pick the JSON structure that matches your language's writing system. The template will be pasted into the editor for you to fill with real data.
+            Pick the JSON structure that matches your language's writing system. The template will be copied to your clipboard for you to paste and fill with real data.
           </p>
         </div>
 
         {/* Template Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {TEMPLATES.map((t) => (
-            <button
+            <div
               key={t.id}
-              type="button"
-              onClick={() => {
-                onSelect(t.json);
-                onClose();
-              }}
-              className="group text-left p-4 rounded-xl border transition-all hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
+              className="group text-left p-5 rounded-xl border transition-all hover:-translate-y-0.5 hover:shadow-md flex flex-col min-h-[420px]"
               style={{
                 backgroundColor: "white",
                 border: "1px solid rgba(107, 87, 64, 0.1)",
@@ -249,18 +282,33 @@ export function ImportTemplateModal({ isOpen, onClose, onSelect }: ImportTemplat
 
               {/* JSON preview */}
               <pre
-                className="mt-3 p-2 rounded-lg text-[9px] leading-tight overflow-hidden max-h-16"
+                className="mt-3 p-3 rounded-lg text-[10px] leading-relaxed overflow-y-auto h-[220px]"
                 style={{
                   backgroundColor: "#faf6ee",
                   color: "#6b5740",
                   fontFamily: "'Geist Mono', monospace",
                   border: "1px solid rgba(107, 87, 64, 0.06)",
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "rgba(184, 74, 30, 0.3) transparent",
                 }}
               >
-                {t.json.slice(0, 180)}
-                {t.json.length > 180 ? "\n  ..." : ""}
+                {t.json}
               </pre>
-            </button>
+
+              {/* Copy Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  copyToClipboard(t.json);
+                  alert("Template JSON copied to clipboard!");
+                  onSelect(t.json);
+                  onClose();
+                }}
+                className="mt-auto w-full py-2 px-4 rounded-lg text-center text-xs font-semibold transition-colors bg-[#f5efe3] hover:bg-[#b84a1e] text-[#b84a1e] hover:text-white cursor-pointer"
+              >
+                Copy Template
+              </button>
+            </div>
           ))}
         </div>
       </div>
