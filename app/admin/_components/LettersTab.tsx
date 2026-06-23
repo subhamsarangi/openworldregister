@@ -785,18 +785,20 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                       </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto flex flex-col gap-1.5 pr-0.5 scrollbar-thin">
-                      {(item.variants ?? []).map((v, vi) => {
-                        const name = v.label || (v.variantType ? v.variantType.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "");
-                        return (
-                          <div key={vi} className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded border border-black/5 text-xs shadow-sm">
-                            <span className="font-extrabold text-[#b84a1e] text-lg leading-none">{v.variantChar}</span>
-                            <span className="text-[10px] text-gray-600 font-medium truncate max-w-[130px]" title={name}>
-                              {name}
-                            </span>
-                          </div>
-                        );
-                      })}
+                    <div className="flex-1 overflow-y-auto pr-0.5 scrollbar-thin">
+                      <div className="grid grid-cols-2 gap-2">
+                        {(item.variants ?? []).map((v, vi) => {
+                          const name = v.label || (v.variantType ? v.variantType.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "");
+                          return (
+                            <div key={vi} className="bg-white p-2.5 rounded-lg border border-black/5 flex flex-col items-center justify-center text-center shadow-sm hover:border-[#b84a1e]/20 transition-all">
+                              <span className="font-extrabold text-[#b84a1e] text-xl leading-none">{v.variantChar}</span>
+                              <span className="text-[10px] text-gray-500 font-semibold truncate w-full mt-1.5" title={name}>
+                                {name}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
 
