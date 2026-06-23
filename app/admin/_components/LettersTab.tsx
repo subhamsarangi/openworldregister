@@ -638,7 +638,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 mt-2">
                               {item.variants?.map((v, vi) => (
                                 <div key={vi} className="bg-white p-3 rounded-xl border border-black/5 shadow-sm flex items-center gap-3">
-                                  <span className="text-lg font-extrabold text-[#b84a1e] bg-[#f5efe3] w-10 h-10 rounded-lg flex items-center justify-center">
+                                  <span className="text-xl font-extrabold text-[#b84a1e] bg-[#f5efe3] w-10 h-10 rounded-lg flex items-center justify-center">
                                     {v.variantChar}
                                   </span>
                                   <div className="flex flex-col">
@@ -692,7 +692,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                     {/* Top Row: Character, Roman, Type */}
                     <div className="flex items-end justify-between">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-extrabold text-[#b84a1e] select-all leading-none">{item.character}</span>
+                        <span className="text-3xl font-extrabold text-[#b84a1e] select-all leading-none">{item.character}</span>
                         <span className="text-sm font-bold text-gray-400">/{item.transliteration}/</span>
                       </div>
                       <span className="px-1.5 py-0.5 rounded text-[0.6rem] font-bold bg-[#faf6ee] text-[#6b5740] border border-black/5 uppercase tracking-wider whitespace-nowrap">
@@ -790,7 +790,7 @@ export function LettersTab({ languages, selectedLanguageId, setSelectedLanguageI
                         const name = v.label || (v.variantType ? v.variantType.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "");
                         return (
                           <div key={vi} className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded border border-black/5 text-xs shadow-sm">
-                            <span className="font-extrabold text-[#b84a1e] text-sm">{v.variantChar}</span>
+                            <span className="font-extrabold text-[#b84a1e] text-lg leading-none">{v.variantChar}</span>
                             <span className="text-[10px] text-gray-600 font-medium truncate max-w-[130px]" title={name}>
                               {name}
                             </span>
